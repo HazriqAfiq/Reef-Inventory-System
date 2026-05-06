@@ -1,0 +1,182 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ═══════════════════════════════════════════════
+   BASE TYPOGRAPHY
+═══════════════════════════════════════════════ */
+@layer base {
+    html {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+    }
+
+    body {
+        font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+        font-size: 0.9375rem; /* 15px */
+        line-height: 1.6;
+        color: theme('colors.gray.900');
+        font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    }
+
+    /* Heading defaults */
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+        line-height: 1.3;
+        letter-spacing: -0.015em;
+        color: theme('colors.gray.900');
+    }
+
+    /* Paragraph & list defaults */
+    p    { line-height: 1.6; }
+    small { font-size: 0.8125rem; } /* 13px */
+
+    /* Form elements inherit body font */
+    input, select, textarea, button {
+        font-family: inherit;
+    }
+}
+
+/* ═══════════════════════════════════════════════
+   TYPOGRAPHY SCALE — COMPONENTS
+═══════════════════════════════════════════════ */
+@layer components {
+
+    /* ── Page Titles (24–28px) ───────────────── */
+    .type-page-title {
+        @apply text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight leading-snug;
+    }
+
+    /* ── Section Titles (18–20px) ────────────── */
+    .type-section-title {
+        @apply text-lg sm:text-xl font-bold text-gray-900 tracking-tight leading-snug;
+    }
+
+    /* ── Card Titles (15–17px) ───────────────── */
+    .type-card-title {
+        @apply text-[15px] sm:text-[17px] font-bold text-gray-900 leading-snug;
+    }
+
+    /* ── Card Subtitles ──────────────────────── */
+    .type-card-subtitle {
+        @apply text-xs font-semibold text-gray-500 uppercase tracking-wider;
+    }
+
+    /* ── Body Text (14–15px) ─────────────────── */
+    .type-body {
+        @apply text-sm sm:text-[15px] text-gray-700 leading-relaxed;
+    }
+
+    /* ── Secondary / Muted Body ──────────────── */
+    .type-body-sm {
+        @apply text-[13px] text-gray-500 leading-relaxed;
+    }
+
+    /* ── Labels & Captions (12–13px) ─────────── */
+    .type-label {
+        @apply text-xs font-bold text-gray-400 uppercase tracking-wider;
+    }
+    .type-caption {
+        @apply text-[12px] font-medium text-gray-400 leading-snug;
+    }
+
+    /* ── KPI / Metric Values (24–32px) ──────── */
+    .type-metric {
+        @apply text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight leading-none;
+    }
+    .type-metric-sm {
+        @apply text-xl font-bold text-gray-900 tracking-tight leading-none;
+    }
+    .type-metric-label {
+        @apply text-xs font-semibold text-gray-400 uppercase tracking-wider;
+    }
+
+    /* ── Table Headers (11px) ────────────────── */
+    .type-table-header {
+        @apply text-xs font-bold text-gray-400 uppercase tracking-wider;
+    }
+
+    /* ── Table Cells (13–14px) ───────────────── */
+    .type-table-cell {
+        @apply text-[13px] font-semibold text-gray-800 leading-snug;
+    }
+    .type-table-cell-sm {
+        @apply text-[11px] font-semibold text-gray-400 leading-snug;
+    }
+
+    /* ── Chart / Graph Text ──────────────────── */
+    .type-chart-title {
+        @apply text-[14px] sm:text-[15px] font-bold text-gray-900 tracking-tight;
+    }
+    .type-chart-label {
+        @apply text-xs font-semibold text-gray-500 uppercase tracking-wider;
+    }
+
+    /* ── Badge / Status Text ─────────────────── */
+    .type-badge {
+        @apply text-[11px] font-bold uppercase tracking-wider leading-none;
+    }
+
+    /* ── Navigation Labels ───────────────────── */
+    .type-nav-section {
+        @apply text-xs font-bold text-gray-400 uppercase tracking-widest;
+    }
+    .type-nav-link {
+        @apply text-[13px] font-bold;
+    }
+
+    /* ══ Sidebar links ═══════════════════════ */
+    .sidebar-link {
+        @apply flex items-center gap-3.5 px-4 py-3 rounded-xl
+               text-sm font-bold text-gray-400
+               hover:bg-gray-50 hover:text-black
+               transition-all duration-300;
+    }
+    .sidebar-link.active {
+        @apply bg-black text-white shadow-lg shadow-black/20 font-bold;
+    }
+    .sidebar-link svg {
+        @apply w-4 h-4 shrink-0 text-gray-400 transition-colors duration-300;
+    }
+    .sidebar-link:hover svg {
+        @apply text-black;
+    }
+    .sidebar-link.active svg {
+        @apply text-white;
+    }
+
+    /* ══ Responsive table wrapper ════════════ */
+    .table-responsive {
+        @apply w-full overflow-x-auto;
+    }
+
+    /* ══ Touch-friendly tap targets ══════════ */
+    .btn-touch {
+        @apply min-h-[44px] min-w-[44px];
+    }
+}
+
+/* ═══════════════════════════════════════════════
+   UTILITIES
+═══════════════════════════════════════════════ */
+@layer utilities {
+    /* Hide scrollbar, preserve scrollability */
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Numeric tabular figures for metrics */
+    .tabular-nums {
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* Tight tracking for large display numbers */
+    .tracking-display {
+        letter-spacing: -0.03em;
+    }
+}
