@@ -41,5 +41,8 @@ class DatabaseSeeder extends Seeder
 
         // ── 4. Resellers + realistic 6-month sales history ──────────────────
         $this->call(SalesSeeder::class);
+
+        // ── 5. Storefront Settings ─────────────────────────────────────────
+        $this->call(StorefrontSettingsSeeder::class);
     }
 }

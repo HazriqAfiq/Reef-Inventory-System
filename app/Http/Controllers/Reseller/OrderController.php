@@ -20,45 +20,50 @@ class OrderController extends Controller
 
     public function create()
     {
-        $products = Product::active()->with('variants')->get();
+        $products = Product::active()->get();
         return view('reseller.orders.create', compact('products'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'variant_id' => 'required|array',
+            'product_id' => 'required|array',
             'quantity' => 'required|array',
         ]);
 
-        $variantIds = $request->input('variant_id');
+        $productIds = $request->input('product_id');
         $quantities = $request->input('quantity');
 
         $totalPrice = 0;
         $orderItems = [];
+        $totalQuantity = 0;
 
-        foreach ($variantIds as $i => $vId) {
-            $qty = $quantities[$i] ?? 0;
+        foreach ($productIds as $i => $pId) {
+            $qty = (int) ($quantities[$i] ?? 0);
             if ($qty > 0) {
-                $variant = \App\Models\ProductVariant::with('product')->findOrFail($vId);
-                if ($variant->stock < $qty) {
-                    return back()->withErrors(['quantity' => "Not enough stock for {$variant->product->name} ({$variant->name})."]);
+                $product = \App\Models\Product::findOrFail($pId);
+                if ($product->stock < $qty) {
+                    return back()->withErrors(['quantity' => "Not enough stock for {$product->name}."]);
                 }
                 
-                $price = $variant->wholesale_price * $qty;
+                $price = $product->wholesale_price * $qty;
                 $totalPrice += $price;
+                $totalQuantity += $qty;
 
                 $orderItems[] = [
-                    'product_id' => $variant->product_id,
-                    'product_variant_id' => $variant->id,
+                    'product_id' => $product->id,
                     'quantity' => $qty,
-                    'price' => $variant->wholesale_price,
+                    'price' => $product->wholesale_price,
                 ];
             }
         }
 
         if (empty($orderItems)) {
             return back()->withErrors(['quantity' => 'Please select at least one item.']);
+        }
+
+        if ($totalQuantity < 15) {
+            return back()->withErrors(['quantity' => 'Minimum Order Quantity (MOQ) for Resellers is 15 items total.']);
         }
 
         $order = auth()->user()->orders()->create([
@@ -94,19 +99,12 @@ class OrderController extends Controller
         $order->update(['status' => 'paid']);
 
         foreach ($order->items as $item) {
-            // Decrement Variant Stock
-            if ($item->product_variant_id) {
-                $variant = \App\Models\ProductVariant::find($item->product_variant_id);
-                $variant->decrement('stock', $item->quantity);
-            } else {
-                $item->product->decrement('stock', $item->quantity);
-            }
+            $item->product->decrement('stock', $item->quantity);
 
-            // Update Reseller Stock (with variant_id)
+            // Update Reseller Stock
             $stock = ResellerStock::firstOrCreate([
                 'user_id' => $order->user_id,
                 'product_id' => $item->product_id,
-                'product_variant_id' => $item->product_variant_id,
             ]);
             $stock->increment('quantity', $item->quantity);
         }

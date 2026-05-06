@@ -25,7 +25,7 @@
                             <div class="w-7 h-7 rounded bg-gray-900 text-white flex items-center justify-center text-[9px] font-bold shrink-0">
                                 {{ $sale->user ? strtoupper(substr($sale->user->name, 0, 2)) : 'ST' }}
                             </div>
-                            <span class="text-xs font-bold text-gray-900 truncate">{{ $sale->user->name ?? 'Storefront' }}</span>
+                            <span class="text-xs font-bold text-gray-900 truncate">{{ $sale->user->name ?? 'Walk-in / POS' }}</span>
                         </div>
                     </td>
 

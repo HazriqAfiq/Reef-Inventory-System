@@ -2,21 +2,7 @@
     <div class="h-screen flex overflow-hidden bg-white">
         <!-- Left Side: Form -->
         <div class="w-full lg:w-[45%] flex flex-col items-center justify-center p-8 sm:p-12 lg:p-20 relative bg-white">
-            <!-- Back Link -->
-            <div class="absolute top-12 left-12 hidden md:block">
-                @php
-                    $prev = url()->previous();
-                    $isAuth = str_contains($prev, 'login') || str_contains($prev, 'register') || str_contains($prev, 'forgot-password') || str_contains($prev, 'reset-password');
-                    $backUrl = ($prev && !$isAuth) ? $prev : route('storefront.index');
-                @endphp
-                <a href="{{ $backUrl }}" 
-                   class="group flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-gray-300 hover:text-black transition-all">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                    </svg>
-                    <span>Back to Shop</span>
-                </a>
-            </div>
+            <!-- Back Link Removed -->
 
             <div class="w-full max-w-[460px] animate-fade-in-up">
                 <!-- Branding -->

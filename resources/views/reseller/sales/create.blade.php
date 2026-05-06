@@ -32,10 +32,6 @@
                         <div>
                             <div class="flex items-center justify-between mb-3">
                                 <label for="product_id" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Select Product</label>
-                                <button type="button" @click="$dispatch('open-scanner')" class="text-[10px] font-bold text-black hover:opacity-70 flex items-center gap-1.5 uppercase tracking-widest transition-all">
-                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
-                                    Scan Barcode
-                                </button>
                             </div>
                             <div class="relative group">
                                 <select id="product_id" name="product_id" required
@@ -144,8 +140,6 @@
         </p>
     </div>
 
-    <x-scanner-modal target-event="barcode-scanned" />
-
     <script>
     (function () {
         const productSelect  = document.getElementById('product_id');
@@ -217,16 +211,7 @@
         qtyInput.addEventListener('input', update);
         resetBtn.addEventListener('click', () => { productSelect.value = ''; qtyInput.value = 1; update(); });
 
-        window.addEventListener('barcode-scanned', (e) => {
-            const scannedSku = e.detail.sku;
-            Array.from(productSelect.options).forEach(opt => {
-                if (opt.dataset.sku === scannedSku) {
-                    productSelect.value = opt.value;
-                    qtyInput.value = (parseInt(qtyInput.value) || 0) + 1;
-                    update();
-                }
-            });
-        });
+
 
         if (productSelect.value) update();
     })();

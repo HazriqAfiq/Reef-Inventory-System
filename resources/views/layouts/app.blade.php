@@ -158,19 +158,7 @@
                         Dashboard
                     </a>
 
-                    <p class="px-3 pt-6 pb-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em]">Operations</p>
 
-                    <a href="{{ route('admin.sales.pos') }}"
-                       class="sidebar-link group {{ request()->routeIs('admin.sales.pos') ? 'active' : '' }}" onclick="closeSidebar()">
-                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                        Counter Sales
-                    </a>
-
-                    <a href="{{ route('admin.inventory.scan-in') }}"
-                       class="sidebar-link group {{ request()->routeIs('admin.inventory.scan-in') ? 'active' : '' }}" onclick="closeSidebar()">
-                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
-                        Scan & Restock
-                    </a>
 
                     <p class="px-3 pt-6 pb-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em]">Management</p>
 
@@ -186,11 +174,7 @@
                         Wholesale Orders
                     </a>
 
-                    <a href="{{ route('admin.settings.page', ['page' => 'promotion']) }}"
-                       class="sidebar-link group {{ request()->is('admin/settings/promotion') ? 'active' : '' }}" onclick="closeSidebar()">
-                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
-                        Promotions
-                    </a>
+
 
                     <p class="px-3 pt-6 pb-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em]">Sales & Analytics</p>
 
@@ -208,7 +192,7 @@
                         Resellers
                     </a>
 
-                    <p class="px-3 pt-6 pb-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em]">Storefront UI</p>
+                    <p class="px-3 pt-6 pb-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em]">System Settings</p>
 
                     <a href="{{ route('admin.settings.page', ['page' => 'brand']) }}"
                        class="sidebar-link group {{ request()->is('admin/settings/brand') || request()->is('admin/settings') ? 'active' : '' }}" onclick="closeSidebar()">
@@ -216,17 +200,7 @@
                         Brand
                     </a>
 
-                    <a href="{{ route('admin.settings.page', ['page' => 'layout']) }}"
-                       class="sidebar-link group {{ request()->is('admin/settings/layout') ? 'active' : '' }}" onclick="closeSidebar()">
-                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
-                        Layout
-                    </a>
 
-                    <a href="{{ route('admin.settings.page', ['page' => 'experience']) }}"
-                       class="sidebar-link group {{ request()->is('admin/settings/experience') ? 'active' : '' }}" onclick="closeSidebar()">
-                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"/></svg>
-                        Experience
-                    </a>
 
                     <a href="{{ route('admin.settings.page', ['page' => 'system']) }}"
                        class="sidebar-link group {{ request()->is('admin/settings/system') ? 'active' : '' }}" onclick="closeSidebar()">

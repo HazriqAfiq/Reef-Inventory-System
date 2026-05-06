@@ -4,7 +4,7 @@
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
         <div>
             <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Global Sales</h1>
-            <p class="text-sm text-gray-500 mt-1">All registered transactions across authorized resellers and storefront.</p>
+            <p class="text-sm text-gray-500 mt-1">All registered transactions across authorized resellers.</p>
         </div>
         <a href="{{ route('admin.sales.report', ['year' => $selectedYear, 'month' => $selectedMonth]) }}"
            class="inline-flex items-center gap-2 px-6 py-3 bg-black text-white text-xs font-bold uppercase tracking-widest rounded-xl hover:bg-gray-800 transition-all shadow-sm">

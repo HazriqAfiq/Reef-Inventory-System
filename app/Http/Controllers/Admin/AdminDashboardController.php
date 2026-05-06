@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
-use App\Models\ProductVariant;
 use App\Models\Sale;
 use App\Models\User;
 use Carbon\Carbon;
@@ -16,36 +15,30 @@ class AdminDashboardController extends Controller
     {
         // ── 1. KPI Cards (Channel-Based) ──────────────────────────────────────
         
-        // Website Storefront: Sales made directly to end-customers (Buyers/Guests)
-        $storefrontRevenue = \App\Models\Order::where('status', 'paid')
-            ->where(function($q) {
-                $q->whereNull('user_id')
-                  ->orWhereHas('user', function($u) { $u->where('role', \App\Models\User::ROLE_BUYER); });
-            })
-            ->sum('total_price');
+
 
         // Wholesale Revenue: Sales made to Resellers (Partner stock purchase)
         $wholesaleRevenue = \App\Models\Order::where('status', 'paid')
-            ->whereHas('user', function($q) { $q->where('role', \App\Models\User::ROLE_RESELLER); })
             ->sum('total_price');
 
         // Total Net Income: Real income for the Admin
-        $totalNetIncome = $storefrontRevenue + $wholesaleRevenue;
+        $totalNetIncome = $wholesaleRevenue;
 
-        // Reseller Network Volume: Sales made BY resellers to their customers (Market Volume)
-        $networkVolume = Sale::whereHas('user', function($q) { $q->where('role', \App\Models\User::ROLE_RESELLER); })
-            ->sum('total_price');
+        // Wholesale Units Sold: Total units supplied to resellers
+        $wholesaleUnitsSold = \App\Models\OrderItem::whereHas('order', function($q) {
+            $q->where('status', 'paid');
+        })->sum('quantity');
 
-        // Total Brand Volume: Every retail sale made (Admin + Reseller retail)
-        $totalBrandVolume = Sale::sum('total_price');
-        
-        $totalItemsSold       = Sale::sum('quantity');
-        $adminStock           = ProductVariant::sum('stock');
+        // Reseller Network Volume: Sales made BY resellers to their customers (Market Volume / Sell-Out)
+        $networkVolume = Sale::sum('total_price');
+
+        $adminStock           = Product::sum('stock');
         $resellerStock        = \App\Models\ResellerStock::sum('quantity');
         $totalProductsInStock = $adminStock + $resellerStock;
         
-        $totalProducts        = ProductVariant::count();
-        $lowStockCount        = ProductVariant::where('stock', '<', 50)->count();
+        $activeResellers      = User::where('role', \App\Models\User::ROLE_RESELLER)->count();
+        $totalProducts        = Product::count();
+        $lowStockCount        = Product::where('stock', '<', 50)->count();
 
         // Month-over-month total income change
         $thisMonthIncome = \App\Models\Order::where('status', 'paid')
@@ -64,16 +57,7 @@ class AdminDashboardController extends Controller
         // ── 2. Trends (last 30 days) ──────────────────────────────────────────
         $days = collect(range(29, 0))->map(fn($i) => now()->subDays($i)->startOfDay());
 
-        // Daily Storefront Revenue
-        $dailyStorefront = \App\Models\Order::where('status', 'paid')
-            ->where(function($q) {
-                $q->whereNull('user_id')
-                  ->orWhereHas('user', function($u) { $u->where('role', \App\Models\User::ROLE_BUYER); });
-            })
-            ->select(DB::raw("date(created_at) as day"), DB::raw("SUM(total_price) as revenue"))
-            ->where('created_at', '>=', now()->subDays(29)->startOfDay())
-            ->groupBy('day')
-            ->pluck('revenue', 'day');
+
 
         // Daily Wholesale Revenue
         $dailyWholesale = \App\Models\Order::where('status', 'paid')
@@ -97,13 +81,13 @@ class AdminDashboardController extends Controller
             ->pluck('units', 'day');
 
         $trendLabels         = $days->map(fn($d) => $d->format('d M'))->values();
-        $trendStorefront     = $days->map(fn($d) => round((float)($dailyStorefront[$d->toDateString()] ?? 0), 2))->values();
+
         $trendWholesale      = $days->map(fn($d) => round((float)($dailyWholesale[$d->toDateString()] ?? 0), 2))->values();
         $trendNetwork        = $days->map(fn($d) => round((float)($dailyNetwork[$d->toDateString()] ?? 0), 2))->values();
         $trendUnits          = $days->map(fn($d) => (int)($dailyTotalUnits[$d->toDateString()] ?? 0))->values();
 
         // ── 3. Inventory & SKU Growth (Sparklines) ──────────────────────────
-        $sparkSkus = $days->map(fn($d) => ProductVariant::where('created_at', '<=', $d->endOfDay())->count())->slice(-7)->values();
+        $sparkSkus = $days->map(fn($d) => Product::where('created_at', '<=', $d->endOfDay())->count())->slice(-7)->values();
 
         $currentStockTotal = $totalProductsInStock;
         $sparkStock = $days->map(function($d) use ($currentStockTotal) {
@@ -117,26 +101,40 @@ class AdminDashboardController extends Controller
         // ── 4. Additional Lists & Lists ──────────────────────────────────────
         $months = collect(range(5, 0))->map(fn($i) => now()->subMonths($i));
         $monthlySalesLabels = $months->map(fn($m) => $m->format('M Y'))->values();
-        $monthlySalesData   = $months->map(fn($m) => round((float) Sale::whereYear('created_at', $m->year)->whereMonth('created_at', $m->month)->sum('total_price'), 2))->values();
+        $monthlySalesData   = $months->map(fn($m) => round((float) \App\Models\Order::where('status', 'paid')->whereYear('created_at', $m->year)->whereMonth('created_at', $m->month)->sum('total_price'), 2))->values();
 
-        $topProductsChart = Product::withSum('sales', 'quantity')->withSum('sales', 'total_price')->orderByDesc('sales_sum_quantity')->take(8)->get();
+        // Top products by wholesale order volume
+        $topProductsChart = Product::withSum(['orderItems as wholesale_qty' => function($q) {
+            $q->whereHas('order', function($o) { $o->where('status', 'paid'); });
+        }], 'quantity')
+        ->withSum(['orderItems as wholesale_revenue' => function($q) {
+            $q->whereHas('order', function($o) { $o->where('status', 'paid'); });
+        }], DB::raw('quantity * price'))
+        ->orderByDesc('wholesale_qty')
+        ->take(8)
+        ->get();
+
         $topProductLabels = $topProductsChart->pluck('name')->values();
-        $topProductData   = $topProductsChart->map(fn($p) => $p->sales_sum_quantity ?? 0)->values();
-        $topProductRevenueData = $topProductsChart->map(fn($p) => round((float)($p->sales_sum_total_price ?? 0), 2))->values();
+        $topProductData   = $topProductsChart->map(fn($p) => $p->wholesale_qty ?? 0)->values();
+        $topProductRevenueData = $topProductsChart->map(fn($p) => round((float)($p->wholesale_revenue ?? 0), 2))->values();
 
-        $topProducts = Product::withSum('sales', 'quantity')->withSum('sales', 'total_price')->orderByDesc('sales_sum_quantity')->take(5)->get();
-        $topResellers = User::where('role', \App\Models\User::ROLE_RESELLER)->withSum('sales', 'total_price')->withSum('sales', 'quantity')->orderByDesc('sales_sum_total_price')->take(5)->get();
+        $topProducts = $topProductsChart->take(5);
 
-        $lowStockProducts = ProductVariant::with('product')->where('stock', '<', 50)->orderBy('stock')->get();
-        $recentStorefrontSales = Sale::with(['user', 'product'])
-            ->where(function($q) {
-                $q->whereNull('user_id')
-                  ->orWhereHas('user', function($u) { $u->where('role', \App\Models\User::ROLE_BUYER); });
-            })->latest()->take(6)->get();
+        // Top resellers by wholesale spend
+        $topResellers = User::where('role', \App\Models\User::ROLE_RESELLER)
+            ->withSum(['orders as wholesale_spend' => function($query) {
+                $query->where('status', 'paid');
+            }], 'total_price')
+            ->orderByDesc('wholesale_spend')
+            ->take(5)
+            ->get();
 
-        $recentResellerSales = Sale::with(['user', 'product'])
-            ->whereHas('user', function($q) { $q->where('role', \App\Models\User::ROLE_RESELLER); })
-            ->latest()->take(6)->get();
+        $lowStockProducts = Product::where('stock', '<', 50)->orderBy('stock')->get();
+
+        $recentWholesaleOrders = \App\Models\Order::with('user')
+            ->latest()
+            ->take(6)
+            ->get();
 
         // ── Insights ──────────────────────────────────────────────────────────
         $insights = [];
@@ -148,7 +146,7 @@ class AdminDashboardController extends Controller
         }
         $insights[] = ($lowStockCount > 0) ? "{$lowStockCount} SKUs require restocking." : "Inventory levels are fully optimal.";
 
-        $sparkRevenue = $trendStorefront->slice(-7)->values(); // Default sparkline shows storefront trend
+        $sparkRevenue = $trendWholesale->slice(-7)->values(); // Default sparkline shows wholesale trend
 
         // ── 5. New Strategic Aggregates ─────────────────────────────────────
         // Weekly Velocity (Mon-Sun)
@@ -165,14 +163,14 @@ class AdminDashboardController extends Controller
             ->pluck('total_qty', 'categories.name');
 
         return view('admin.dashboard', compact(
-            'storefrontRevenue', 'wholesaleRevenue', 'totalNetIncome', 'networkVolume', 'totalBrandVolume',
-            'totalItemsSold', 'adminStock', 'resellerStock', 'totalProductsInStock',
-            'totalProducts', 'lowStockCount', 'incomeChange',
-            'trendLabels', 'trendStorefront', 'trendWholesale', 'trendNetwork', 'trendUnits',
+            'wholesaleRevenue', 'totalNetIncome', 'networkVolume',
+            'wholesaleUnitsSold', 'adminStock', 'resellerStock', 'totalProductsInStock',
+            'totalProducts', 'lowStockCount', 'incomeChange', 'activeResellers',
+            'trendLabels', 'trendWholesale', 'trendNetwork', 'trendUnits',
             'monthlySalesLabels', 'monthlySalesData',
             'topProductLabels', 'topProductData', 'topProductRevenueData',
             'topProducts', 'topResellers',
-            'lowStockProducts', 'recentStorefrontSales', 'recentResellerSales',
+            'lowStockProducts', 'recentWholesaleOrders',
             'insights', 'sparkRevenue', 'sparkSkus', 'sparkStock', 'topProductsChart',
             'weeklyVelocityData', 'categoryDistribution'
         ));

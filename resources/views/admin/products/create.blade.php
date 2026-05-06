@@ -21,12 +21,7 @@
             <div class="space-y-8">
                 <h2 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50 pb-2">Product Identity</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <div class="space-y-2">
-                        <label for="sku" class="block text-[10px] font-bold text-gray-900 uppercase tracking-widest">SKU Reference</label>
-                        <input id="sku" name="sku" type="text" value="{{ old('sku') }}" placeholder="e.g. REEF-1-100"
-                               class="w-full px-4 py-3 text-sm font-bold text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:border-black focus:ring-0 transition-all">
-                        @error('sku')<p class="mt-1.5 text-[10px] font-bold text-red-500 uppercase">{{ $message }}</p>@enderror
-                    </div>
+
                     <div class="space-y-2 lg:col-span-1">
                         <label for="name" class="block text-[10px] font-bold text-gray-900 uppercase tracking-widest">Display Name</label>
                         <input id="name" name="name" type="text" value="{{ old('name') }}" autofocus placeholder="Noble Scent..."
@@ -103,48 +98,28 @@
                 </div>
             </div>
 
-            <!-- Variants Section -->
-            <div x-data="{ 
-                variants: [{ name: 'Default', retail_price: '', wholesale_price: '', stock: 0, sku: '' }],
-                addVariant() { this.variants.push({ name: '', retail_price: '', wholesale_price: '', stock: 0, sku: '' }); },
-                removeVariant(index) { this.variants.splice(index, 1); }
-            }" class="space-y-8">
-                <div class="flex items-center justify-between border-b border-gray-50 pb-2">
-                    <h2 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Sizing & Commercials</h2>
-                    <button type="button" @click="addVariant()" class="text-[9px] font-bold uppercase tracking-widest text-black hover:opacity-60 flex items-center gap-1.5 transition-all">
-                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                        Add Variant
-                    </button>
-                </div>
-
-                <div class="space-y-4">
-                    <template x-for="(variant, index) in variants" :key="index">
-                        <div class="bg-gray-50/50 border border-gray-50 rounded-2xl p-6 relative group">
-                            <button type="button" @click="removeVariant(index)" x-show="variants.length > 1" class="absolute -top-2 -right-2 w-6 h-6 bg-black text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6"/></svg></button>
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-                                <div>
-                                    <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-2">Variant Name</label>
-                                    <input type="text" :name="'variants['+index+'][name]'" x-model="variant.name" required class="w-full px-4 py-3 text-sm font-bold text-gray-900 bg-white border border-gray-100 rounded-xl focus:border-black focus:ring-0 transition-all">
-                                </div>
-                                <div>
-                                    <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-2">SKU Suffix</label>
-                                    <input type="text" :name="'variants['+index+'][sku]'" x-model="variant.sku" placeholder="-XL..." class="w-full px-4 py-3 text-sm font-mono font-bold text-gray-900 bg-white border border-gray-100 rounded-xl focus:border-black focus:ring-0 transition-all">
-                                </div>
-                                <div>
-                                    <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-2">Retail (RM)</label>
-                                    <input type="number" step="0.01" :name="'variants['+index+'][retail_price]'" x-model="variant.retail_price" required class="w-full px-4 py-3 text-sm font-bold text-gray-900 bg-white border border-gray-100 rounded-xl focus:border-black focus:ring-0 transition-all">
-                                </div>
-                                <div>
-                                    <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-2">Wholesale (RM)</label>
-                                    <input type="number" step="0.01" :name="'variants['+index+'][wholesale_price]'" x-model="variant.wholesale_price" required class="w-full px-4 py-3 text-sm font-bold text-gray-900 bg-white border border-gray-100 rounded-xl focus:border-black focus:ring-0 transition-all">
-                                </div>
-                                <div>
-                                    <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-2">Initial Stock</label>
-                                    <input type="number" :name="'variants['+index+'][stock]'" x-model="variant.stock" required class="w-full px-4 py-3 text-sm font-bold text-gray-900 bg-white border border-gray-100 rounded-xl focus:border-black focus:ring-0 transition-all">
-                                </div>
-                            </div>
-                        </div>
-                    </template>
+            <!-- Pricing & Inventory Section -->
+            <div class="space-y-8">
+                <h2 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50 pb-2">Pricing & Inventory</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="space-y-2">
+                        <label for="retail_price" class="block text-[10px] font-bold text-gray-900 uppercase tracking-widest">Retail Price (RM)</label>
+                        <input id="retail_price" name="retail_price" type="number" step="0.01" value="{{ old('retail_price') }}"
+                               class="w-full px-4 py-3 text-sm font-bold text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:border-black focus:ring-0 transition-all">
+                        @error('retail_price')<p class="mt-1.5 text-[10px] font-bold text-red-500 uppercase">{{ $message }}</p>@enderror
+                    </div>
+                    <div class="space-y-2">
+                        <label for="wholesale_price" class="block text-[10px] font-bold text-gray-900 uppercase tracking-widest">Wholesale Price (RM)</label>
+                        <input id="wholesale_price" name="wholesale_price" type="number" step="0.01" value="{{ old('wholesale_price') }}"
+                               class="w-full px-4 py-3 text-sm font-bold text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:border-black focus:ring-0 transition-all">
+                        @error('wholesale_price')<p class="mt-1.5 text-[10px] font-bold text-red-500 uppercase">{{ $message }}</p>@enderror
+                    </div>
+                    <div class="space-y-2">
+                        <label for="stock" class="block text-[10px] font-bold text-gray-900 uppercase tracking-widest">Initial Stock</label>
+                        <input id="stock" name="stock" type="number" value="{{ old('stock', 0) }}" min="0"
+                               class="w-full px-4 py-3 text-sm font-bold text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:border-black focus:ring-0 transition-all">
+                        @error('stock')<p class="mt-1.5 text-[10px] font-bold text-red-500 uppercase">{{ $message }}</p>@enderror
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -199,7 +174,7 @@
                         <x-toggle name="is_active" 
                                   :checked="old('is_active', true)" 
                                   label="Active Availability"
-                                  description="Controls product visibility across storefront and reseller dashboards." />
+                                  description="Controls product visibility across reseller dashboards and POS." />
                     </div>
                     <div class="space-y-2">
                         <label for="description" class="block text-[10px] font-bold text-gray-900 uppercase tracking-widest">Internal Narrative</label>

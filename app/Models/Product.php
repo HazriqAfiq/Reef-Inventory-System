@@ -24,15 +24,6 @@ class Product extends Model
         'stock',
         'release_date',
         'is_active',
-        'promotion_type',
-        'promotion_value',
-        'promotion_badge',
-        'promotion_badge_color',
-        'promotion_starts_at',
-        'promotion_ends_at',
-        'promotion_min_qty',
-        'promotion_min_amount',
-        'promotion_target',
     ];
 
     protected $casts = [
@@ -40,8 +31,6 @@ class Product extends Model
         'release_date' => 'date',
         'wholesale_price' => 'decimal:2',
         'retail_price' => 'decimal:2',
-        'promotion_starts_at' => 'datetime',
-        'promotion_ends_at' => 'datetime',
     ];
 
     protected static function booted()
@@ -111,82 +100,6 @@ class Product extends Model
                      ->orderBy('release_date', 'desc');
     }
 
-    public function scopeOnPromotion($query, $user = null)
-    {
-        $now = now();
-        $query->whereNotNull('promotion_type')
-              ->where(function($q) use ($now) {
-                  $q->whereNull('promotion_starts_at')
-                    ->orWhere('promotion_starts_at', '<=', $now);
-              })
-              ->where(function($q) use ($now) {
-                  $q->whereNull('promotion_ends_at')
-                    ->orWhere('promotion_ends_at', '>=', $now);
-              });
-
-        // Target audience filtering
-        if ($user && method_exists($user, 'isReseller') && $user->isReseller()) {
-            $query->whereIn('promotion_target', ['all', 'reseller']);
-        } else {
-            $query->whereIn('promotion_target', ['all', 'direct']);
-        }
-
-        return $query;
-    }
-
-    public static function hasActivePromotions($user = null)
-    {
-        return self::active()->onPromotion($user)->exists();
-    }
-
-    public function isPromotionActive($quantity = null, $user = null)
-    {
-        if (empty($this->promotion_type)) {
-            return false;
-        }
-
-        $now = now();
-        
-        // Time window check
-        if ($this->promotion_starts_at && $this->promotion_starts_at > $now) {
-            return false;
-        }
-
-        if ($this->promotion_ends_at && $this->promotion_ends_at < $now) {
-            return false;
-        }
-
-        // Quantity check (if provided)
-        if ($quantity !== null && $this->promotion_min_qty > 0) {
-            if ($quantity < $this->promotion_min_qty) {
-                return false;
-            }
-        }
-
-        // Target audience check
-        if ($user && method_exists($user, 'isReseller') && $user->isReseller()) {
-            return in_array($this->promotion_target, ['all', 'reseller']);
-        }
-
-        return in_array($this->promotion_target, ['all', 'direct']);
-    }
-
-    public function getDiscountedPriceAttribute()
-    {
-        if (!$this->isPromotionActive() || $this->promotion_type !== 'discount_percent') {
-            return $this->retail_price;
-        }
-
-        // If there's a minimum quantity required, the base displayed price should remain the retail price.
-        // The discount is only applied in the cart when the threshold is met.
-        if ($this->promotion_min_qty > 1) {
-            return $this->retail_price;
-        }
-
-        $discount = $this->retail_price * ($this->promotion_value / 100);
-        return max(0, $this->retail_price - $discount);
-    }
-
     public function getAverageRatingAttribute()
     {
         return $this->reviews()->avg('rating') ?: 0;
@@ -195,33 +108,5 @@ class Product extends Model
     public function getReviewCountAttribute()
     {
         return $this->reviews()->count();
-    }
-
-    public function variants()
-    {
-        return $this->hasMany(ProductVariant::class);
-    }
-
-    /**
-     * Get the badge text to display for promotions.
-     * Fallback to type-based defaults if no custom badge is set.
-     */
-    public function getEffectivePromotionBadgeAttribute()
-    {
-        $minText = $this->promotion_min_qty > 1 ? ' (MIN ' . $this->promotion_min_qty . ')' : '';
-
-        if ($this->promotion_badge) {
-            return $this->promotion_badge . $minText;
-        }
-
-        if ($this->promotion_type === 'bogo') {
-            return '1+1' . $minText;
-        }
-
-        if ($this->promotion_type === 'discount_percent') {
-            return $this->promotion_value . '% OFF' . $minText;
-        }
-
-        return 'PROMO' . $minText;
     }
 }

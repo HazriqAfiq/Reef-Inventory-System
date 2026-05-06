@@ -1,10 +1,10 @@
-<x-app-layout :title="$title ?? 'Storefront Settings'">
+<x-app-layout :title="$title ?? 'System Settings'">
 
     <!-- Page Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900 tracking-tight">{{ $title ?? 'Storefront Configuration' }}</h1>
-            <p class="text-sm text-gray-500 mt-1">Manage global identifiers and public storefront presentation layers.</p>
+            <h1 class="text-2xl font-bold text-gray-900 tracking-tight">{{ $title ?? 'System Configuration' }}</h1>
+            <p class="text-sm text-gray-500 mt-1">Manage global identifiers and system presentation layers.</p>
         </div>
     </div>
 

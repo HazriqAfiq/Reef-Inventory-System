@@ -2,16 +2,7 @@
     <div class="flex flex-col md:flex-row min-h-screen">
         <!-- Left Side: Form -->
         <div class="w-full md:w-[45%] bg-white flex flex-col justify-center items-center p-8 sm:p-12 lg:p-24 relative overflow-y-auto">
-            <!-- Back Button -->
-            <div class="absolute top-8 left-8 sm:top-12 sm:left-12">
-                <a href="{{ (url()->previous() && !str_contains(url()->previous(), 'login') && !str_contains(url()->previous(), 'register') && !str_contains(url()->previous(), 'forgot-password')) ? url()->previous() : route('storefront.index') }}" 
-                   class="group flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-gray-300 hover:text-black transition-all">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                    </svg>
-                    <span>Back to Boutique</span>
-                </a>
-            </div>
+            <!-- Back Button Removed -->
 
             <div class="max-w-[420px] w-full animate-fade-in-up">
                 <!-- Branding -->

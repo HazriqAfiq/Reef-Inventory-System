@@ -37,7 +37,7 @@
                     {{-- Stock --}}
                     <td class="px-8 py-5">
                         @php
-                            $adminStockTotal = $product->variants->sum('stock');
+                            $adminStockTotal = $product->stock;
                             $combinedStock = $adminStockTotal + ($product->reseller_stocks_sum_quantity ?? 0);
                             $percent = min(max(($combinedStock / 150) * 100, 2), 100); 
                             if($combinedStock == 0) $percent = 0;

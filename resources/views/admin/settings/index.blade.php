@@ -1,8 +1,8 @@
-<x-app-layout title="Storefront Settings">
+<x-app-layout title="System Settings">
     <div class="mb-8 flex justify-between items-end">
         <div>
-            <h1 class="text-xl font-bold text-gray-900 tracking-tight">Storefront Settings</h1>
-            <p class="text-sm text-gray-500 mt-1">Manage branding, hero sections, and public content.</p>
+            <h1 class="text-xl font-bold text-gray-900 tracking-tight">System Settings</h1>
+            <p class="text-sm text-gray-500 mt-1">Manage system branding and configuration.</p>
         </div>
     </div>
 
@@ -22,7 +22,7 @@
                                 <label class="text-sm font-bold text-gray-700 block mb-1">
                                     {{ ucwords(str_replace('_', ' ', $setting->key)) }}
                                 </label>
-                                <p class="text-xs text-gray-400 font-medium">Manage the {{ str_replace('_', ' ', $setting->key) }} displayed on the storefront.</p>
+                                <p class="text-xs text-gray-400 font-medium">Manage the {{ str_replace('_', ' ', $setting->key) }} configuration.</p>
                             </div>
                             
                             <div class="lg:col-span-2">
