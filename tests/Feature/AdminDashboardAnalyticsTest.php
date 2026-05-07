@@ -43,8 +43,8 @@ class AdminDashboardAnalyticsTest extends TestCase
         $response = $this->actingAs($admin)->get(route('admin.dashboard'));
 
         $response->assertOk()
-            ->assertViewHas('adminStock', 110)
+            ->assertViewHas('totalStockUnits', 110)
             ->assertViewHas('totalProducts', 2)
-            ->assertViewHas('lowStockCount', 1);
+            ->assertViewHas('lowStockProductsCount', 1);
     }
 }

@@ -97,14 +97,6 @@ class ProductController extends Controller
             $data['sku'] = 'PRD-' . strtoupper(Str::random(8));
             $product = Product::create($data);
             
-            // Auto-detect fragrance family if empty
-            if (empty($product->fragrance_family)) {
-                $detected = $this->detectFragranceFamily($product);
-                if ($detected) {
-                    $product->update(['fragrance_family' => $detected]);
-                }
-            }
-
             // Handle Images
             if ($request->hasFile('images')) {
                 $primaryIndex = (int) $request->input('primary_index', 0);
@@ -145,14 +137,6 @@ class ProductController extends Controller
         return \Illuminate\Support\Facades\DB::transaction(function () use ($request, $product) {
             $oldStock = $product->stock;
             $product->update($request->validated());
-
-            // Auto-detect fragrance family if empty
-            if (empty($product->fragrance_family)) {
-                $detected = $this->detectFragranceFamily($product);
-                if ($detected) {
-                    $product->update(['fragrance_family' => $detected]);
-                }
-            }
 
             // Handle Image Deletions
             if ($request->has('delete_images')) {
@@ -227,51 +211,4 @@ class ProductController extends Controller
         return redirect()->route('admin.products.index')->with('success', 'Product deleted.');
     }
 
-    /**
-     * Auto-detect the fragrance family of a product based on its olfactory notes.
-     */
-    protected function detectFragranceFamily(Product $product): ?string
-    {
-        $notesConfig = config('scent-notes.notes', []);
-        $scores = [
-            'fresh' => 0,
-            'floral' => 0,
-            'woody' => 0,
-            'oriental' => 0,
-            'gourmand' => 0,
-        ];
-
-        $textLayers = [
-            'top_note' => ['text' => strtolower($product->top_note ?? ''), 'weight' => 1],
-            'heart_note' => ['text' => strtolower($product->heart_note ?? ''), 'weight' => 2],
-            'base_note' => ['text' => strtolower($product->base_note ?? ''), 'weight' => 3],
-        ];
-
-        foreach ($notesConfig as $noteKeyword => $meta) {
-            $family = $meta['family'] ?? null;
-            if (!$family || !array_key_exists($family, $scores)) {
-                continue;
-            }
-
-            foreach ($textLayers as $layer => $info) {
-                if (empty($info['text'])) {
-                    continue;
-                }
-                if (str_contains($info['text'], $noteKeyword)) {
-                    $scores[$family] += $info['weight'];
-                }
-            }
-        }
-
-        $bestFamily = null;
-        $maxScore = 0;
-        foreach ($scores as $family => $score) {
-            if ($score > $maxScore) {
-                $maxScore = $score;
-                $bestFamily = $family;
-            }
-        }
-
-        return $bestFamily;
-    }
 }

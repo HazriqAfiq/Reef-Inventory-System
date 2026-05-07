@@ -226,10 +226,16 @@
                         My Stock
                     </a>
 
+                    <a href="{{ route('reseller.orders.create') }}"
+                       class="sidebar-link group {{ request()->routeIs('reseller.orders.create') ? 'active' : '' }}" onclick="closeSidebar()">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Restock HQ
+                    </a>
+
                     <a href="{{ route('reseller.orders.index') }}"
-                       class="sidebar-link group {{ request()->routeIs('reseller.orders.*') ? 'active' : '' }}" onclick="closeSidebar()">
-                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
-                        Restock / Orders
+                       class="sidebar-link group {{ request()->routeIs('reseller.orders.index') || request()->routeIs('reseller.orders.show') || request()->routeIs('reseller.orders.payment') || request()->routeIs('reseller.orders.invoice') ? 'active' : '' }}" onclick="closeSidebar()">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                        Wholesale Orders
                     </a>
 
                     <p class="px-3 pt-6 pb-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em]">System</p>
@@ -448,6 +454,27 @@
                         </div>
                     </div>
                 </div>
+                @endauth
+
+                {{-- Global Reseller Wholesale Cart Icon & Dynamic Count Badge --}}
+                @auth
+                    @if(Auth::user()->isReseller())
+                        @php
+                            $globalCart = Auth::user()->cart;
+                            $globalCartCount = $globalCart && is_array($globalCart->content) ? array_sum($globalCart->content) : 0;
+                        @endphp
+                        <a href="{{ route('reseller.orders.create') }}" 
+                           id="global-header-cart-btn"
+                           class="relative w-9 h-9 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400 hover:text-black hover:bg-gray-100 hover:border-black transition-all duration-200 focus:outline-none"
+                           title="View Wholesale Cart">
+                            <svg class="w-4 h-4 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                            </svg>
+                            <span id="global-header-cart-badge" class="{{ $globalCartCount > 0 ? '' : 'hidden' }} absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-black text-white text-[9px] font-black flex items-center justify-center border-2 border-white shadow-sm">
+                                {{ $globalCartCount }}
+                            </span>
+                        </a>
+                    @endif
                 @endauth
 
                 <div class="h-5 w-px bg-gray-200 hidden sm:block"></div>

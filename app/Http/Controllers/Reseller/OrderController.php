@@ -20,8 +20,15 @@ class OrderController extends Controller
 
     public function create()
     {
-        $products = Product::active()->get();
-        return view('reseller.orders.create', compact('products'));
+        $products = Product::active()->with('primaryImage')->get();
+        $totalMoq = (int) \App\Models\Setting::getValue('reseller_total_moq', 15);
+        $productMoq = (int) \App\Models\Setting::getValue('reseller_product_moq', 5);
+        
+        // Fetch persisted JSON cart mapping
+        $cart = auth()->user()->cart;
+        $cartItems = $cart && is_array($cart->content) ? $cart->content : [];
+
+        return view('reseller.orders.create', compact('products', 'totalMoq', 'productMoq', 'cartItems'));
     }
 
     public function store(Request $request)
@@ -30,6 +37,9 @@ class OrderController extends Controller
             'product_id' => 'required|array',
             'quantity' => 'required|array',
         ]);
+
+        $totalMoq = (int) \App\Models\Setting::getValue('reseller_total_moq', 15);
+        $productMoq = (int) \App\Models\Setting::getValue('reseller_product_moq', 5);
 
         $productIds = $request->input('product_id');
         $quantities = $request->input('quantity');
@@ -42,8 +52,20 @@ class OrderController extends Controller
             $qty = (int) ($quantities[$i] ?? 0);
             if ($qty > 0) {
                 $product = \App\Models\Product::findOrFail($pId);
-                if ($product->stock < $qty) {
-                    return back()->withErrors(['quantity' => "Not enough stock for {$product->name}."]);
+
+                // Low-Stock Cleardown Rule: if stock is below the per-product MOQ set by admin, reseller must purchase exactly 100% of the available stock.
+                if ($product->stock < $productMoq) {
+                    if ($qty !== $product->stock) {
+                        return back()->withErrors(['quantity' => "For low-stock product '{$product->name}' (stock below minimum MOQ of {$productMoq}), you must purchase all remaining {$product->stock} units to clear stock."]);
+                    }
+                } else {
+                    // Standard MOQ Check
+                    if ($qty < $productMoq) {
+                        return back()->withErrors(['quantity' => "Quantity selected for '{$product->name}' must be at least {$productMoq} units."]);
+                    }
+                    if ($product->stock < $qty) {
+                        return back()->withErrors(['quantity' => "Not enough stock for {$product->name}."]);
+                    }
                 }
                 
                 $price = $product->wholesale_price * $qty;
@@ -62,8 +84,8 @@ class OrderController extends Controller
             return back()->withErrors(['quantity' => 'Please select at least one item.']);
         }
 
-        if ($totalQuantity < 15) {
-            return back()->withErrors(['quantity' => 'Minimum Order Quantity (MOQ) for Resellers is 15 items total.']);
+        if ($totalQuantity < $totalMoq) {
+            return back()->withErrors(['quantity' => "Minimum Order Quantity (MOQ) for Resellers is {$totalMoq} items total."]);
         }
 
         $order = auth()->user()->orders()->create([
@@ -76,6 +98,13 @@ class OrderController extends Controller
 
         // Notify admins of the new wholesale order
         NotificationService::newOrder($order, auth()->user());
+
+        // Clear persistent database cart on successful order creation
+        $cart = \App\Models\Cart::where('user_id', auth()->id())->first();
+        if ($cart) {
+            $cart->content = [];
+            $cart->save();
+        }
 
         return redirect()->route('reseller.orders.payment', $order);
     }
@@ -129,5 +158,78 @@ class OrderController extends Controller
         
         $pdf = Pdf::loadView('reseller.orders.invoice', compact('order'));
         return $pdf->download("invoice_ORD_{$order->id}.pdf");
+    }
+
+    /**
+     * Display a beautiful detailed view of a product for resellers.
+     */
+    public function showProduct(Product $product)
+    {
+        $product->load(['images', 'primaryImage']);
+        
+        // B2B Wholesale Profit margins calculations
+        $profit = $product->retail_price - $product->wholesale_price;
+        $margin = $product->retail_price > 0 ? round(($profit / $product->retail_price) * 100, 1) : 0;
+        
+        // Fetch persisted JSON cart mapping and active products
+        $allProducts = Product::active()->with('primaryImage')->get();
+        $cart = auth()->user()->cart;
+        $cartItems = $cart && is_array($cart->content) ? $cart->content : [];
+        $totalMoq = (int) \App\Models\Setting::getValue('reseller_total_moq', 15);
+        $productMoq = (int) \App\Models\Setting::getValue('reseller_product_moq', 5);
+
+        return view('reseller.products.show', compact('product', 'profit', 'margin', 'allProducts', 'cartItems', 'totalMoq', 'productMoq'));
+    }
+
+    /**
+     * Update dynamic persistent database cart selections via AJAX.
+     */
+    public function updateCart(Request $request)
+    {
+        $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'quantity' => 'required|integer|min:0',
+        ]);
+
+        $productId = $request->input('product_id');
+        $quantity = (int) $request->input('quantity');
+
+        $cart = \App\Models\Cart::firstOrCreate([
+            'user_id' => auth()->id(),
+        ], [
+            'content' => [],
+        ]);
+
+        $content = is_array($cart->content) ? $cart->content : [];
+
+        if ($quantity > 0) {
+            $content[$productId] = $quantity;
+        } else {
+            unset($content[$productId]);
+        }
+
+        $cart->content = $content;
+        $cart->save();
+
+        return response()->json([
+            'success' => true,
+            'cart' => $content,
+        ]);
+    }
+
+    /**
+     * Clear dynamic persistent database cart selections via AJAX.
+     */
+    public function clearCart()
+    {
+        $cart = \App\Models\Cart::where('user_id', auth()->id())->first();
+        if ($cart) {
+            $cart->content = [];
+            $cart->save();
+        }
+
+        return response()->json([
+            'success' => true,
+        ]);
     }
 }

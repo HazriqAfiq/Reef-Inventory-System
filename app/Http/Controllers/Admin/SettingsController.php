@@ -22,7 +22,7 @@ class SettingsController extends Controller
                 'branding' => 'Branding'
             ],
             'system' => [
-                'auth' => 'Authentication'
+                'reseller' => 'Reseller System'
             ]
         ];
         
@@ -49,7 +49,7 @@ class SettingsController extends Controller
 
         $pageGroups = [
             'brand' => ['global', 'branding', 'contact'],
-            'system' => ['auth']
+            'system' => ['reseller']
         ];
         
         if (!array_key_exists($page, $pageGroups)) {

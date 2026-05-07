@@ -52,11 +52,16 @@ Route::middleware(['auth', 'verified', 'role:reseller'])->prefix('reseller')->na
     Route::get('/dashboard', [\App\Http\Controllers\Reseller\ResellerDashboardController::class, 'index'])->name('dashboard');
     Route::post('/dashboard/goal', [\App\Http\Controllers\Reseller\ResellerDashboardController::class, 'updateGoal'])->name('dashboard.goal');
     Route::resource('sales', \App\Http\Controllers\SaleController::class)->only(['index', 'create', 'store']);
-    Route::resource('orders', \App\Http\Controllers\Reseller\OrderController::class)->only(['index', 'create', 'store', 'show']);
+    Route::resource('orders', \App\Http\Controllers\Reseller\OrderController::class)->only(['index', 'show']);
+    Route::get('restock', [\App\Http\Controllers\Reseller\OrderController::class, 'create'])->name('orders.create');
+    Route::post('restock', [\App\Http\Controllers\Reseller\OrderController::class, 'store'])->name('orders.store');
     Route::get('orders/{order}/payment', [\App\Http\Controllers\Reseller\OrderController::class, 'payment'])->name('orders.payment');
     Route::post('orders/{order}/callback', [\App\Http\Controllers\Reseller\OrderController::class, 'callback'])->name('orders.callback');
     Route::get('orders/{order}/invoice', [\App\Http\Controllers\Reseller\OrderController::class, 'invoice'])->name('orders.invoice');
     Route::get('/stock', [\App\Http\Controllers\Reseller\StockController::class, 'index'])->name('stock.index');
+    Route::get('products/{product:slug}', [\App\Http\Controllers\Reseller\OrderController::class, 'showProduct'])->name('products.show');
+    Route::post('/cart/update', [\App\Http\Controllers\Reseller\OrderController::class, 'updateCart'])->name('cart.update');
+    Route::post('/cart/clear', [\App\Http\Controllers\Reseller\OrderController::class, 'clearCart'])->name('cart.clear');
 });
 
 Route::middleware('auth')->group(function () {

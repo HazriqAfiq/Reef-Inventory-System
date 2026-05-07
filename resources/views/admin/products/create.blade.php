@@ -139,7 +139,7 @@
             <!-- Fragrance Profile Section -->
             <div class="space-y-8">
                 <h2 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50 pb-2">Olfactory Profile</h2>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div class="space-y-2">
                         <label for="top_note" class="block text-[10px] font-bold text-gray-900 uppercase tracking-widest flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>Top Note</label>
                         <input id="top_note" name="top_note" type="text" value="{{ old('top_note') }}" placeholder="Citrus, Bergamot..." class="w-full px-4 py-3 text-sm font-bold text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:border-black focus:ring-0 transition-all">
@@ -151,17 +151,6 @@
                     <div class="space-y-2">
                         <label for="base_note" class="block text-[10px] font-bold text-gray-900 uppercase tracking-widest flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>Base Note</label>
                         <input id="base_note" name="base_note" type="text" value="{{ old('base_note') }}" placeholder="Sandalwood, Musk..." class="w-full px-4 py-3 text-sm font-bold text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:border-black focus:ring-0 transition-all">
-                    </div>
-                    <div class="space-y-2">
-                        <label for="fragrance_family" class="block text-[10px] font-bold text-gray-900 uppercase tracking-widest flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>Fragrance Family</label>
-                        <select id="fragrance_family" name="fragrance_family" class="w-full px-4 py-3 text-sm font-bold text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:border-black focus:ring-0 transition-all cursor-pointer">
-                            <option value="">Auto-detect from notes</option>
-                            <option value="fresh" {{ old('fragrance_family') == 'fresh' ? 'selected' : '' }}>Fresh & Aquatic</option>
-                            <option value="woody" {{ old('fragrance_family') == 'woody' ? 'selected' : '' }}>Woody & Earthy</option>
-                            <option value="floral" {{ old('fragrance_family') == 'floral' ? 'selected' : '' }}>Floral & Powdery</option>
-                            <option value="oriental" {{ old('fragrance_family') == 'oriental' ? 'selected' : '' }}>Oriental & Rich</option>
-                            <option value="gourmand" {{ old('fragrance_family') == 'gourmand' ? 'selected' : '' }}>Gourmand & Sweet</option>
-                        </select>
                     </div>
                 </div>
             </div>

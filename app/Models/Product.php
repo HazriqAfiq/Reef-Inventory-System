@@ -18,7 +18,6 @@ class Product extends Model
         'top_note',
         'heart_note',
         'base_note',
-        'fragrance_family',
         'wholesale_price',
         'retail_price',
         'stock',

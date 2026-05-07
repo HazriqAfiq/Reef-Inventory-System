@@ -48,8 +48,8 @@ class StorefrontSettingsSeeder extends Seeder
             ['key' => 'scent_finder_results_hero_image', 'value' => 'https://images.unsplash.com/photo-1557170334-a9632e77c6e4?auto=format&fit=crop&q=80&w=2000', 'type' => 'image', 'group' => 'scent_finder'],
 
             // Auth Settings
-            ['key' => 'sign_in_image', 'value' => 'hero/hero_cinematic.png', 'type' => 'image', 'group' => 'auth'],
-            ['key' => 'sign_up_image', 'value' => 'https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=1974&auto=format&fit=crop', 'type' => 'image', 'group' => 'auth'],
+            ['key' => 'sign_in_image', 'value' => 'hero/hero_cinematic.png', 'type' => 'image', 'group' => 'branding'],
+            ['key' => 'sign_up_image', 'value' => 'https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=1974&auto=format&fit=crop', 'type' => 'image', 'group' => 'branding'],
 
             // Branding & Appearance Settings
             ['key' => 'philosophy_title', 'value' => 'Our Philosophy', 'type' => 'text', 'group' => 'philosophy'],
@@ -64,6 +64,10 @@ class StorefrontSettingsSeeder extends Seeder
             // Customer Engagement Settings
             ['key' => 'scent_finder_cta_text', 'value' => 'Secure Your Signature', 'type' => 'text', 'group' => 'engagement'],
             ['key' => 'announcement_bar_sticky', 'value' => '0', 'type' => 'boolean', 'group' => 'engagement'],
+
+            // Reseller System Settings
+            ['key' => 'reseller_total_moq', 'value' => '15', 'type' => 'text', 'group' => 'reseller'],
+            ['key' => 'reseller_product_moq', 'value' => '5', 'type' => 'text', 'group' => 'reseller'],
         ];
 
         foreach ($settings as $setting) {

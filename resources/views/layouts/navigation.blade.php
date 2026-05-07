@@ -33,8 +33,11 @@
                         <x-nav-link :href="route('reseller.stock.index')" :active="request()->routeIs('reseller.stock.index')" class="text-[11px] font-black uppercase tracking-widest">
                             {{ __('My Stock') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('reseller.orders.index')" :active="request()->routeIs('reseller.orders.*')" class="text-[11px] font-black uppercase tracking-widest">
-                            {{ __('Restock / Orders') }}
+                        <x-nav-link :href="route('reseller.orders.create')" :active="request()->routeIs('reseller.orders.create')" class="text-[11px] font-black uppercase tracking-widest">
+                            {{ __('Restock HQ') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('reseller.orders.index')" :active="request()->routeIs('reseller.orders.index') || request()->routeIs('reseller.orders.show') || request()->routeIs('reseller.orders.payment') || request()->routeIs('reseller.orders.invoice')" class="text-[11px] font-black uppercase tracking-widest">
+                            {{ __('Wholesale Orders') }}
                         </x-nav-link>
                         <x-nav-link :href="route('reseller.sales.index')" :active="request()->routeIs('reseller.sales.index')" class="text-[11px] font-black uppercase tracking-widest">
                             {{ __('My Sales History') }}

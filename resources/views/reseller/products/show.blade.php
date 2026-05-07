@@ -1,13 +1,4 @@
-<?php if (isset($component)) { $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54 = $attributes; } ?>
-<?php $component = App\View\Components\AppLayout::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('app-layout'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\App\View\Components\AppLayout::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['title' => 'Wholesale Fragrance Restock']); ?>
+<x-app-layout title="{{ $product->name }} - Wholesale Profile">
     <!-- Premium Minimalist Scrollbar Styles -->
     <style>
         .cart-items-list::-webkit-scrollbar {
@@ -25,238 +16,268 @@
         }
     </style>
 
-    <div class="max-w-full pb-44" x-data="{ cartOpen: false, search: '', activeCategory: 'all' }">
+    <!-- Wrapper with local cartOpen state for Responsive Drawer -->
+    <div x-data="{ cartOpen: false }" class="relative">
         
-        <!-- Page Header -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
-            <div>
-                <span class="text-xs font-bold text-indigo-500 uppercase tracking-widest bg-indigo-50 px-3 py-1.5 rounded-lg">B2B Reseller Portal</span>
-                <h1 class="text-3xl font-black text-gray-900 tracking-tight mt-3">Wholesale Restock HQ</h1>
-                <p class="text-sm text-gray-500 mt-1.5">Replenish your local stock directly from HQ. Orders require a Minimum Order Quantity (MOQ) of <?php echo e($totalMoq); ?> items total.</p>
-            </div>
-            <div class="flex items-center gap-3 shrink-0">
-                <a href="<?php echo e(route('reseller.orders.index')); ?>" class="inline-flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 text-gray-700 hover:text-black hover:border-black text-xs font-bold uppercase tracking-widest rounded-xl transition-all shadow-sm">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                    </svg>
-                    Wholesale Orders History
-                </a>
-            </div>
-        </div>
+        <!-- Main Form wrapper submitting to checkout -->
+        <form action="{{ route('reseller.orders.store') }}" method="POST" id="restock-form" class="relative">
+            @csrf
 
-        <?php if($errors->any()): ?>
-            <div class="mb-10 p-5 bg-rose-50 border border-rose-100 rounded-2xl flex items-start gap-4 animate-fade-in-up">
-                <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-rose-600 shadow-sm border border-rose-100 shrink-0">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                    </svg>
+            <!-- Hidden inputs for ALL products to preserve the full cart state in form submission -->
+            @foreach($allProducts as $p)
+                @php
+                    $pEffectiveMoq = $p->stock < $productMoq ? $p->stock : $productMoq;
+                    $pIsLowStock = $p->stock < $productMoq;
+                    $pCounter = $loop->index;
+                @endphp
+                <div class="product-metadata-node hidden">
+                    <input type="hidden" class="product-id" value="{{ $p->id }}">
+                    <input type="hidden" class="product-price" value="{{ $p->wholesale_price }}">
+                    <input type="hidden" class="product-name" value="{{ $p->name }}">
+                    <input type="hidden" class="product-sku" value="{{ $p->sku }}">
+                    <input type="hidden" class="product-image" value="{{ $p->primaryImage ? asset('storage/' . $p->primaryImage->image_path) : '' }}">
+                    <input type="hidden" class="product-max" value="{{ $p->stock }}">
+                    <input type="hidden" class="product-effective-moq" value="{{ $pEffectiveMoq }}">
+                    <input type="hidden" class="product-buy-all" value="{{ $pIsLowStock ? 'true' : 'false' }}">
+                    
+                    <input type="number" 
+                           name="quantity[{{ $pCounter }}]" 
+                           class="qty-input" 
+                           data-counter="{{ $pCounter }}"
+                           value="{{ $cartItems[$p->id] ?? 0 }}" 
+                           min="0" 
+                           max="{{ $p->stock }}"
+                           onchange="validateInput({{ $pCounter }})"
+                           {{ $p->stock === 0 ? 'disabled' : '' }}
+                           {{ $pIsLowStock ? 'readonly' : '' }}>
+                           
+                    <input type="hidden" name="product_id[{{ $pCounter }}]" value="{{ $p->id }}">
                 </div>
-                <div>
-                    <h3 class="text-sm font-bold text-rose-900">Restocking errors detected</h3>
-                    <ul class="mt-1 text-xs text-rose-600 font-medium space-y-1 pl-4 list-disc">
-                        <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $err): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <li><?php echo e($err); ?></li>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                    </ul>
-                </div>
-            </div>
-        <?php endif; ?>
+            @endforeach
 
-        <form id="order-form" action="<?php echo e(route('reseller.orders.store')); ?>" method="POST">
-            <?php echo csrf_field(); ?>
-
-            <!-- Workspace Layout (Desktop: Side-by-side products and static cart, Mobile: stacked) -->
+            <!-- Workspace Layout (Desktop: Side-by-side spec-sheet and static cart, Mobile: stacked) -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 
-                <!-- Left Column: Product Catalog Grid -->
-                <div class="lg:col-span-8 xl:col-span-9 space-y-8">
+                <!-- Left Column: Breadcrumbs and Product Details -->
+                <div class="lg:col-span-8 xl:col-span-9 space-y-6">
                     
-                    <!-- Search and Category Filter Controls Bar (Placed inside left column so Wholesale Cart sits level next to it) -->
-                    <div class="bg-white border border-gray-100 rounded-3xl p-4 md:p-6 shadow-sm flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-6">
-                        <!-- Real-time Search Box -->
-                        <div class="relative flex-1 max-w-xl">
-                            <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none text-gray-400">
-                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                                </svg>
-                            </div>
-                            <input type="text" 
-                                   x-model="search"
-                                   placeholder="Search catalog by product name..." 
-                                   class="w-full pl-12 pr-4 py-3 bg-gray-50/50 border border-gray-100 rounded-xl focus:bg-white focus:border-black focus:ring-0 text-sm font-medium text-gray-800 placeholder-gray-400 transition-all">
-                            <button type="button" 
-                                    x-show="search.length > 0" 
-                                    @click="search = ''" 
-                                    class="absolute inset-y-0 right-4 flex items-center text-gray-400 hover:text-black">
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                                </svg>
-                            </button>
-                        </div>
+                    <!-- Page Breadcrumbs -->
+                    <nav class="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">
+                        <a href="{{ route('dashboard') }}" class="hover:text-black transition-colors">Dashboard</a>
+                        <span>/</span>
+                        <a href="{{ route('reseller.orders.create') }}" class="hover:text-black transition-colors">Restock HQ</a>
+                        <span>/</span>
+                        <span class="text-gray-900">{{ $product->name }}</span>
+                    </nav>
 
-                        <!-- Dynamic Category Filter Tabs -->
-                        <?php
-                            $categories = $products->map(fn($p) => $p->category)->filter()->unique('id');
-                        ?>
-                        <div class="flex items-center gap-1.5 overflow-x-auto scrollbar-hide py-1">
-                            <button type="button" 
-                                    @click="activeCategory = 'all'"
-                                    :class="activeCategory === 'all' ? 'bg-black text-white shadow-md shadow-black/10' : 'bg-gray-50 hover:bg-gray-100 text-gray-600'" 
-                                    class="px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-all shrink-0">
-                                All Fragrances
-                            </button>
-                            <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <button type="button" 
-                                        @click="activeCategory = '<?php echo e($cat->id); ?>'"
-                                        :class="activeCategory === '<?php echo e($cat->id); ?>' ? 'bg-black text-white shadow-md shadow-black/10' : 'bg-gray-50 hover:bg-gray-100 text-gray-600'" 
-                                        class="px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-all shrink-0">
-                                    <?php echo e($cat->name); ?>
-
-                                </button>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                        </div>
-                    </div>
-
-                    <!-- Product Catalog Grid inside left column - Upgraded to 4 columns per row on desktop -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        <?php $counter = 0; ?>
-                        <?php $__currentLoopData = $products; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <?php
-                                $isLowStock = $product->stock < $productMoq;
-                                $effectiveMoq = $isLowStock ? $product->stock : $productMoq;
-                            ?>
-                            <div class="product-card bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between transition-all duration-300 hover:shadow-xl overflow-hidden group"
-                                 x-show="(search === '' || <?php echo e(json_encode(strtolower($product->name))); ?>.includes(search.toLowerCase()) || <?php echo e(json_encode(strtolower($product->sku))); ?>.includes(search.toLowerCase())) && (activeCategory === 'all' || activeCategory === '<?php echo e($product->category_id); ?>')">
+                    <!-- Large specs spec-sheet panel -->
+                    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden p-8 lg:p-12">
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-12">
+                            
+                            <!-- Gallery Column (md:col-span-5) -->
+                            <div class="md:col-span-5 flex flex-col gap-6"
+                                 x-data="{ activeImage: '{{ $product->primaryImage ? asset('storage/' . $product->primaryImage->image_path) : 'https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=1974&auto=format&fit=crop' }}' }">
                                 
-                                <!-- Premium Product Media (Clickable) -->
-                                <a href="<?php echo e(route('reseller.products.show', $product->slug)); ?>" class="block relative aspect-square bg-gray-50 flex items-center justify-center overflow-hidden shrink-0 group/media">
-                                    <?php if($product->primaryImage): ?>
-                                        <img src="<?php echo e(asset('storage/' . $product->primaryImage->image_path)); ?>" 
-                                             alt="<?php echo e($product->name); ?>" 
-                                             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-                                    <?php else: ?>
-                                        <div class="w-full h-full bg-gradient-to-br from-gray-100 to-gray-50/50 flex flex-col items-center justify-center p-6 text-center">
-                                            <svg class="w-12 h-12 text-gray-300 mb-2 transition-transform duration-500 group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
-                                            </svg>
-                                            <span class="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">No Image Available</span>
+                                <div class="aspect-[4/5] bg-gray-50 border border-gray-100 rounded-2xl overflow-hidden relative group shadow-sm">
+                                    <img :src="activeImage" 
+                                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                                         alt="{{ $product->name }}">
+                                    
+                                    <!-- Warehouse Stock Pill -->
+                                    <div class="absolute top-4 left-4 z-10">
+                                        @if($product->stock === 0)
+                                            <span class="px-3 py-1.5 bg-rose-500/90 backdrop-blur-md border border-rose-400 text-[9px] font-black uppercase tracking-widest text-white rounded-lg shadow-sm">
+                                                Sold Out
+                                            </span>
+                                        @elseif($product->stock < $productMoq)
+                                            <span class="px-3 py-1.5 bg-amber-500/90 backdrop-blur-md border border-amber-400 text-[9px] font-black uppercase tracking-widest text-white rounded-lg shadow-sm">
+                                                Clear Stock ({{ $product->stock }} Left)
+                                            </span>
+                                        @else
+                                            <span class="px-3 py-1.5 bg-emerald-500/90 backdrop-blur-md border border-emerald-400 text-[9px] font-black uppercase tracking-widest text-white rounded-lg shadow-sm">
+                                                In Stock ({{ $product->stock }})
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <!-- Gallery mini-thumbnails -->
+                                @if($product->images->count() > 1)
+                                    <div class="grid grid-cols-4 gap-3">
+                                        @foreach($product->images as $img)
+                                            @php $imgPath = asset('storage/' . $img->image_path); @endphp
+                                            <button type="button" 
+                                                    @click="activeImage = '{{ $imgPath }}'"
+                                                    class="aspect-square bg-gray-50 border rounded-xl overflow-hidden transition-all duration-300 relative group"
+                                                    :class="activeImage === '{{ $imgPath }}' ? 'border-black ring-2 ring-black/10' : 'border-gray-100 hover:border-gray-400'">
+                                                <img src="{{ $imgPath }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform">
+                                            </button>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
+
+                            <!-- Details Column (md:col-span-7) -->
+                            <div class="md:col-span-7 flex flex-col justify-between">
+                                <div class="space-y-8">
+                                    
+                                    <!-- Title Row -->
+                                    <div class="space-y-3">
+                                        <div class="flex flex-wrap items-center gap-3">
+                                            @if($product->volume_ml)
+                                                <span class="px-3 py-1 bg-black text-white text-[9px] font-black uppercase tracking-widest rounded-md">
+                                                    {{ $product->volume_ml }}ML Volume
+                                                </span>
+                                            @endif
                                         </div>
-                                    <?php endif; ?>
-                                </a>
+                                        <h1 class="text-2xl lg:text-3xl font-black text-gray-900 tracking-tight leading-none pt-1">{{ $product->name }}</h1>
+                                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">SKU Code: <span class="text-gray-900 font-black">{{ $product->sku }}</span></p>
+                                    </div>
 
-                                <!-- Product Summary & Actions -->
-                                <div class="p-4 md:p-5 flex-1 flex flex-col justify-between">
-                                    <!-- Clickable Metadata Body -->
-                                    <a href="<?php echo e(route('reseller.products.show', $product->slug)); ?>" class="block space-y-4 group/text">
-                                        <!-- Category & Stock Badges Row -->
-                                        <div class="flex items-center justify-between gap-2">
-                                            <?php if($product->category): ?>
-                                                <span class="text-[9px] font-black text-indigo-500 uppercase tracking-widest bg-indigo-50 px-2.5 py-1 rounded-md leading-none"><?php echo e($product->category->name); ?></span>
-                                            <?php else: ?>
-                                                <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest bg-gray-50 px-2.5 py-1 rounded-md leading-none">Catalog</span>
-                                            <?php endif; ?>
-
-                                            <?php if($product->stock > 0): ?>
-                                                <span class="px-2 py-1 bg-emerald-50 text-emerald-600 text-[8px] font-black uppercase tracking-widest rounded border border-emerald-100 leading-none">In Stock (<?php echo e($product->stock); ?>)</span>
-                                            <?php else: ?>
-                                                <span class="px-2 py-1 bg-rose-50 text-rose-600 text-[8px] font-black uppercase tracking-widest rounded border border-rose-100 leading-none">Sold Out</span>
-                                            <?php endif; ?>
-                                        </div>
-
-                                        <!-- Name & Volume next to each other -->
-                                        <h3 class="text-[15px] font-bold text-gray-900 leading-snug tracking-tight group-hover/text:text-emerald-600 transition-colors">
-                                            <?php echo e($product->name); ?>
-
-                                            <?php if($product->volume_ml): ?>
-                                                <span class="text-[11px] font-bold text-gray-400 ml-1">(<?php echo e($product->volume_ml); ?>ML)</span>
-                                            <?php endif; ?>
-                                        </h3>
-                                    </a>
-
-                                    <!-- Price, MOQ & Add to Cart Trigger -->
-                                    <div class="pt-5 mt-6 border-t border-gray-100 flex flex-col gap-4">
-                                        <div class="flex items-center justify-between gap-2">
-                                            <div>
-                                                <p class="text-[9px] font-black text-gray-400 uppercase tracking-wider">Price per Unit</p>
-                                                <p class="text-base font-black text-gray-900 mt-0.5">RM<?php echo e(number_format($product->wholesale_price, 2)); ?></p>
-                                                <?php if($isLowStock): ?>
-                                                    <span class="inline-block mt-1 text-[8px] font-black text-rose-500 uppercase tracking-wider bg-rose-50 px-2 py-0.5 rounded leading-none animate-pulse">Clear Stock: Buy All (<?php echo e($product->stock); ?>)</span>
-                                                <?php else: ?>
-                                                    <span class="inline-block mt-1 text-[8px] font-black text-amber-500 uppercase tracking-wider bg-amber-50 px-2 py-0.5 rounded leading-none">Min. <?php echo e($productMoq); ?> units</span>
-                                                <?php endif; ?>
+                                    <!-- Price spec table -->
+                                    <div class="bg-gradient-to-br from-gray-50 to-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+                                        <div class="grid grid-cols-3 gap-6 items-center">
+                                            
+                                            <!-- Wholesale Price -->
+                                            <div class="space-y-1">
+                                                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none">Wholesale Price</p>
+                                                <p class="text-xl font-black text-gray-900 tracking-tight">RM{{ number_format($product->wholesale_price, 2) }}</p>
+                                                <p class="text-[8px] font-medium text-gray-400">Unit Cost</p>
                                             </div>
 
-                                            <!-- Contextual Interactive Quantity Panel -->
-                                            <div class="relative shrink-0 flex items-center justify-end">
-                                                <!-- Hidden fields for cart calculation scripts -->
-                                                <input type="hidden" class="product-id" value="<?php echo e($product->id); ?>">
-                                                <input type="hidden" class="product-price" value="<?php echo e($product->wholesale_price); ?>">
-                                                <input type="hidden" class="product-name" value="<?php echo e($product->name); ?>">
-                                                <input type="hidden" class="product-sku" value="<?php echo e($product->sku); ?>">
-                                                <input type="hidden" class="product-image" value="<?php echo e($product->primaryImage ? asset('storage/' . $product->primaryImage->image_path) : ''); ?>">
-                                                <input type="hidden" class="product-max" value="<?php echo e($product->stock); ?>">
-                                                <input type="hidden" class="product-effective-moq" value="<?php echo e($effectiveMoq); ?>">
-                                                <input type="hidden" class="product-buy-all" value="<?php echo e($isLowStock ? 'true' : 'false'); ?>">
+                                            <!-- Retail Price -->
+                                            <div class="space-y-1 border-l border-gray-100 pl-6">
+                                                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none">Retail Price</p>
+                                                <p class="text-lg font-bold text-gray-900 tracking-tight">RM{{ number_format($product->retail_price, 2) }}</p>
+                                                <p class="text-[8px] font-medium text-gray-400">RSP</p>
+                                            </div>
 
-                                                <!-- State 1: Sleek "Add to Cart" Button (Displayed when quantity is 0) -->
+                                            <!-- Profit Margins -->
+                                            <div class="space-y-1 border-l border-gray-100 pl-4 bg-amber-50/50 p-3 rounded-xl border border-amber-100/50">
+                                                <p class="text-[9px] font-black text-amber-600 uppercase tracking-widest leading-none">Profit Margin</p>
+                                                <p class="text-lg font-black text-amber-700 tracking-tight">+RM{{ number_format($profit, 2) }}</p>
+                                                <p class="text-[9px] font-black text-amber-600 uppercase tracking-wider mt-0.5">{{ $margin }}% ROI</p>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                    <!-- Olfactory pyramid notes -->
+                                    <div class="space-y-4">
+                                        <h3 class="text-[10px] font-black text-gray-900 uppercase tracking-widest border-b border-gray-50 pb-2">Olfactory Profile Notes</h3>
+                                        
+                                        <div class="grid grid-cols-3 gap-3">
+                                            <div class="p-3 bg-gray-50/50 border border-gray-100 rounded-xl space-y-1">
+                                                <span class="text-[8px] font-black text-gray-400 uppercase tracking-widest">Top Note</span>
+                                                <p class="text-[11px] font-bold text-gray-800 leading-snug">{{ $product->top_note ?: 'Subtle citrus aura' }}</p>
+                                            </div>
+                                            
+                                            <div class="p-3 bg-gray-50/50 border border-gray-100 rounded-xl space-y-1">
+                                                <span class="text-[8px] font-black text-gray-400 uppercase tracking-widest">Heart Note</span>
+                                                <p class="text-[11px] font-bold text-gray-800 leading-snug">{{ $product->heart_note ?: 'Exotic florals' }}</p>
+                                            </div>
+
+                                            <div class="p-3 bg-gray-50/50 border border-gray-100 rounded-xl space-y-1">
+                                                <span class="text-[8px] font-black text-gray-400 uppercase tracking-widest">Base Note</span>
+                                                <p class="text-[11px] font-bold text-gray-800 leading-snug">{{ $product->base_note ?: 'Amber musk' }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Product Description -->
+                                    <div class="space-y-3">
+                                        <h3 class="text-[10px] font-black text-gray-900 uppercase tracking-widest border-b border-gray-50 pb-2">Product Heritage</h3>
+                                        <p class="text-xs font-medium text-gray-500 leading-relaxed">
+                                            {{ $product->description ?: 'An exquisite formulation handcrafted to represent luxury. Handcrafted with organic base elements that diffuse beautifully across the skin, leaving a persistent trail of elegance.' }}
+                                        </p>
+                                    </div>
+
+                                </div>
+
+                                <!-- Dynamic cart operations matching inputs node indexes -->
+                                @php
+                                    $effectiveMoq = $product->stock < $productMoq ? $product->stock : $productMoq;
+                                    $isLowStock = $product->stock < $productMoq;
+                                    $loopIndex = $allProducts->search(fn($p) => $p->id === $product->id);
+                                @endphp
+
+                                <div class="pt-10 mt-10 border-t border-gray-50 flex flex-col sm:flex-row items-center justify-between gap-6">
+                                    <a href="{{ route('reseller.orders.create') }}" 
+                                       class="px-6 py-3.5 bg-gray-50 hover:bg-gray-100 border border-gray-100 text-gray-700 text-[10px] font-bold uppercase tracking-widest rounded-xl transition-all flex items-center gap-2">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                                        </svg>
+                                        <span>Back to Restock HQ</span>
+                                    </a>
+
+                                    <div class="flex items-center gap-4">
+                                        @if($product->stock === 0)
+                                            <button type="button" disabled class="px-8 py-3.5 bg-gray-100 text-gray-400 text-[10px] font-bold uppercase tracking-widest rounded-xl cursor-not-allowed">
+                                                Out of Stock
+                                            </button>
+                                        @else
+                                            <div class="relative flex items-center justify-end product-metadata-node">
+                                                <!-- Same metadata fields so that adjustQty target references map correctly -->
+                                                <input type="hidden" class="product-id" value="{{ $product->id }}">
+                                                <input type="hidden" class="product-price" value="{{ $product->wholesale_price }}">
+                                                <input type="hidden" class="product-name" value="{{ $product->name }}">
+                                                <input type="hidden" class="product-sku" value="{{ $product->sku }}">
+                                                <input type="hidden" class="product-image" value="{{ $product->primaryImage ? asset('storage/' . $product->primaryImage->image_path) : '' }}">
+                                                <input type="hidden" class="product-max" value="{{ $product->stock }}">
+                                                <input type="hidden" class="product-effective-moq" value="{{ $effectiveMoq }}">
+                                                <input type="hidden" class="product-buy-all" value="{{ $isLowStock ? 'true' : 'false' }}">
+
+                                                <!-- State 1: Sleek "Add to Cart" Button -->
                                                 <button type="button" 
-                                                        class="add-to-cart-btn px-4 py-2.5 bg-black hover:bg-gray-800 text-white text-[10px] font-bold uppercase tracking-widest rounded-xl transition-all shadow-sm active:scale-95 flex items-center gap-1.5 <?php echo e($product->stock === 0 ? 'opacity-30 cursor-not-allowed pointer-events-none' : ''); ?>"
-                                                        data-counter="<?php echo e($counter); ?>"
-                                                        onclick="addToCartAction(<?php echo e($counter); ?>)">
+                                                        class="add-to-cart-btn px-8 py-3.5 bg-black hover:bg-gray-800 text-white text-[10px] font-bold uppercase tracking-widest rounded-xl transition-all shadow-md active:scale-95 flex items-center gap-2"
+                                                        data-counter="{{ $loopIndex }}"
+                                                        onclick="addToCartAction({{ $loopIndex }})">
                                                     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                                                     </svg>
                                                     <span>Add To Cart</span>
                                                 </button>
 
-                                                <!-- State 2: Active Quantity Selector (Visible when quantity > 0) -->
-                                                <div class="qty-counter-widget hidden items-center gap-1 bg-gray-50 border border-gray-100 p-1 rounded-xl">
-                                                    <!-- Decrement / Complete Removal Trash Selector -->
+                                                <!-- State 2: Active Quantity Selector widget -->
+                                                <div class="qty-counter-widget hidden items-center gap-1.5 bg-gray-50 border border-gray-100 p-1.5 rounded-xl">
+                                                    <!-- Decrement / Trash Selector -->
                                                     <button type="button" 
                                                             class="qty-btn minus w-8 h-8 rounded-lg flex items-center justify-center bg-white border border-gray-100 text-gray-400 hover:text-black hover:border-black transition-all shadow-sm"
-                                                            onclick="adjustQty(<?php echo e($counter); ?>, false)">
-                                                        <?php if($isLowStock): ?>
-                                                            <!-- Elegant trash bin icon when Buy-All is active -->
+                                                            onclick="adjustQty({{ $loopIndex }}, false)">
+                                                        @if($isLowStock)
                                                             <svg class="w-3.5 h-3.5 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                                             </svg>
-                                                        <?php else: ?>
+                                                        @else
                                                             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4"/>
                                                             </svg>
-                                                        <?php endif; ?>
+                                                        @endif
                                                     </button>
                                                     
-                                                    <input type="number" 
-                                                           name="quantity[<?php echo e($counter); ?>]" 
-                                                           class="qty-input w-10 text-center text-xs font-bold border-transparent bg-transparent p-0 focus:ring-0 text-gray-900 tabular-nums <?php echo e($isLowStock ? 'pointer-events-none bg-rose-50/50 rounded text-rose-600' : ''); ?>" 
-                                                           data-counter="<?php echo e($counter); ?>"
-                                                           value="<?php echo e(old('quantity.' . $counter, $cartItems[$product->id] ?? 0)); ?>" 
-                                                           min="0" 
-                                                           max="<?php echo e($product->stock); ?>"
-                                                           onchange="validateInput(<?php echo e($counter); ?>)"
-                                                           <?php echo e($product->stock === 0 ? 'disabled' : ''); ?>
+                                                    <!-- Active widget counter display -->
+                                                    <span class="qty-display-detail w-8 text-center text-xs font-black text-gray-900 tabular-nums {{ $isLowStock ? 'text-rose-600 bg-rose-50/50 rounded py-1 px-1.5' : '' }}">
+                                                        0
+                                                    </span>
 
-                                                           <?php echo e($isLowStock ? 'readonly' : ''); ?>>
-                                                           
-                                                    <input type="hidden" name="product_id[<?php echo e($counter); ?>]" value="<?php echo e($product->id); ?>">
-
-                                                    <!-- Increment Button (Hidden entirely if Low-Stock is active and buying all is locked) -->
+                                                    <!-- Increment Button -->
                                                     <button type="button" 
-                                                            class="qty-btn plus w-8 h-8 rounded-lg flex items-center justify-center bg-white border border-gray-100 text-gray-400 hover:text-black hover:border-black transition-all shadow-sm <?php echo e($isLowStock ? 'hidden' : ''); ?>"
-                                                            onclick="adjustQty(<?php echo e($counter); ?>, true)">
+                                                            class="qty-btn plus w-8 h-8 rounded-lg flex items-center justify-center bg-white border border-gray-100 text-gray-400 hover:text-black hover:border-black transition-all shadow-sm {{ $isLowStock ? 'hidden' : '' }}"
+                                                            onclick="adjustQty({{ $loopIndex }}, true)">
                                                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                                                         </svg>
                                                     </button>
                                                 </div>
                                             </div>
-                                        </div>
+                                        @endif
                                     </div>
                                 </div>
+
                             </div>
-                            <?php $counter++; ?>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </div>
+
                     </div>
                 </div>
 
@@ -285,8 +306,8 @@
                         <!-- Progress and MOQ Tracker Indicator -->
                         <div class="border-t border-gray-100 pt-5 space-y-3">
                             <div class="flex justify-between items-baseline">
-                                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">MOQ Progress (<?php echo e($totalMoq); ?> Min)</p>
-                                <p class="text-xs font-black text-gray-900 tabular-nums"><span class="cart-total-items text-sm font-black">0</span> / <?php echo e($totalMoq); ?></p>
+                                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">MOQ Progress ({{ $totalMoq }} Min)</p>
+                                <p class="text-xs font-black text-gray-900 tabular-nums"><span class="cart-total-items text-sm font-black">0</span> / {{ $totalMoq }}</p>
                             </div>
                             <!-- Progress Line Bar -->
                             <div class="w-full bg-gray-50 h-2 rounded-full overflow-hidden shadow-inner relative">
@@ -296,7 +317,7 @@
                                 <svg class="w-3.5 h-3.5 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                                 </svg>
-                                <span>Wholesale orders require a minimum of <?php echo e($totalMoq); ?> items.</span>
+                                <span>Wholesale orders require a minimum of {{ $totalMoq }} items.</span>
                             </div>
                         </div>
 
@@ -309,7 +330,7 @@
                             <button type="submit" 
                                     class="cart-checkout-btn w-full py-4 bg-gray-100 text-gray-400 font-bold text-xs uppercase tracking-widest rounded-xl transition-all duration-300 cursor-not-allowed text-center"
                                     disabled>
-                                Need <?php echo e($totalMoq); ?> Items
+                                Need {{ $totalMoq }} Items
                             </button>
                         </div>
                     </div>
@@ -344,7 +365,6 @@
                             </div>
                             <div class="flex items-center gap-3">
                                 <span id="cart-items-count-text" class="cart-items-count-text text-[9px] font-bold text-gray-400 uppercase tracking-wider">0 Items</span>
-                                <!-- Close button -->
                                 <button type="button" x-on:click="cartOpen = false" class="text-gray-400 hover:text-black">
                                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
@@ -353,7 +373,7 @@
                             </div>
                         </div>
 
-                        <!-- Scrollable Selected Wholesale Items List -->
+                        <!-- Scrollable Selected Items List -->
                         <div id="cart-items-list" class="cart-items-list space-y-4 max-h-[380px] overflow-y-auto pr-3 py-2 divide-y divide-gray-50">
                             <!-- Populated in real-time via JS -->
                         </div>
@@ -361,10 +381,9 @@
                         <!-- Progress and MOQ Tracker Indicator -->
                         <div class="border-t border-gray-100 pt-5 space-y-3">
                             <div class="flex justify-between items-baseline">
-                                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">MOQ Progress (<?php echo e($totalMoq); ?> Min)</p>
-                                <p class="text-xs font-black text-gray-900 tabular-nums"><span id="total-items" class="cart-total-items text-sm font-black">0</span> / <?php echo e($totalMoq); ?></p>
+                                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">MOQ Progress ({{ $totalMoq }} Min)</p>
+                                <p class="text-xs font-black text-gray-900 tabular-nums"><span id="total-items" class="cart-total-items text-sm font-black">0</span> / {{ $totalMoq }}</p>
                             </div>
-                            <!-- Graphical Progress Bar -->
                             <div class="w-full h-2 bg-gray-50 rounded-full overflow-hidden shadow-inner relative">
                                 <div id="moq-progress" class="cart-moq-progress h-full bg-gradient-to-r from-amber-400 to-indigo-500 rounded-full transition-all duration-500 w-0"></div>
                             </div>
@@ -372,23 +391,22 @@
                                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                                 </svg>
-                                <span>Wholesale orders require a minimum of <?php echo e($totalMoq); ?> items.</span>
+                                <span>Wholesale orders require a minimum of {{ $totalMoq }} items.</span>
                             </p>
                         </div>
 
-                        <!-- Checkout & Subtotal Summary Panel -->
+                        <!-- Checkout Summary -->
                         <div class="border-t border-gray-100 pt-5 space-y-4">
                             <div class="flex items-center justify-between">
                                 <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Wholesale Subtotal</span>
                                 <span id="total-price" class="cart-total-price text-xl font-black text-gray-900 tracking-tight tabular-nums">RM0.00</span>
                             </div>
                             
-                            <!-- Form Submission Checkout Button -->
                             <button type="submit" 
                                     id="checkout-btn" 
                                     disabled 
                                     class="cart-checkout-btn w-full py-4 bg-gray-100 text-gray-400 font-bold text-xs uppercase tracking-widest rounded-xl transition-all duration-300 cursor-not-allowed text-center">
-                                Need <?php echo e($totalMoq); ?> Items
+                                Need {{ $totalMoq }} Items
                             </button>
                         </div>
 
@@ -410,8 +428,8 @@
             <!-- MOQ Progress Tracker -->
             <div class="space-y-1.5">
                 <div class="flex justify-between items-baseline">
-                    <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">MOQ Progress (<?php echo e($totalMoq); ?> Min)</span>
-                    <span class="text-[10px] font-black text-gray-900 tabular-nums"><span id="floating-total-items" class="text-xs font-black">0</span> / <?php echo e($totalMoq); ?></span>
+                    <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">MOQ Progress ({{ $totalMoq }} Min)</span>
+                    <span class="text-[10px] font-black text-gray-900 tabular-nums"><span id="floating-total-items" class="text-xs font-black">0</span> / {{ $totalMoq }}</span>
                 </div>
                 <!-- Progress Line Bar -->
                 <div class="w-full bg-gray-50 h-1.5 rounded-full overflow-hidden shadow-inner relative">
@@ -440,16 +458,16 @@
                         id="floating-checkout-btn" 
                         disabled 
                         class="flex-1 py-3.5 bg-gray-100 text-gray-400 font-bold text-xs uppercase tracking-widest rounded-xl transition-all duration-300 cursor-not-allowed text-center shadow-sm">
-                    Need <?php echo e($totalMoq); ?> Items
+                    Need {{ $totalMoq }} Items
                 </button>
             </div>
         </div>
 
     </div>
 
-    <!-- Real-time E-Commerce Bidirectional Cart Sync JavaScript Engine -->
+    <!-- E-Commerce Bidirectional Real-Time Cart Syncer Script -->
     <script>
-        function initializeCartEngine() {
+        function initializeProductDetailCartEngine() {
             const inputs = document.querySelectorAll('.qty-input');
             const totalItemsEl = document.getElementById('total-items');
             const totalPrices = document.querySelectorAll('#total-price');
@@ -462,8 +480,8 @@
             const cartItemsCountText = document.getElementById('cart-items-count-text');
             const cartItemsList = document.getElementById('cart-items-list');
 
-            const MIN_ORDER_QTY = <?php echo e($totalMoq); ?>;
-            const MIN_PRODUCT_QTY = <?php echo e($productMoq); ?>;
+            const MIN_ORDER_QTY = {{ $totalMoq }};
+            const MIN_PRODUCT_QTY = {{ $productMoq }};
 
             // Bidirectional State Synchronizer
             window.syncCardState = function(counter) {
@@ -471,42 +489,75 @@
                 if (!input) return;
 
                 const val = parseInt(input.value) || 0;
-                const parentContainer = input.closest('.relative');
-                if (!parentContainer) return;
-
-                const addToCartBtn = parentContainer.querySelector('.add-to-cart-btn');
-                const qtyWidget = parentContainer.querySelector('.qty-counter-widget');
-
-                if (addToCartBtn && qtyWidget) {
-                    if (val > 0) {
-                        addToCartBtn.classList.add('hidden');
-                        qtyWidget.classList.remove('hidden');
-                        qtyWidget.classList.add('flex');
-                    } else {
-                        addToCartBtn.classList.remove('hidden');
-                        qtyWidget.classList.add('hidden');
-                        qtyWidget.classList.remove('flex');
+                // Query container
+                const parentContainers = document.querySelectorAll('.product-metadata-node');
+                
+                // Track matching nodes across both hidden lists and visible specs panel
+                let currentProductId = '';
+                parentContainers.forEach(container => {
+                    const inputNode = container.querySelector(`.qty-input[data-counter="${counter}"]`);
+                    if (inputNode) {
+                        const pidNode = container.querySelector('.product-id');
+                        if (pidNode) currentProductId = pidNode.value;
                     }
-                }
+                });
+
+                // Update widgets anywhere on the page matching this product ID
+                const activeCardContainers = document.querySelectorAll(`.product-metadata-node`);
+                activeCardContainers.forEach(container => {
+                    const pidEl = container.querySelector('.product-id');
+                    if (pidEl && pidEl.value === currentProductId) {
+                        const inputNode = container.querySelector(`.qty-input`);
+                        if (inputNode) {
+                            inputNode.value = val; // keep inputs in lockstep
+                        }
+
+                        const addToCartBtn = container.querySelector('.add-to-cart-btn');
+                        const qtyWidget = container.querySelector('.qty-counter-widget');
+                        const qtyDisplay = container.querySelector('.qty-display-detail');
+
+                        if (qtyDisplay) {
+                            qtyDisplay.textContent = val;
+                        }
+
+                        if (addToCartBtn && qtyWidget) {
+                            if (val > 0) {
+                                addToCartBtn.classList.add('hidden');
+                                qtyWidget.classList.remove('hidden');
+                                qtyWidget.classList.add('flex');
+                            } else {
+                                addToCartBtn.classList.remove('hidden');
+                                qtyWidget.classList.add('hidden');
+                                qtyWidget.classList.remove('flex');
+                            }
+                        }
+                    }
+                });
             };
 
-            // Sync current item quantity to database cart via AJAX
+            // Sync quantity selection to database via AJAX
             function syncCartToDatabase(counter) {
                 const input = document.querySelector(`.qty-input[data-counter="${counter}"]`);
                 if (!input) return;
 
-                const parent = input.closest('.relative');
-                if (!parent) return;
-                const pidEl = parent.querySelector('.product-id');
-                if (!pidEl) return;
-                const productId = pidEl.value;
+                const parentContainers = document.querySelectorAll('.product-metadata-node');
+                let productId = '';
+                parentContainers.forEach(container => {
+                    const inputNode = container.querySelector(`.qty-input[data-counter="${counter}"]`);
+                    if (inputNode) {
+                        const pidNode = container.querySelector('.product-id');
+                        if (pidNode) productId = pidNode.value;
+                    }
+                });
+
+                if (!productId) return;
                 const quantity = parseInt(input.value) || 0;
 
-                fetch("<?php echo e(route('reseller.cart.update')); ?>", {
+                fetch("{{ route('reseller.cart.update') }}", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': "<?php echo e(csrf_token()); ?>"
+                        'X-CSRF-TOKEN': "{{ csrf_token() }}"
                     },
                     body: JSON.stringify({
                         product_id: productId,
@@ -522,18 +573,29 @@
                 });
             }
 
-            // "Add to Cart" Initial Trigger Click
+            // Add To Cart Click trigger
             window.addToCartAction = function(counter) {
                 const input = document.querySelector(`.qty-input[data-counter="${counter}"]`);
                 if (!input) return;
 
-                const max = parseInt(input.max) || 0;
-                if (max <= 0) return; // Prevent out of stock trigger
+                const parentContainers = document.querySelectorAll('.product-metadata-node');
+                let max = 0;
+                let effectiveMoq = MIN_PRODUCT_QTY;
 
-                const parent = input.closest('.relative');
-                const effectiveMoq = parseInt(parent.querySelector('.product-effective-moq').value) || MIN_PRODUCT_QTY;
+                parentContainers.forEach(container => {
+                    const inputNode = container.querySelector(`.qty-input[data-counter="${counter}"]`);
+                    if (inputNode) {
+                        const maxEl = container.querySelector('.product-max');
+                        const moqEl = container.querySelector('.product-effective-moq');
+                        const maxVal = maxEl ? (parseInt(maxEl.value) || 0) : 0;
+                        const moqVal = moqEl ? (parseInt(moqEl.value) || MIN_PRODUCT_QTY) : MIN_PRODUCT_QTY;
+                        max = maxVal;
+                        effectiveMoq = moqVal;
+                    }
+                });
 
-                // Instantly set to effective MOQ (which is exactly all available stock for stock < 10)
+                if (max <= 0) return;
+
                 input.value = Math.min(max, effectiveMoq);
                 
                 syncCardState(counter);
@@ -541,20 +603,31 @@
                 syncCartToDatabase(counter);
             };
 
-            // Increments or decrements item quantities
+            // Plus/Minus adjusters
             window.adjustQty = function(counter, isPlus) {
                 const input = document.querySelector(`.qty-input[data-counter="${counter}"]`);
                 if (!input) return;
 
-                const max = parseInt(input.max) || 0;
+                const parentContainers = document.querySelectorAll('.product-metadata-node');
+                let max = 0;
+                let effectiveMoq = MIN_PRODUCT_QTY;
+                let buyAll = false;
+
+                parentContainers.forEach(container => {
+                    const inputNode = container.querySelector(`.qty-input[data-counter="${counter}"]`);
+                    if (inputNode) {
+                        const maxEl = container.querySelector('.product-max');
+                        const moqEl = container.querySelector('.product-effective-moq');
+                        const buyAllEl = container.querySelector('.product-buy-all');
+                        max = maxEl ? (parseInt(maxEl.value) || 0) : 0;
+                        effectiveMoq = moqEl ? (parseInt(moqEl.value) || MIN_PRODUCT_QTY) : MIN_PRODUCT_QTY;
+                        buyAll = buyAllEl ? (buyAllEl.value === 'true') : false;
+                    }
+                });
+
                 let val = parseInt(input.value) || 0;
 
-                const parent = input.closest('.relative');
-                const buyAll = parent.querySelector('.product-buy-all').value === 'true';
-                const effectiveMoq = parseInt(parent.querySelector('.product-effective-moq').value) || MIN_PRODUCT_QTY;
-
                 if (buyAll) {
-                    // For Buy-All Low Stock Items, we toggle strictly between 0 and effectiveMoq (full stock)
                     if (isPlus) {
                         input.value = effectiveMoq;
                     } else {
@@ -567,7 +640,6 @@
                         }
                     } else {
                         if (val <= effectiveMoq) {
-                            // Drop beneath MOQ snaps back to zero (and resets to button view)
                             input.value = 0;
                         } else if (val > 0) {
                             input.value = val - 1;
@@ -580,21 +652,33 @@
                 syncCartToDatabase(counter);
             };
 
-            // Handles keyboard wedge direct quantity inputs
+            // Direct keyboards validation
             window.validateInput = function(counter) {
                 const input = document.querySelector(`.qty-input[data-counter="${counter}"]`);
                 if (!input) return;
 
-                const max = parseInt(input.max) || 0;
-                let val = parseInt(input.value) || 0;
+                const parentContainers = document.querySelectorAll('.product-metadata-node');
+                let max = 0;
+                let effectiveMoq = MIN_PRODUCT_QTY;
+                let buyAll = false;
 
-                const parent = input.closest('.relative');
-                const buyAll = parent.querySelector('.product-buy-all').value === 'true';
-                const effectiveMoq = parseInt(parent.querySelector('.product-effective-moq').value) || MIN_PRODUCT_QTY;
+                parentContainers.forEach(container => {
+                    const inputNode = container.querySelector(`.qty-input[data-counter="${counter}"]`);
+                    if (inputNode) {
+                        const maxEl = container.querySelector('.product-max');
+                        const moqEl = container.querySelector('.product-effective-moq');
+                        const buyAllEl = container.querySelector('.product-buy-all');
+                        max = maxEl ? (parseInt(maxEl.value) || 0) : 0;
+                        effectiveMoq = moqEl ? (parseInt(moqEl.value) || MIN_PRODUCT_QTY) : MIN_PRODUCT_QTY;
+                        buyAll = buyAllEl ? (buyAllEl.value === 'true') : false;
+                    }
+                });
+
+                let val = parseInt(input.value) || 0;
 
                 if (buyAll) {
                     if (val > 0) {
-                        input.value = effectiveMoq; // Snaps to full stock always
+                        input.value = effectiveMoq;
                     } else {
                         input.value = 0;
                     }
@@ -604,7 +688,6 @@
                     } else if (val > max) {
                         input.value = max;
                     } else if (val > 0 && val < effectiveMoq) {
-                        // Snaps to MOQ if input is set below minimum per-product requirement
                         input.value = Math.min(max, effectiveMoq);
                     }
                 }
@@ -614,7 +697,6 @@
                 syncCartToDatabase(counter);
             };
 
-            // Outer Sidebar Actions
             window.adjustCartQty = function(counter, isPlus) {
                 adjustQty(counter, isPlus);
             };
@@ -635,29 +717,41 @@
                 let price = 0;
                 let listHtml = '';
 
+                // Capture mapping values (unique per product ID)
+                const processedProductIds = new Set();
+
                 inputs.forEach(input => {
                     const qty = parseInt(input.value) || 0;
-                    if (qty > 0) {
-                        const parent = input.parentElement ? input.parentElement.closest('.relative') : null;
-                        if (!parent) return;
+                    const counterIndex = input.getAttribute('data-counter');
+                    
+                    // Locate specs
+                    const parentContainers = document.querySelectorAll('.product-metadata-node');
+                    let pId = '', unitPrice = 0, pName = '', pSku = '', pImg = '', buyAll = false;
 
-                        const priceEl = parent.querySelector('.product-price');
-                        const nameEl = parent.querySelector('.product-name');
-                        const skuEl = parent.querySelector('.product-sku');
-                        const imgEl = parent.querySelector('.product-image');
-                        const buyAllEl = parent.querySelector('.product-buy-all');
+                    parentContainers.forEach(container => {
+                        const inputNode = container.querySelector(`.qty-input[data-counter="${counterIndex}"]`);
+                        if (inputNode) {
+                            const idNode = container.querySelector('.product-id');
+                            const priceNode = container.querySelector('.product-price');
+                            const nameNode = container.querySelector('.product-name');
+                            const skuNode = container.querySelector('.product-sku');
+                            const imgNode = container.querySelector('.product-image');
+                            const buyAllNode = container.querySelector('.product-buy-all');
 
-                        const unitPrice = priceEl ? (parseFloat(priceEl.value) || 0) : 0;
-                        const pName = nameEl ? nameEl.value : 'Fragrance';
-                        const pSku = skuEl ? skuEl.value : '';
-                        const pImg = imgEl ? imgEl.value : '';
-                        const buyAll = buyAllEl ? (buyAllEl.value === 'true') : false;
-                        const counterIndex = input.getAttribute('data-counter');
+                            pId = idNode ? idNode.value : '';
+                            unitPrice = priceNode ? (parseFloat(priceNode.value) || 0) : 0;
+                            pName = nameNode ? nameNode.value : 'Fragrance';
+                            pSku = skuNode ? skuNode.value : '';
+                            pImg = imgNode ? imgNode.value : '';
+                            buyAll = buyAllNode ? (buyAllNode.value === 'true') : false;
+                        }
+                    });
 
+                    if (qty > 0 && pId && !processedProductIds.has(pId)) {
+                        processedProductIds.add(pId);
                         items += qty;
                         price += (qty * unitPrice);
 
-                        // Render elegant item card details inside checkout drawer/sidebar
                         let qtyControlsHtml = '';
                         if (buyAll) {
                             qtyControlsHtml = `
@@ -688,28 +782,22 @@
                             <div class="py-4 flex flex-col gap-3 group">
                                 <div class="flex items-center justify-between gap-3">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 bg-gray-50 border border-gray-100 rounded-xl flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
-                                            ${pImg ? `<img src="${pImg}" class="w-full h-full object-cover">` : `
-                                                <svg class="w-4 h-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
-                                                </svg>
-                                            `}
+                                        <div class="w-10 h-10 bg-gray-50 border border-gray-100 rounded-lg overflow-hidden shrink-0">
+                                            <img src="${pImg || 'https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=1974'}" class="w-full h-full object-cover">
                                         </div>
-                                        <div>
-                                            <p class="text-xs font-bold text-gray-900 line-clamp-1 leading-snug">${pName}</p>
-                                            <p class="text-[10px] font-black text-gray-900 mt-1">RM${unitPrice.toFixed(2)}/unit</p>
+                                        <div class="text-left">
+                                            <p class="text-[11px] font-bold text-gray-900 leading-tight">${pName}</p>
+                                            <p class="text-[8px] font-semibold text-gray-400 uppercase tracking-widest">${pSku}</p>
+                                            <p class="text-[10px] font-black text-gray-900">RM${unitPrice.toFixed(2)}</p>
                                         </div>
                                     </div>
-                                    
-                                    <button type="button" onclick="removeFromCart(${counterIndex})" class="w-8 h-8 rounded-lg flex items-center justify-center bg-gray-50 border border-gray-100 text-gray-400 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-100 transition-all" title="Remove Item">
+                                    <button type="button" onclick="removeFromCart(${counterIndex})" class="w-8 h-8 rounded-lg flex items-center justify-center bg-gray-50 border border-gray-100 text-gray-400 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-100 transition-all">
                                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                         </svg>
                                     </button>
                                 </div>
-
                                 <div class="flex items-center justify-between bg-gray-50/50 rounded-xl p-2 border border-gray-100">
-                                    <!-- Sidebar Quantity Controllers -->
                                     ${qtyControlsHtml}
                                     <p class="text-xs font-black text-gray-900 tabular-nums">RM${(qty * unitPrice).toFixed(2)}</p>
                                 </div>
@@ -753,10 +841,10 @@
                 cartItemsListEls.forEach(el => {
                     el.innerHTML = listHtml || `
                         <div class="py-10 text-center flex flex-col items-center justify-center gap-3">
-                            <svg class="w-8 h-8 text-gray-300 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <svg class="w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                             </svg>
-                            <p class="text-xs font-semibold text-gray-400">Your shopping cart is currently empty. Click "Add to Cart" on fragrances to begin purchasing.</p>
+                            <p class="text-[11px] font-bold text-gray-400">Your shopping cart is currently empty.</p>
                         </div>
                     `;
                 });
@@ -876,7 +964,7 @@
                 }
             }
 
-            // Initialization loop
+            // Page Boot Initialization
             inputs.forEach(input => {
                 const counter = input.getAttribute('data-counter');
                 syncCardState(counter);
@@ -898,19 +986,10 @@
         }
 
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initializeCartEngine);
+            document.addEventListener('DOMContentLoaded', initializeProductDetailCartEngine);
         } else {
-            initializeCartEngine();
+            initializeProductDetailCartEngine();
         }
     </script>
- <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>
-<?php $attributes = $__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54; ?>
-<?php unset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>
-<?php $component = $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54; ?>
-<?php unset($__componentOriginal9ac128a9029c0e4701924bd2d73d7f54); ?>
-<?php endif; ?>
-<?php /**PATH C:\Users\USER\Documents\Project Code\reef_inventory\resources\views/reseller/orders/create.blade.php ENDPATH**/ ?>
+
+</x-app-layout>

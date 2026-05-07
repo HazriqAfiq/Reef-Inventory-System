@@ -28,7 +28,6 @@ class StoreProductRequest extends FormRequest
             'top_note'        => ['nullable', 'string'],
             'heart_note'      => ['nullable', 'string'],
             'base_note'       => ['nullable', 'string'],
-            'fragrance_family' => ['nullable', 'string', 'in:fresh,woody,floral,oriental,gourmand'],
             'wholesale_price' => ['nullable', 'numeric', 'min:0'],
             'retail_price'    => ['nullable', 'numeric', 'min:0'],
             'stock'           => ['nullable', 'integer', 'min:0'],

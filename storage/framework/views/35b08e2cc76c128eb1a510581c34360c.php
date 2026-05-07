@@ -44,15 +44,12 @@
 
                     
                     <td class="px-8 py-5 text-right">
-                        <div class="flex items-center justify-end gap-3">
-                            <a href="<?php echo e(route('admin.resellers.edit', $reseller)); ?>"
-                               class="text-[10px] font-bold text-gray-400 hover:text-black uppercase tracking-widest transition-colors">
-                                Edit
+                        <div class="flex items-center justify-end gap-2.5">
+                            <a href="<?php echo e(route('admin.resellers.edit', $reseller)); ?>" class="w-8 h-8 rounded-lg flex items-center justify-center bg-gray-50 border border-gray-100 text-gray-400 hover:bg-black hover:text-white hover:border-black transition-all" title="Edit">
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                             </a>
-                            <button type="button"
-                                    onclick="confirmDelete('<?php echo e(route('admin.resellers.destroy', $reseller)); ?>', '<?php echo e(addslashes($reseller->name)); ?>')"
-                                    class="text-[10px] font-bold text-gray-300 hover:text-red-500 uppercase tracking-widest transition-colors">
-                                Remove
+                            <button type="button" onclick="confirmDelete('<?php echo e(route('admin.resellers.destroy', $reseller)); ?>', '<?php echo e(addslashes($reseller->name)); ?>')" class="w-8 h-8 rounded-lg flex items-center justify-center bg-gray-50 border border-gray-100 text-gray-400 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-100 transition-all" title="Remove Partner">
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                             </button>
                         </div>
                     </td>

@@ -43,19 +43,7 @@
             <div class="space-y-8">
                 <h2 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50 pb-2">Product Identity</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <div class="space-y-2">
-                        <label for="sku" class="block text-[10px] font-bold text-gray-900 uppercase tracking-widest">SKU Reference</label>
-                        <input id="sku" name="sku" type="text" value="<?php echo e(old('sku', $product->sku)); ?>"
-                               class="w-full px-4 py-3 text-sm font-bold text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:border-black focus:ring-0 transition-all">
-                        <?php $__errorArgs = ['sku'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?><p class="mt-1.5 text-[10px] font-bold text-red-500 uppercase"><?php echo e($message); ?></p><?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
-                    </div>
+
                     <div class="space-y-2">
                         <label for="name" class="block text-[10px] font-bold text-gray-900 uppercase tracking-widest">Display Name</label>
                         <input id="name" name="name" type="text" value="<?php echo e(old('name', $product->name)); ?>"
@@ -159,49 +147,49 @@ unset($__errorArgs, $__bag); ?>
                 </div>
             </div>
 
-            <!-- Variants Section -->
-            <div x-data="{ 
-                variants: <?php echo e($product->variants->map(fn($v) => ['id' => $v->id, 'name' => $v->name, 'retail_price' => $v->retail_price, 'wholesale_price' => $v->wholesale_price, 'stock' => $v->stock, 'sku' => $v->sku])->toJson()); ?>,
-                addVariant() { this.variants.push({ id: null, name: '', retail_price: '', wholesale_price: '', stock: 0, sku: '' }); },
-                removeVariant(index) { this.variants.splice(index, 1); }
-            }" class="space-y-8">
-                <div class="flex items-center justify-between border-b border-gray-50 pb-2">
-                    <h2 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Sizing & Commercials</h2>
-                    <button type="button" @click="addVariant()" class="text-[9px] font-bold uppercase tracking-widest text-black hover:opacity-60 flex items-center gap-1.5 transition-all">
-                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                        Add Variant
-                    </button>
-                </div>
-
-                <div class="space-y-4">
-                    <template x-for="(variant, index) in variants" :key="index">
-                        <div class="bg-gray-50/50 border border-gray-50 rounded-2xl p-6 relative group">
-                            <button type="button" @click="removeVariant(index)" class="absolute -top-2 -right-2 w-6 h-6 bg-black text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6"/></svg></button>
-                            <input type="hidden" :name="'variants['+index+'][id]'" :value="variant.id">
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-                                <div>
-                                    <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-2">Variant Name</label>
-                                    <input type="text" :name="'variants['+index+'][name]'" x-model="variant.name" required class="w-full px-4 py-3 text-sm font-bold text-gray-900 bg-white border border-gray-100 rounded-xl focus:border-black focus:ring-0 transition-all">
-                                </div>
-                                <div>
-                                    <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-2">SKU Suffix</label>
-                                    <input type="text" :name="'variants['+index+'][sku]'" x-model="variant.sku" class="w-full px-4 py-3 text-sm font-mono font-bold text-gray-900 bg-white border border-gray-100 rounded-xl focus:border-black focus:ring-0 transition-all">
-                                </div>
-                                <div>
-                                    <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-2">Retail (RM)</label>
-                                    <input type="number" step="0.01" :name="'variants['+index+'][retail_price]'" x-model="variant.retail_price" required class="w-full px-4 py-3 text-sm font-bold text-gray-900 bg-white border border-gray-100 rounded-xl focus:border-black focus:ring-0 transition-all">
-                                </div>
-                                <div>
-                                    <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-2">Wholesale (RM)</label>
-                                    <input type="number" step="0.01" :name="'variants['+index+'][wholesale_price]'" x-model="variant.wholesale_price" required class="w-full px-4 py-3 text-sm font-bold text-gray-900 bg-white border border-gray-100 rounded-xl focus:border-black focus:ring-0 transition-all">
-                                </div>
-                                <div>
-                                    <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-2">Stock</label>
-                                    <input type="number" :name="'variants['+index+'][stock]'" x-model="variant.stock" required class="w-full px-4 py-3 text-sm font-bold text-gray-900 bg-white border border-gray-100 rounded-xl focus:border-black focus:ring-0 transition-all">
-                                </div>
-                            </div>
-                        </div>
-                    </template>
+            <!-- Pricing & Inventory Section -->
+            <div class="space-y-8">
+                <h2 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50 pb-2">Pricing & Inventory</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="space-y-2">
+                        <label for="retail_price" class="block text-[10px] font-bold text-gray-900 uppercase tracking-widest">Retail Price (RM)</label>
+                        <input id="retail_price" name="retail_price" type="number" step="0.01" value="<?php echo e(old('retail_price', $product->retail_price)); ?>"
+                               class="w-full px-4 py-3 text-sm font-bold text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:border-black focus:ring-0 transition-all">
+                        <?php $__errorArgs = ['retail_price'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><p class="mt-1.5 text-[10px] font-bold text-red-500 uppercase"><?php echo e($message); ?></p><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                    </div>
+                    <div class="space-y-2">
+                        <label for="wholesale_price" class="block text-[10px] font-bold text-gray-900 uppercase tracking-widest">Wholesale Price (RM)</label>
+                        <input id="wholesale_price" name="wholesale_price" type="number" step="0.01" value="<?php echo e(old('wholesale_price', $product->wholesale_price)); ?>"
+                               class="w-full px-4 py-3 text-sm font-bold text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:border-black focus:ring-0 transition-all">
+                        <?php $__errorArgs = ['wholesale_price'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><p class="mt-1.5 text-[10px] font-bold text-red-500 uppercase"><?php echo e($message); ?></p><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                    </div>
+                    <div class="space-y-2">
+                        <label for="stock" class="block text-[10px] font-bold text-gray-900 uppercase tracking-widest">Stock Level</label>
+                        <input id="stock" name="stock" type="number" value="<?php echo e(old('stock', $product->stock)); ?>" min="0"
+                               class="w-full px-4 py-3 text-sm font-bold text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:border-black focus:ring-0 transition-all">
+                        <?php $__errorArgs = ['stock'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><p class="mt-1.5 text-[10px] font-bold text-red-500 uppercase"><?php echo e($message); ?></p><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -221,7 +209,7 @@ unset($__errorArgs, $__bag); ?>
             <!-- Fragrance Profile Section -->
             <div class="space-y-8">
                 <h2 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50 pb-2">Olfactory Profile</h2>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div class="space-y-2">
                         <label for="top_note" class="block text-[10px] font-bold text-gray-900 uppercase tracking-widest flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>Top Note</label>
                         <input id="top_note" name="top_note" type="text" value="<?php echo e(old('top_note', $product->top_note)); ?>" placeholder="Citrus, Bergamot..." class="w-full px-4 py-3 text-sm font-bold text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:border-black focus:ring-0 transition-all">
@@ -234,17 +222,6 @@ unset($__errorArgs, $__bag); ?>
                         <label for="base_note" class="block text-[10px] font-bold text-gray-900 uppercase tracking-widest flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>Base Note</label>
                         <input id="base_note" name="base_note" type="text" value="<?php echo e(old('base_note', $product->base_note)); ?>" placeholder="Sandalwood, Musk..." class="w-full px-4 py-3 text-sm font-bold text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:border-black focus:ring-0 transition-all">
                     </div>
-                    <div class="space-y-2">
-                        <label for="fragrance_family" class="block text-[10px] font-bold text-gray-900 uppercase tracking-widest flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>Fragrance Family</label>
-                        <select id="fragrance_family" name="fragrance_family" class="w-full px-4 py-3 text-sm font-bold text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:border-black focus:ring-0 transition-all cursor-pointer">
-                            <option value="">Auto-detect from notes</option>
-                            <option value="fresh" <?php echo e(old('fragrance_family', $product->fragrance_family) == 'fresh' ? 'selected' : ''); ?>>Fresh & Aquatic</option>
-                            <option value="woody" <?php echo e(old('fragrance_family', $product->fragrance_family) == 'woody' ? 'selected' : ''); ?>>Woody & Earthy</option>
-                            <option value="floral" <?php echo e(old('fragrance_family', $product->fragrance_family) == 'floral' ? 'selected' : ''); ?>>Floral & Powdery</option>
-                            <option value="oriental" <?php echo e(old('fragrance_family', $product->fragrance_family) == 'oriental' ? 'selected' : ''); ?>>Oriental & Rich</option>
-                            <option value="gourmand" <?php echo e(old('fragrance_family', $product->fragrance_family) == 'gourmand' ? 'selected' : ''); ?>>Gourmand & Sweet</option>
-                        </select>
-                    </div>
                 </div>
             </div>
 
@@ -255,14 +232,14 @@ unset($__errorArgs, $__bag); ?>
                     <div class="space-y-6">
                         <?php if (isset($component)) { $__componentOriginal592735d30e1926fbb04ff9e089d1fccf = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal592735d30e1926fbb04ff9e089d1fccf = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.toggle','data' => ['name' => 'is_active','checked' => old('is_active', $product->is_active),'label' => 'Active Availability','description' => 'Controls product visibility across storefront and reseller dashboards.']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.toggle','data' => ['name' => 'is_active','checked' => old('is_active', $product->is_active),'label' => 'Active Availability','description' => 'Controls product visibility across reseller dashboards and POS.']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('toggle'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['name' => 'is_active','checked' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(old('is_active', $product->is_active)),'label' => 'Active Availability','description' => 'Controls product visibility across storefront and reseller dashboards.']); ?>
+<?php $component->withAttributes(['name' => 'is_active','checked' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(old('is_active', $product->is_active)),'label' => 'Active Availability','description' => 'Controls product visibility across reseller dashboards and POS.']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal592735d30e1926fbb04ff9e089d1fccf)): ?>
