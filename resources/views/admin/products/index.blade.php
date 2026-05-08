@@ -3,91 +3,93 @@
 
 
     <!-- Page Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Product Inventory</h1>
-            <p class="text-sm text-gray-500 mt-1">Manage full product catalog and ecosystem stock levels.</p>
+            <span class="text-xs font-bold text-indigo-500 uppercase tracking-widest bg-indigo-50 px-3 py-1.5 rounded-lg">Product Assets & Stock</span>
+            <h1 class="text-3xl font-black text-gray-900 tracking-tight mt-3">Product Catalog</h1>
+            <p class="text-sm text-gray-500 mt-1.5">Manage full product catalog and ecosystem stock levels.</p>
         </div>
         <a href="{{ route('admin.products.create') }}"
-           class="inline-flex items-center gap-2 px-6 py-3 bg-black text-white text-xs font-bold uppercase tracking-widest rounded-xl hover:bg-gray-800 transition-all">
+           class="inline-flex items-center gap-2 px-6 py-3.5 bg-brand hover:bg-brand-hover text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-md shadow-brand/5 hover:shadow-lg hover:shadow-brand/10 hover:scale-[1.01] active:scale-[0.99] shrink-0">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
             Add Product
         </a>
     </div>
 
     <!-- Inventory KPIs -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-        {{-- Total SKUs --}}
-        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-5">
-            <div class="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 shrink-0 border border-gray-100">
-                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
-                </svg>
-            </div>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <!-- Card 1: Total Catalog Products -->
+        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group duration-300 flex flex-col justify-between h-full">
             <div>
-                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Total SKUs</p>
-                <p class="text-2xl font-bold text-gray-900 leading-none">{{ $totalProducts }}</p>
-            </div>
-        </div>
-
-        {{-- Total Stock --}}
-        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-5">
-            <div class="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 shrink-0 border border-gray-100">
-                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/>
-                </svg>
-            </div>
-            <div class="flex-1">
-                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Ecosystem Stock</p>
-                <p class="text-2xl font-bold text-gray-900 leading-none">{{ number_format($totalStock) }}</p>
-                <p class="text-[9px] font-bold text-gray-400 mt-2 uppercase tracking-tight">
-                    {{ number_format($adminStock) }} ADM · {{ number_format($resellerStock) }} RES
-                </p>
-            </div>
-        </div>
-
-        {{-- Low Stock --}}
-        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-5">
-            <div class="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 shrink-0 border border-gray-100">
-                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                </svg>
-            </div>
-            <div>
-                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Low Stock</p>
-                <div class="flex items-center gap-2">
-                    <p class="text-2xl font-bold {{ $lowStockCount > 0 ? 'text-amber-600' : 'text-gray-900' }} leading-none">{{ $lowStockCount }}</p>
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Catalog Products</span>
+                    <div class="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-500 group-hover:bg-brand group-hover:text-white transition-colors">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                    </div>
                 </div>
+                <h3 class="text-2xl font-black text-gray-900 tracking-tight tabular-nums truncate">{{ number_format($totalProducts) }}</h3>
             </div>
+            <p class="text-[9px] text-gray-400 font-bold uppercase tracking-wider mt-2 leading-none">Total products in catalog</p>
         </div>
 
-        {{-- Out of Stock --}}
-        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-5">
-            <div class="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 shrink-0 border border-gray-100">
-                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
-                </svg>
-            </div>
+        <!-- Card 2: Ecosystem Stock -->
+        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group duration-300 flex flex-col justify-between h-full">
             <div>
-                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Out of Stock</p>
-                <p class="text-2xl font-bold {{ $outOfStock > 0 ? 'text-rose-600' : 'text-gray-900' }} leading-none">{{ $outOfStock }}</p>
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Ecosystem Stock</span>
+                    <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white transition-colors">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                    </div>
+                </div>
+                <h3 class="text-2xl font-black text-gray-900 tracking-tight tabular-nums truncate">{{ number_format($totalStock) }}</h3>
             </div>
+            <p class="text-[9px] text-emerald-600 font-bold uppercase tracking-wider mt-2 leading-none">
+                <span class="text-gray-950 font-black">{{ number_format($adminStock) }}</span> ADM &middot; <span class="text-gray-950 font-black">{{ number_format($resellerStock) }}</span> RES
+            </p>
+        </div>
+
+        <!-- Card 3: Low Stock Items -->
+        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group duration-300 flex flex-col justify-between h-full">
+            <div>
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Low Stock Items</span>
+                    <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600 group-hover:bg-amber-500 group-hover:text-white transition-colors">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    </div>
+                </div>
+                <h3 class="text-2xl font-black text-gray-900 tracking-tight tabular-nums truncate">{{ number_format($lowStockCount) }}</h3>
+            </div>
+            <p class="text-[9px] text-amber-600 font-bold uppercase tracking-wider mt-2 leading-none">Products needing restock</p>
+        </div>
+
+        <!-- Card 4: Out of Stock Items -->
+        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group duration-300 flex flex-col justify-between h-full">
+            <div>
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Out of Stock Items</span>
+                    <div class="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-red-600 group-hover:bg-red-500 group-hover:text-white transition-colors">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
+                    </div>
+                </div>
+                <h3 class="text-2xl font-black text-gray-900 tracking-tight tabular-nums truncate">{{ number_format($outOfStock) }}</h3>
+            </div>
+            <p class="text-[9px] text-red-600 font-bold uppercase tracking-wider mt-2 leading-none">Products completely out</p>
         </div>
     </div>
 
     <!-- Search & Filters -->
-    <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm mb-6">
+    <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm mb-8">
         <form id="filter-form" method="GET" action="{{ route('admin.products.index') }}" class="flex flex-col lg:flex-row gap-4">
             <div class="relative flex-1">
                 <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                 </svg>
                 <input type="text" id="search-input" name="search" value="{{ request('search') }}"
-                       placeholder="Search catalog…" autocomplete="off"
-                       class="w-full pl-10 pr-4 py-2.5 text-sm font-medium text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:border-black focus:ring-0 transition-all">
+                       placeholder="Search product name, SKU..." autocomplete="off"
+                       class="w-full pl-11 pr-4 py-3 text-sm font-medium text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:bg-white focus:border-black focus:ring-0 transition-all placeholder:text-gray-400">
             </div>
 
-            <select name="stock" class="px-4 py-2.5 text-[11px] font-bold text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:border-black focus:ring-0 uppercase tracking-widest cursor-pointer">
+            <select name="stock" class="px-5 py-3 text-[10px] font-black text-gray-800 bg-gray-50 border border-gray-100 rounded-xl focus:bg-white focus:border-black focus:ring-0 uppercase tracking-widest cursor-pointer transition-all hover:bg-gray-100">
                 <option value="">Stock Level</option>
                 <option value="high" {{ request('stock') === 'high' ? 'selected' : '' }}>High (> 100)</option>
                 <option value="medium" {{ request('stock') === 'medium' ? 'selected' : '' }}>Medium (50–100)</option>
@@ -95,24 +97,24 @@
                 <option value="out" {{ request('stock') === 'out' ? 'selected' : '' }}>Out of Stock</option>
             </select>
 
-            <select name="volume" class="px-4 py-2.5 text-[11px] font-bold text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:border-black focus:ring-0 uppercase tracking-widest cursor-pointer">
+            <select name="volume" class="px-5 py-3 text-[10px] font-black text-gray-800 bg-gray-50 border border-gray-100 rounded-xl focus:bg-white focus:border-black focus:ring-0 uppercase tracking-widest cursor-pointer transition-all hover:bg-gray-100">
                 <option value="">Volume</option>
                 @foreach($volumes as $vol)
                     <option value="{{ $vol }}" {{ request('volume') == $vol ? 'selected' : '' }}>{{ $vol }}ml</option>
                 @endforeach
             </select>
 
-            <select name="sort" class="px-4 py-2.5 text-[11px] font-bold text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:border-black focus:ring-0 uppercase tracking-widest cursor-pointer">
+            <select name="sort" class="px-5 py-3 text-[10px] font-black text-gray-800 bg-gray-50 border border-gray-100 rounded-xl focus:bg-white focus:border-black focus:ring-0 uppercase tracking-widest cursor-pointer transition-all hover:bg-gray-100">
                 <option value="name" {{ request('sort', 'name') === 'name' ? 'selected' : '' }}>Name A–Z</option>
                 <option value="retail_price" {{ request('sort') === 'retail_price' ? 'selected' : '' }}>Retail ↓</option>
                 <option value="wholesale_price" {{ request('sort') === 'wholesale_price' ? 'selected' : '' }}>Wholesale ↓</option>
                 <option value="stock" {{ request('sort') === 'stock' ? 'selected' : '' }}>Stock ↑</option>
             </select>
 
-            <button type="submit" class="px-8 py-2.5 bg-black text-white text-[11px] font-bold uppercase tracking-widest rounded-xl hover:bg-gray-800 transition-all">Filter</button>
+            <button type="submit" class="px-8 py-3 bg-brand hover:bg-brand-hover text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-sm active:scale-95">Filter</button>
             
             @if(request()->hasAny(['search', 'stock', 'volume', 'sort']))
-                <a href="{{ route('admin.products.index') }}" class="px-6 py-2.5 text-[11px] font-bold text-gray-400 hover:text-black bg-white border border-gray-100 rounded-xl text-center uppercase tracking-widest">Reset</a>
+                <a href="{{ route('admin.products.index') }}" class="px-6 py-3 text-[10px] font-black text-gray-400 hover:text-black bg-white border border-gray-100 rounded-xl text-center uppercase tracking-widest transition-all">Reset</a>
             @endif
         </form>
     </div>

@@ -130,17 +130,17 @@
     .sidebar-link {
         @apply flex items-center gap-3.5 px-4 py-3 rounded-xl
                text-sm font-bold text-gray-400
-               hover:bg-gray-50 hover:text-black
+               hover:bg-brand/5 hover:text-brand
                transition-all duration-300;
     }
     .sidebar-link.active {
-        @apply bg-black text-white shadow-lg shadow-black/20 font-bold;
+        @apply bg-brand text-white shadow-lg shadow-brand/20 font-bold;
     }
     .sidebar-link svg {
         @apply w-4 h-4 shrink-0 text-gray-400 transition-colors duration-300;
     }
     .sidebar-link:hover svg {
-        @apply text-black;
+        @apply text-brand;
     }
     .sidebar-link.active svg {
         @apply text-white;
@@ -179,4 +179,51 @@
     .tracking-display {
         letter-spacing: -0.03em;
     }
+}
+
+/* ═══════════════════════════════════════════════
+   BRAND COLOR THEME SYSTEM OVERRIDES (#E67452)
+   ═══════════════════════════════════════════════ */
+
+/* 1. Solid background color replacements for active UI, buttons, and badges */
+.bg-black {
+    background-color: #E67452 !important;
+}
+
+/* 2. Interactive hover transitions */
+.hover\:bg-black:hover {
+    background-color: #E67452 !important;
+}
+.hover\:bg-gray-800:hover,
+.hover\:bg-gray-900:hover {
+    background-color: #d46342 !important;
+}
+
+/* 3. Focus states & outlines */
+.focus\:border-black:focus {
+    border-color: #E67452 !important;
+}
+.focus\:ring-black:focus {
+    --tw-ring-color: #E67452 !important;
+    border-color: #E67452 !important;
+}
+
+/* 4. Active peers (toggles/checkboxes) */
+.peer-checked\:bg-black:checked {
+    background-color: #E67452 !important;
+}
+
+/* 5. Active outline highlights for buttons */
+button.border-black,
+a.border-black {
+    border-color: #E67452 !important;
+}
+button.hover\:border-black:hover,
+a.hover\:border-black:hover {
+    border-color: #E67452 !important;
+}
+
+/* 6. Soft dropdown/focus rings */
+.focus\:border-black:focus-within {
+    border-color: #E67452 !important;
 }

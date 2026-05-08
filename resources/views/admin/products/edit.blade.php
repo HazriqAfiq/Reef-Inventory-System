@@ -12,8 +12,8 @@
         <!-- Header with Context -->
         <div class="px-8 py-6 border-b border-gray-50 bg-gray-50/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-                <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Edit Product</h1>
-                <p class="text-sm text-gray-500 mt-1">{{ $product->name }} &middot; <span class="font-mono text-[10px] font-bold uppercase tracking-widest bg-gray-100 px-2 py-0.5 rounded-lg border border-gray-200">{{ $product->sku }}</span></p>
+                <h1 class="text-3xl font-black text-gray-900 tracking-tight">Edit Product</h1>
+                <p class="text-sm text-gray-500 mt-1.5">{{ $product->name }} &middot; <span class="font-mono text-[10px] font-bold uppercase tracking-widest bg-gray-100 px-2 py-0.5 rounded-lg border border-gray-200">{{ $product->sku }}</span></p>
             </div>
             <div class="flex items-center gap-3">
                 @if($product->stock === 0)

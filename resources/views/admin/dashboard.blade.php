@@ -22,79 +22,105 @@
     </div>
 
     <!-- Overview KPI Cards (Critical numbers only) -->
-    <div class="grid grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
-        <!-- Card 1: Total Products -->
-        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group duration-300">
-            <div class="flex items-center justify-between mb-3">
-                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Catalog Products</span>
-                <div class="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-500 group-hover:bg-black group-hover:text-white transition-colors">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+    <div class="grid grid-cols-2 lg:grid-cols-7 gap-4 mb-8">
+        <!-- Card 1: Total Accumulated Revenue -->
+        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group duration-300 flex flex-col justify-between h-full">
+            <div>
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Revenue</span>
+                    <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 group-hover:bg-indigo-500 group-hover:text-white transition-colors">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
                 </div>
+                <h3 class="text-2xl font-black text-gray-900 tracking-tight tabular-nums truncate">RM{{ number_format($totalRevenue, 0) }}</h3>
             </div>
-            <h3 class="text-2xl font-black text-gray-900 tracking-tight tabular-nums">{{ number_format($totalProducts) }}</h3>
-            <p class="text-[9px] text-gray-400 font-bold uppercase tracking-wider mt-1">Total products in catalog</p>
+            <p class="text-[9px] text-indigo-600 font-bold uppercase tracking-wider mt-2 leading-none">All-time wholesale revenue</p>
         </div>
 
-        <!-- Card 2: Total Stock Units -->
-        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group duration-300">
-            <div class="flex items-center justify-between mb-3">
-                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Headquarters Stock</span>
-                <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white transition-colors">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+        <!-- Card 2: Monthly Sales Revenue -->
+        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group duration-300 flex flex-col justify-between h-full">
+            <div>
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Monthly Sales Revenue</span>
+                    <div class="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center text-rose-600 group-hover:bg-rose-500 group-hover:text-white transition-colors">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
                 </div>
+                <h3 class="text-2xl font-black text-gray-900 tracking-tight tabular-nums truncate">RM{{ number_format($monthlyRevenue, 0) }}</h3>
             </div>
-            <h3 class="text-2xl font-black text-gray-900 tracking-tight tabular-nums">{{ number_format($totalStockUnits) }}</h3>
-            <p class="text-[9px] text-emerald-600 font-bold uppercase tracking-wider mt-1">Available stock units</p>
-        </div>
-
-        <!-- Card 3: Low Stock Products -->
-        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group duration-300">
-            <div class="flex items-center justify-between mb-3">
-                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Low Stock Items</span>
-                <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600 group-hover:bg-amber-500 group-hover:text-white transition-colors">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                </div>
-            </div>
-            <h3 class="text-2xl font-black text-gray-900 tracking-tight tabular-nums">{{ number_format($lowStockProductsCount) }}</h3>
-            <p class="text-[9px] text-amber-600 font-bold uppercase tracking-wider mt-1">Products needing restock</p>
-        </div>
-
-        <!-- Card 4: Pending Orders -->
-        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group duration-300">
-            <div class="flex items-center justify-between mb-3">
-                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Orders Awaiting Review</span>
-                <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 group-hover:bg-indigo-500 group-hover:text-white transition-colors">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                </div>
-            </div>
-            <h3 class="text-2xl font-black text-gray-900 tracking-tight tabular-nums">{{ number_format($pendingOrdersCount) }}</h3>
-            <p class="text-[9px] text-indigo-600 font-bold uppercase tracking-wider mt-1">Wholesale orders to approve</p>
-        </div>
-
-        <!-- Card 5: Total Resellers -->
-        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group duration-300">
-            <div class="flex items-center justify-between mb-3">
-                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Active Resellers</span>
-                <div class="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center text-violet-600 group-hover:bg-violet-500 group-hover:text-white transition-colors">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857"/></svg>
-                </div>
-            </div>
-            <h3 class="text-2xl font-black text-gray-900 tracking-tight tabular-nums">{{ number_format($totalResellers) }}</h3>
-            <p class="text-[9px] text-violet-600 font-bold uppercase tracking-wider mt-1">Registered partners</p>
-        </div>
-
-        <!-- Card 6: Monthly Orders / Revenue -->
-        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group duration-300">
-            <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Monthly Sales Revenue</span>
-                <div class="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center text-rose-600 group-hover:bg-rose-500 group-hover:text-white transition-colors">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                </div>
-            </div>
-            <h3 class="text-lg font-black text-gray-900 tracking-tight tabular-nums truncate">RM{{ number_format($monthlyRevenue, 0) }}</h3>
-            <p class="text-[9px] text-rose-600 font-black uppercase tracking-wider mt-1 leading-none">
+            <p class="text-[9px] text-rose-600 font-bold uppercase tracking-wider mt-2 leading-none">
                 {{ $monthlyOrdersCount }} {{ Str::plural('order', $monthlyOrdersCount) }} this month
             </p>
+        </div>
+
+        <!-- Card 3: Total Products -->
+        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group duration-300 flex flex-col justify-between h-full">
+            <div>
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Catalog Products</span>
+                    <div class="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-500 group-hover:bg-brand group-hover:text-white transition-colors">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                    </div>
+                </div>
+                <h3 class="text-2xl font-black text-gray-900 tracking-tight tabular-nums truncate">{{ number_format($totalProducts) }}</h3>
+            </div>
+            <p class="text-[9px] text-gray-400 font-bold uppercase tracking-wider mt-2 leading-none">Total products in catalog</p>
+        </div>
+
+        <!-- Card 4: Total Stock Units -->
+        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group duration-300 flex flex-col justify-between h-full">
+            <div>
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Headquarters Stock</span>
+                    <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white transition-colors">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                    </div>
+                </div>
+                <h3 class="text-2xl font-black text-gray-900 tracking-tight tabular-nums truncate">{{ number_format($totalStockUnits) }}</h3>
+            </div>
+            <p class="text-[9px] text-emerald-600 font-bold uppercase tracking-wider mt-2 leading-none">Available stock units</p>
+        </div>
+
+        <!-- Card 5: Low Stock Items -->
+        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group duration-300 flex flex-col justify-between h-full">
+            <div>
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Low Stock Items</span>
+                    <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600 group-hover:bg-amber-500 group-hover:text-white transition-colors">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    </div>
+                </div>
+                <h3 class="text-2xl font-black text-gray-900 tracking-tight tabular-nums truncate">{{ number_format($lowStockProductsCount) }}</h3>
+            </div>
+            <p class="text-[9px] text-amber-600 font-bold uppercase tracking-wider mt-2 leading-none">Products needing restock</p>
+        </div>
+
+        <!-- Card 6: Out of Stock Items -->
+        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group duration-300 flex flex-col justify-between h-full">
+            <div>
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Out of Stock Items</span>
+                    <div class="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-red-600 group-hover:bg-red-500 group-hover:text-white transition-colors">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
+                    </div>
+                </div>
+                <h3 class="text-2xl font-black text-gray-900 tracking-tight tabular-nums truncate">{{ number_format($outOfStockProductsCount) }}</h3>
+            </div>
+            <p class="text-[9px] text-red-600 font-bold uppercase tracking-wider mt-2 leading-none">Products completely out</p>
+        </div>
+
+        <!-- Card 7: Total Active Resellers -->
+        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group duration-300 flex flex-col justify-between h-full">
+            <div>
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Active Resellers</span>
+                    <div class="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center text-violet-600 group-hover:bg-violet-500 group-hover:text-white transition-colors">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857"/></svg>
+                    </div>
+                </div>
+                <h3 class="text-2xl font-black text-gray-900 tracking-tight tabular-nums truncate">{{ number_format($totalResellers) }}</h3>
+            </div>
+            <p class="text-[9px] text-violet-600 font-bold uppercase tracking-wider mt-2 leading-none">Registered partners</p>
         </div>
     </div>
 
@@ -219,49 +245,61 @@
 
     </div>
 
-    <!-- Powerhouse Leaders and Reseller Activity (3-Column Grid) -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+    <!-- Powerhouse Leaders and Reseller Activity Section -->
+    <div x-data="{
+        activeFilter: 'month',
+        resellerTotals: {
+            month: {{ $topResellersMonth->sum('wholesale_spend') }},
+            year: {{ $topResellersYear->sum('wholesale_spend') }},
+            total: {{ $topResellersTotal->sum('wholesale_spend') }}
+        },
+        formatRM(val) {
+            return 'RM' + Number(val).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+        }
+    }" x-init="$watch('activeFilter', val => updateDashboardCharts(val))">
+        
+        <!-- Row Header with Period Filter Segment Control -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <div>
+                <h3 class="text-xs font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-600"></span>
+                    Performance & Network Leaders
+                </h3>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">Real-time statistics of product movement and reseller acquisitions</p>
+            </div>
+            
+            <!-- Segment Control Button Group -->
+            <div class="inline-flex bg-gray-100 p-1 rounded-xl shadow-inner shrink-0">
+                <button @click="activeFilter = 'month'" :class="activeFilter === 'month' ? 'bg-white text-black shadow-sm' : 'text-gray-500 hover:text-black'" class="px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all duration-150">
+                    This Month
+                </button>
+                <button @click="activeFilter = 'year'" :class="activeFilter === 'year' ? 'bg-white text-black shadow-sm' : 'text-gray-500 hover:text-black'" class="px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all duration-150">
+                    This Year
+                </button>
+                <button @click="activeFilter = 'total'" :class="activeFilter === 'total' ? 'bg-white text-black shadow-sm' : 'text-gray-500 hover:text-black'" class="px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all duration-150">
+                    All-Time
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8 items-stretch">
         
         <!-- Column 1: Top Selling Products -->
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col h-full">
             <div class="px-6 py-4 border-b border-gray-50 bg-gray-50/20 flex items-center justify-between gap-3 shrink-0">
                 <div>
                     <h2 class="text-xs font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
                         <span class="w-2.5 h-2.5 rounded-full bg-slate-900"></span>
-                        Top Selling Products
+                        Top Wholesale Products
                     </h2>
-                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">Best performing products by units sold</p>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">Highest volume catalog items purchased by resellers</p>
                 </div>
             </div>
 
-            <div class="p-6 flex-1">
+            <div class="p-6 flex-1 flex flex-col justify-center items-center">
                 @if(isset($topSellingProducts) && $topSellingProducts->count() > 0)
-                    <div class="space-y-3">
-                        @foreach($topSellingProducts as $product)
-                            <div class="flex items-center justify-between p-3 bg-slate-50/30 border border-slate-100/50 rounded-xl hover:bg-slate-50/80 transition-colors">
-                                <div class="flex items-center gap-3 min-w-0">
-                                    <div class="w-10 h-10 rounded-lg bg-white border border-gray-100 p-1 shrink-0 overflow-hidden flex items-center justify-center">
-                                        @if($product->primaryImage)
-                                            <img src="{{ asset('storage/' . $product->primaryImage->image_path) }}" class="w-full h-full object-contain">
-                                        @else
-                                            <div class="text-[10px] font-black text-gray-300">SKU</div>
-                                        @endif
-                                    </div>
-                                    <div class="min-w-0">
-                                        <h4 class="text-xs font-bold text-gray-900 truncate">{{ $product->name }}</h4>
-                                        <p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">{{ $product->sku }}</p>
-                                    </div>
-                                </div>
-                                <div class="text-right shrink-0">
-                                    <div class="text-xs font-black text-gray-900 tabular-nums">
-                                        {{ number_format($product->wholesale_qty ?? 0) }} units
-                                    </div>
-                                    <div class="text-[10px] font-bold text-emerald-600 mt-0.5">
-                                        RM{{ number_format($product->wholesale_revenue ?? 0, 2) }}
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
+                    <div class="w-full h-[280px] relative">
+                        <canvas id="topWholesaleProductsChart"></canvas>
                     </div>
                 @else
                     <div class="text-center py-8 text-gray-400 text-xs">No product sales yet.</div>
@@ -270,36 +308,49 @@
         </div>
 
         <!-- Column 2: Top Resellers by Spend -->
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col h-full">
             <div class="px-6 py-4 border-b border-gray-50 bg-gray-50/20 flex items-center justify-between gap-3 shrink-0">
                 <div>
                     <h2 class="text-xs font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
                         <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
-                        Top Resellers by Spend
+                        Top Resellers by Items
                     </h2>
-                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">Partners with the highest wholesale purchase values</p>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">Partners with the highest wholesale items purchased</p>
                 </div>
             </div>
 
-            <div class="p-6 flex-1">
+            <div class="p-6 flex-1 flex flex-col justify-center items-center">
                 @if(isset($topResellers) && $topResellers->count() > 0)
-                    <div class="space-y-3">
-                        @foreach($topResellers as $reseller)
-                            <div class="flex items-center justify-between p-3 bg-indigo-50/10 border border-indigo-100/30 rounded-xl hover:bg-indigo-50/30 transition-colors">
-                                <div class="min-w-0 mr-3">
-                                    <h4 class="text-xs font-bold text-gray-900 truncate">{{ $reseller->name }}</h4>
-                                    <p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-0.5 truncate">{{ $reseller->email }}</p>
-                                </div>
-                                <div class="text-right shrink-0">
-                                    <div class="text-xs font-black text-indigo-600 tabular-nums">
-                                        RM{{ number_format($reseller->wholesale_spend ?? 0, 2) }}
-                                    </div>
-                                    <div class="text-[9px] text-gray-400 font-bold mt-0.5">
-                                        {{ $reseller->orders_count }} {{ Str::plural('order', $reseller->orders_count) }}
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
+                    <div class="w-full h-[280px] relative">
+                        <canvas id="topResellersSpendChart"></canvas>
+                    </div>
+                @else
+                    <div class="text-center py-8 text-gray-400 text-xs">No reseller items purchased recorded.</div>
+                @endif
+            </div>
+        </div>
+
+        <!-- Column 3: Reseller Spend Share -->
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col h-full">
+            <div class="px-6 py-4 border-b border-gray-50 bg-gray-50/20 shrink-0 flex items-center justify-between gap-3">
+                <div>
+                    <h2 class="text-xs font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-violet-500"></span>
+                        Reseller Distribution
+                    </h2>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">Wholesale spend distribution among all resellers</p>
+                </div>
+            </div>
+
+            <div class="p-6 flex-1 flex flex-col justify-center items-center">
+                @if(isset($topResellers) && $topResellers->count() > 0)
+                    <div class="w-full h-[280px] relative flex items-center justify-center">
+                        <canvas id="resellerSpendShareChart"></canvas>
+                        <!-- Center Info Overlay -->
+                        <div class="absolute flex flex-col items-center justify-center text-center pointer-events-none mb-8">
+                            <span class="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none">Total Spend</span>
+                            <span class="text-xs font-black text-gray-900 mt-1 tabular-nums leading-none" x-text="formatRM(resellerTotals[activeFilter])"></span>
+                        </div>
                     </div>
                 @else
                     <div class="text-center py-8 text-gray-400 text-xs">No reseller spend recorded.</div>
@@ -307,35 +358,7 @@
             </div>
         </div>
 
-        <!-- Column 3: Active Resellers Spend Overview -->
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
-            <div class="px-6 py-4 border-b border-gray-50 bg-gray-50/20 shrink-0 flex items-center justify-between gap-3">
-                <div>
-                    <h2 class="text-xs font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
-                        <span class="w-2.5 h-2.5 rounded-full bg-violet-500"></span>
-                        Reseller Spend Overview
-                    </h2>
-                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">Total spent and orders submitted by active partners</p>
-                </div>
-            </div>
-
-            <div class="p-6 flex-1 space-y-4">
-                @forelse($mostActiveResellers as $reseller)
-                    <div class="flex items-center justify-between text-xs">
-                        <div class="min-w-0 mr-2">
-                            <h4 class="font-bold text-gray-900 truncate">{{ $reseller->name }}</h4>
-                            <p class="text-[9px] text-indigo-600 font-bold uppercase tracking-wider mt-0.5">RM{{ number_format($reseller->wholesale_spend ?? 0, 2) }} • {{ $reseller->orders_count }} orders</p>
-                        </div>
-                        <a href="{{ route('admin.resellers.index') }}" class="text-[9px] font-black uppercase tracking-wider bg-gray-50 border border-gray-100 hover:bg-gray-100 text-black px-2 py-1.5 rounded-lg shadow-sm shrink-0">
-                            View
-                        </a>
-                    </div>
-                @empty
-                    <p class="text-center py-8 text-gray-400 text-xs">No active resellers yet.</p>
-                @endforelse
-            </div>
-        </div>
-
+    </div>
     </div>
 
     <!-- Recent Wholesale Orders (Full Width Table) -->
@@ -361,7 +384,6 @@
                         <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Reseller</th>
                         <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Items Qty</th>
                         <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Total Price</th>
-                        <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">MOQ Status</th>
                         <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Order Status</th>
                     </tr>
                 </thead>
@@ -383,17 +405,6 @@
                             </td>
                             <td class="px-6 py-4 text-right font-black text-gray-900 tabular-nums">
                                 RM{{ number_format($order->total_price, 2) }}
-                            </td>
-                            <td class="px-6 py-4 text-center">
-                                @if(($order->total_quantity ?? 0) >= 15)
-                                    <span class="inline-flex px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-600 border border-emerald-100">
-                                        Met MOQ
-                                    </span>
-                                @else
-                                    <span class="inline-flex px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-rose-50 text-rose-600 border border-rose-100">
-                                        Below MOQ
-                                    </span>
-                                @endif
                             </td>
                             <td class="px-6 py-4 text-right">
                                 @php
@@ -505,6 +516,249 @@
                             grid: { display: false },
                             border: { display: false },
                             ticks: { font: { weight: 'bold' } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Global variables for multi-period charts
+        let productChartInstance, resellerChartInstance, spendShareChartInstance;
+
+        // Datasets mapping for dynamic filtering
+        const productDatasets = {
+            month: {
+                labels: @json($topSellingProductsMonth->pluck('name')),
+                qty: @json($topSellingProductsMonth->map(fn($p) => (int)($p->wholesale_qty ?? 0))->values()),
+                revenue: @json($topSellingProductsMonth->map(fn($p) => round((float)($p->wholesale_revenue ?? 0), 2))->values())
+            },
+            year: {
+                labels: @json($topSellingProductsYear->pluck('name')),
+                qty: @json($topSellingProductsYear->map(fn($p) => (int)($p->wholesale_qty ?? 0))->values()),
+                revenue: @json($topSellingProductsYear->map(fn($p) => round((float)($p->wholesale_revenue ?? 0), 2))->values())
+            },
+            total: {
+                labels: @json($topSellingProductsTotal->pluck('name')),
+                qty: @json($topSellingProductsTotal->map(fn($p) => (int)($p->wholesale_qty ?? 0))->values()),
+                revenue: @json($topSellingProductsTotal->map(fn($p) => round((float)($p->wholesale_revenue ?? 0), 2))->values())
+            }
+        };
+
+        const resellerDatasets = {
+            month: {
+                labels: @json($topResellersMonth->pluck('name')),
+                spend: @json($topResellersMonth->map(fn($r) => round((float)($r->wholesale_spend ?? 0), 2))->values()),
+                items: @json($topResellersMonth->map(fn($r) => (int)($r->wholesale_items ?? 0))->values()),
+                orders: @json($topResellersMonth->pluck('orders_count'))
+            },
+            year: {
+                labels: @json($topResellersYear->pluck('name')),
+                spend: @json($topResellersYear->map(fn($r) => round((float)($r->wholesale_spend ?? 0), 2))->values()),
+                items: @json($topResellersYear->map(fn($r) => (int)($r->wholesale_items ?? 0))->values()),
+                orders: @json($topResellersYear->pluck('orders_count'))
+            },
+            total: {
+                labels: @json($topResellersTotal->pluck('name')),
+                spend: @json($topResellersTotal->map(fn($r) => round((float)($r->wholesale_spend ?? 0), 2))->values()),
+                items: @json($topResellersTotal->map(fn($r) => (int)($r->wholesale_items ?? 0))->values()),
+                orders: @json($topResellersTotal->pluck('orders_count'))
+            }
+        };
+
+        // Variable tracker to keep the current filter reference inside tooltips
+        let currentFilterPeriod = 'month';
+
+        // Dynamic update function called by Alpine.js $watch
+        window.updateDashboardCharts = function(period) {
+            currentFilterPeriod = period;
+
+            // 1. Update Product Chart
+            if (productChartInstance) {
+                productChartInstance.data.labels = productDatasets[period].labels;
+                productChartInstance.data.datasets[0].data = productDatasets[period].qty;
+                productChartInstance.update();
+            }
+
+            // 2. Update Reseller Chart (Counted by Items/Units)
+            if (resellerChartInstance) {
+                resellerChartInstance.data.labels = resellerDatasets[period].labels;
+                resellerChartInstance.data.datasets[0].data = resellerDatasets[period].items;
+                resellerChartInstance.update();
+            }
+
+            // 3. Update Spend Share Doughnut Chart
+            if (spendShareChartInstance) {
+                spendShareChartInstance.data.labels = resellerDatasets[period].labels;
+                spendShareChartInstance.data.datasets[0].data = resellerDatasets[period].spend;
+                spendShareChartInstance.update();
+            }
+        };
+
+        // Reseller Spend Share Doughnut Chart
+        const pieCtx = document.getElementById('resellerSpendShareChart');
+        if (pieCtx) {
+            spendShareChartInstance = new Chart(pieCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: resellerDatasets[currentFilterPeriod].labels,
+                    datasets: [{
+                        data: resellerDatasets[currentFilterPeriod].spend,
+                        backgroundColor: [
+                            '#4f46e5', // Deep Royal Indigo
+                            '#06b6d4', // Vibrant Cyan
+                            '#10b981', // Vibrant Emerald Green
+                            '#f59e0b', // Warm Amber Orange
+                            '#ec4899'  // Elegant Rose Pink
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#ffffff',
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 10,
+                                padding: 12,
+                                font: {
+                                    weight: 'bold',
+                                    size: 10
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                    return ' ' + context.label + ': RM' + value.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' (' + percentage + '%)';
+                                }
+                            },
+                            padding: 12,
+                            backgroundColor: 'rgba(0,0,0,0.85)',
+                            titleFont: { weight: 'black', size: 11 },
+                            bodyFont: { weight: 'bold', size: 10 }
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        // 1. Top Wholesale Products Horizontal Bar Chart
+        const barCtx1 = document.getElementById('topWholesaleProductsChart');
+        if (barCtx1) {
+            productChartInstance = new Chart(barCtx1, {
+                type: 'bar',
+                data: {
+                    labels: productDatasets[currentFilterPeriod].labels,
+                    datasets: [{
+                        label: 'Units Sold',
+                        data: productDatasets[currentFilterPeriod].qty,
+                        backgroundColor: '#1e293b',
+                        hoverBackgroundColor: '#0f172a',
+                        borderRadius: 6,
+                        barThickness: 16
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const revenues = productDatasets[currentFilterPeriod].revenue;
+                                    const value = context.raw || 0;
+                                    const rev = revenues[context.dataIndex] || 0;
+                                    return ' ' + value.toLocaleString() + ' units (RM' + rev.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}) + ')';
+                                }
+                            },
+                            padding: 10,
+                            backgroundColor: 'rgba(0,0,0,0.85)',
+                            titleFont: { weight: 'black', size: 11 },
+                            bodyFont: { weight: 'bold', size: 10 }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            border: { display: false },
+                            ticks: { font: { weight: 'bold' } }
+                        },
+                        y: {
+                            grid: { display: false },
+                            border: { display: false },
+                            ticks: {
+                                font: { weight: 'bold' },
+                                color: '#1e293b'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 2. Top Resellers Items Purchased Horizontal Bar Chart
+        const barCtx2 = document.getElementById('topResellersSpendChart');
+        if (barCtx2) {
+            resellerChartInstance = new Chart(barCtx2, {
+                type: 'bar',
+                data: {
+                    labels: resellerDatasets[currentFilterPeriod].labels,
+                    datasets: [{
+                        label: 'Items Purchased',
+                        data: resellerDatasets[currentFilterPeriod].items,
+                        backgroundColor: '#4f46e5',
+                        hoverBackgroundColor: '#4338ca',
+                        borderRadius: 6,
+                        barThickness: 16
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.raw || 0; // items
+                                    const spend = resellerDatasets[currentFilterPeriod].spend[context.dataIndex] || 0;
+                                    const orderCount = resellerDatasets[currentFilterPeriod].orders[context.dataIndex] || 0;
+                                    return ' ' + value.toLocaleString() + ' units purchased (RM' + spend.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}) + ' spend across ' + orderCount + 'x orders)';
+                                }
+                            },
+                            padding: 10,
+                            backgroundColor: 'rgba(0,0,0,0.85)',
+                            titleFont: { weight: 'black', size: 11 },
+                            bodyFont: { weight: 'bold', size: 10 }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            border: { display: false },
+                            ticks: {
+                                callback: function(value) { return value.toLocaleString() + ' units'; },
+                                font: { weight: 'bold' }
+                            }
+                        },
+                        y: {
+                            grid: { display: false },
+                            border: { display: false },
+                            ticks: {
+                                font: { weight: 'bold' },
+                                color: '#1e293b'
+                            }
                         }
                     }
                 }

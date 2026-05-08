@@ -103,9 +103,9 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10 items-stretch">
         <!-- Top Products -->
-        <div class="lg:col-span-2 bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
+        <div class="lg:col-span-2 bg-white p-8 rounded-2xl border border-gray-100 shadow-sm h-full">
             <h2 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-6">Product Performance</h2>
             <div class="h-[300px]">
                 <canvas id="topSellersChart"></canvas>
@@ -113,7 +113,7 @@
         </div>
 
         <!-- Goal Progress -->
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden relative" x-data="{ editing: false }">
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden relative h-full" x-data="{ editing: false }">
             <div class="px-6 py-4 border-b border-gray-50 bg-gray-50/30 flex items-center justify-between">
                 <h2 class="text-[10px] font-bold text-gray-900 uppercase tracking-wider">Monthly Goal</h2>
                 <button @click="editing = true" class="text-[10px] font-bold text-gray-400 hover:text-black uppercase tracking-wider transition-colors">Adjust</button>

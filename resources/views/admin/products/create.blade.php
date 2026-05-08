@@ -10,8 +10,8 @@
     <!-- Page Content Container -->
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-12">
         <div class="px-8 py-6 border-b border-gray-50 bg-gray-50/20">
-            <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Add New Product</h1>
-            <p class="text-sm text-gray-500 mt-1">Configure the identity and specifications for the new catalog item.</p>
+            <h1 class="text-3xl font-black text-gray-900 tracking-tight">Add New Product</h1>
+            <p class="text-sm text-gray-500 mt-1.5">Configure the identity and specifications for the new catalog item.</p>
         </div>
 
         <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data" class="p-8 space-y-12">

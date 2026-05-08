@@ -19,6 +19,7 @@ class AdminDashboardController extends Controller
         $totalProducts = Product::count();
         $totalStockUnits = Product::sum('stock'); // HQ Stock
         $lowStockProductsCount = Product::where('stock', '<', 50)->count();
+        $outOfStockProductsCount = Product::where('stock', 0)->count();
         $pendingOrdersCount = Order::where('status', 'pending')->count();
         $totalResellers = User::where('role', User::ROLE_RESELLER)->count();
         
@@ -30,6 +31,9 @@ class AdminDashboardController extends Controller
         $monthlyRevenue = Order::where('status', 'paid')
             ->whereYear('created_at', now()->year)
             ->whereMonth('created_at', now()->month)
+            ->sum('total_price');
+
+        $totalRevenue = Order::where('status', 'paid')
             ->sum('total_price');
 
         // ── 2. Sales & Order Analytics ───────────────────────────────────────
@@ -50,8 +54,44 @@ class AdminDashboardController extends Controller
         $trendRevenue = $days->map(fn($d) => round((float)($dailyOrders[$d->toDateString()]->revenue ?? 0), 2))->values();
         $trendCount = $days->map(fn($d) => (int)($dailyOrders[$d->toDateString()]->count ?? 0))->values();
 
-        // Top Selling Products (by wholesale sales quantity)
-        $topSellingProducts = Product::withSum(['orderItems as wholesale_qty' => function($q) {
+        // Top Selling Products (by wholesale sales quantity) - Month
+        $topSellingProductsMonth = Product::withSum(['orderItems as wholesale_qty' => function($q) {
+                $q->whereHas('order', function($o) {
+                    $o->where('status', 'paid')
+                      ->whereYear('created_at', now()->year)
+                      ->whereMonth('created_at', now()->month);
+                });
+            }], 'quantity')
+            ->withSum(['orderItems as wholesale_revenue' => function($q) {
+                $q->whereHas('order', function($o) {
+                    $o->where('status', 'paid')
+                      ->whereYear('created_at', now()->year)
+                      ->whereMonth('created_at', now()->month);
+                });
+            }], DB::raw('quantity * price'))
+            ->orderByDesc('wholesale_qty')
+            ->take(5)
+            ->get();
+
+        // Top Selling Products (by wholesale sales quantity) - Year
+        $topSellingProductsYear = Product::withSum(['orderItems as wholesale_qty' => function($q) {
+                $q->whereHas('order', function($o) {
+                    $o->where('status', 'paid')
+                      ->whereYear('created_at', now()->year);
+                });
+            }], 'quantity')
+            ->withSum(['orderItems as wholesale_revenue' => function($q) {
+                $q->whereHas('order', function($o) {
+                    $o->where('status', 'paid')
+                      ->whereYear('created_at', now()->year);
+                });
+            }], DB::raw('quantity * price'))
+            ->orderByDesc('wholesale_qty')
+            ->take(5)
+            ->get();
+
+        // Top Selling Products (by wholesale sales quantity) - Total
+        $topSellingProductsTotal = Product::withSum(['orderItems as wholesale_qty' => function($q) {
                 $q->whereHas('order', function($o) { $o->where('status', 'paid'); });
             }], 'quantity')
             ->withSum(['orderItems as wholesale_revenue' => function($q) {
@@ -61,17 +101,66 @@ class AdminDashboardController extends Controller
             ->take(5)
             ->get();
 
-        // Top Reseller Buyers
-        $topResellers = User::where('role', User::ROLE_RESELLER)
+        $topSellingProducts = $topSellingProductsTotal; // Backwards compatibility
+
+        // Top Reseller Buyers - Month
+        $topResellersMonth = User::where('role', User::ROLE_RESELLER)
+            ->withSum(['orderItems as wholesale_items' => function($query) {
+                $query->whereHas('order', function($o) {
+                    $o->where('status', 'paid')
+                      ->whereYear('created_at', now()->year)
+                      ->whereMonth('created_at', now()->month);
+                });
+            }], 'quantity')
+            ->withSum(['orders as wholesale_spend' => function($query) {
+                $query->where('status', 'paid')
+                      ->whereYear('created_at', now()->year)
+                      ->whereMonth('created_at', now()->month);
+            }], 'total_price')
+            ->withCount(['orders' => function($query) {
+                $query->where('status', 'paid')
+                      ->whereYear('created_at', now()->year)
+                      ->whereMonth('created_at', now()->month);
+            }])
+            ->orderByDesc('wholesale_items')
+            ->get();
+
+        // Top Reseller Buyers - Year
+        $topResellersYear = User::where('role', User::ROLE_RESELLER)
+            ->withSum(['orderItems as wholesale_items' => function($query) {
+                $query->whereHas('order', function($o) {
+                    $o->where('status', 'paid')
+                      ->whereYear('created_at', now()->year);
+                });
+            }], 'quantity')
+            ->withSum(['orders as wholesale_spend' => function($query) {
+                $query->where('status', 'paid')
+                      ->whereYear('created_at', now()->year);
+            }], 'total_price')
+            ->withCount(['orders' => function($query) {
+                $query->where('status', 'paid')
+                      ->whereYear('created_at', now()->year);
+            }])
+            ->orderByDesc('wholesale_items')
+            ->get();
+
+        // Top Reseller Buyers - Total
+        $topResellersTotal = User::where('role', User::ROLE_RESELLER)
+            ->withSum(['orderItems as wholesale_items' => function($query) {
+                $query->whereHas('order', function($o) {
+                    $o->where('status', 'paid');
+                });
+            }], 'quantity')
             ->withSum(['orders as wholesale_spend' => function($query) {
                 $query->where('status', 'paid');
             }], 'total_price')
             ->withCount(['orders' => function($query) {
                 $query->where('status', 'paid');
             }])
-            ->orderByDesc('wholesale_spend')
-            ->take(5)
+            ->orderByDesc('wholesale_items')
             ->get();
+
+        $topResellers = $topResellersTotal; // Backwards compatibility
 
         // ── 3. Inventory Alerts ──────────────────────────────────────────────
         // Low stock items (0 < stock < 50)
@@ -145,10 +234,12 @@ class AdminDashboardController extends Controller
             ->get();
 
         return view('admin.dashboard', compact(
-            'totalProducts', 'totalStockUnits', 'lowStockProductsCount', 'pendingOrdersCount', 'totalResellers',
-            'monthlyOrdersCount', 'monthlyRevenue',
+            'totalProducts', 'totalStockUnits', 'lowStockProductsCount', 'outOfStockProductsCount', 'pendingOrdersCount', 'totalResellers',
+            'monthlyOrdersCount', 'monthlyRevenue', 'totalRevenue',
             'trendLabels', 'trendRevenue', 'trendCount',
             'topSellingProducts', 'topResellers',
+            'topSellingProductsMonth', 'topSellingProductsYear', 'topSellingProductsTotal',
+            'topResellersMonth', 'topResellersYear', 'topResellersTotal',
             'lowStockItems', 'outOfStockItems', 'recentlyRestockedItems',
             'recentOrders',
             'newResellers', 'mostActiveResellers', 'dormantResellers',

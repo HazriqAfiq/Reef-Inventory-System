@@ -161,64 +161,68 @@
                                             @endif
                                         </h3>
                                     </a>
-
                                     <!-- Price, MOQ & Add to Cart Trigger -->
-                                    <div class="pt-5 mt-6 border-t border-gray-100 flex flex-col gap-4">
-                                        <div class="flex items-center justify-between gap-2">
+                                    <div class="pt-4 mt-5 border-t border-gray-100 flex flex-col gap-4">
+                                        <!-- Price & Badge Row -->
+                                        <div class="flex items-start justify-between gap-2">
                                             <div>
-                                                <p class="text-[9px] font-black text-gray-400 uppercase tracking-wider">Price per Unit</p>
-                                                <p class="text-base font-black text-gray-900 mt-0.5">RM{{ number_format($product->wholesale_price, 2) }}</p>
+                                                <p class="text-[9px] font-black text-gray-400 uppercase tracking-wider leading-none">Price per Unit</p>
+                                                <p class="text-base font-black text-gray-900 mt-1 leading-none">RM{{ number_format($product->wholesale_price, 2) }}</p>
+                                            </div>
+                                            <div class="text-right">
                                                 @if($isLowStock)
-                                                    <span class="inline-block mt-1 text-[8px] font-black text-rose-500 uppercase tracking-wider bg-rose-50 px-2 py-0.5 rounded leading-none animate-pulse">Clear Stock: Buy All ({{ $product->stock }})</span>
+                                                    <span class="inline-block text-[8px] font-black text-rose-600 uppercase tracking-wider bg-rose-50 border border-rose-100 px-2 py-1 rounded-md leading-none whitespace-nowrap animate-pulse">Clear Stock: Buy All ({{ $product->stock }})</span>
                                                 @else
-                                                    <span class="inline-block mt-1 text-[8px] font-black text-amber-500 uppercase tracking-wider bg-amber-50 px-2 py-0.5 rounded leading-none">Min. {{ $productMoq }} units</span>
+                                                    <span class="inline-block text-[8px] font-black text-amber-600 uppercase tracking-wider bg-amber-50 border border-amber-100 px-2 py-1 rounded-md leading-none whitespace-nowrap">Min. {{ $productMoq }} units</span>
                                                 @endif
                                             </div>
+                                        </div>
 
-                                            <!-- Contextual Interactive Quantity Panel -->
-                                            <div class="relative shrink-0 flex items-center justify-end">
-                                                <!-- Hidden fields for cart calculation scripts -->
-                                                <input type="hidden" class="product-id" value="{{ $product->id }}">
-                                                <input type="hidden" class="product-price" value="{{ $product->wholesale_price }}">
-                                                <input type="hidden" class="product-name" value="{{ $product->name }}">
-                                                <input type="hidden" class="product-sku" value="{{ $product->sku }}">
-                                                <input type="hidden" class="product-image" value="{{ $product->primaryImage ? asset('storage/' . $product->primaryImage->image_path) : '' }}">
-                                                <input type="hidden" class="product-max" value="{{ $product->stock }}">
-                                                <input type="hidden" class="product-effective-moq" value="{{ $effectiveMoq }}">
-                                                <input type="hidden" class="product-buy-all" value="{{ $isLowStock ? 'true' : 'false' }}">
+                                        <!-- Dedicated Action Row (Full Width Button/Widget) -->
+                                        <div class="relative w-full">
+                                            <!-- Hidden fields for cart calculation scripts -->
+                                            <input type="hidden" class="product-id" value="{{ $product->id }}">
+                                            <input type="hidden" class="product-price" value="{{ $product->wholesale_price }}">
+                                            <input type="hidden" class="product-name" value="{{ $product->name }}">
+                                            <input type="hidden" class="product-sku" value="{{ $product->sku }}">
+                                            <input type="hidden" class="product-image" value="{{ $product->primaryImage ? asset('storage/' . $product->primaryImage->image_path) : '' }}">
+                                            <input type="hidden" class="product-max" value="{{ $product->stock }}">
+                                            <input type="hidden" class="product-effective-moq" value="{{ $effectiveMoq }}">
+                                            <input type="hidden" class="product-buy-all" value="{{ $isLowStock ? 'true' : 'false' }}">
 
-                                                <!-- State 1: Sleek "Add to Cart" Button (Displayed when quantity is 0) -->
+                                            <!-- State 1: Sleek "Add to Cart" Button (Displayed when quantity is 0) -->
+                                            <button type="button" 
+                                                    class="add-to-cart-btn w-full py-3 bg-black hover:bg-gray-800 text-white text-[10px] font-bold uppercase tracking-widest rounded-xl transition-all shadow-sm active:scale-[0.98] flex items-center justify-center gap-1.5 {{ $product->stock === 0 ? 'opacity-30 cursor-not-allowed pointer-events-none' : '' }}"
+                                                    data-counter="{{ $counter }}"
+                                                    onclick="addToCartAction({{ $counter }})">
+                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                                                </svg>
+                                                <span>Add To Cart</span>
+                                            </button>
+
+                                            <!-- State 2: Active Quantity Selector (Visible when quantity > 0) -->
+                                            <div class="qty-counter-widget hidden items-center justify-between bg-gray-50 border border-gray-100 p-1.5 rounded-xl w-full">
+                                                <!-- Decrement / Complete Removal Trash Selector -->
                                                 <button type="button" 
-                                                        class="add-to-cart-btn px-4 py-2.5 bg-black hover:bg-gray-800 text-white text-[10px] font-bold uppercase tracking-widest rounded-xl transition-all shadow-sm active:scale-95 flex items-center gap-1.5 {{ $product->stock === 0 ? 'opacity-30 cursor-not-allowed pointer-events-none' : '' }}"
-                                                        data-counter="{{ $counter }}"
-                                                        onclick="addToCartAction({{ $counter }})">
-                                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-                                                    </svg>
-                                                    <span>Add To Cart</span>
+                                                        class="qty-btn minus w-8 h-8 rounded-lg flex items-center justify-center bg-white border border-gray-100 text-gray-400 hover:text-black hover:border-black transition-all shadow-sm"
+                                                        onclick="adjustQty({{ $counter }}, false)">
+                                                    @if($isLowStock)
+                                                        <!-- Elegant trash bin icon when Buy-All is active -->
+                                                        <svg class="w-3.5 h-3.5 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                        </svg>
+                                                    @else
+                                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4"/>
+                                                        </svg>
+                                                    @endif
                                                 </button>
-
-                                                <!-- State 2: Active Quantity Selector (Visible when quantity > 0) -->
-                                                <div class="qty-counter-widget hidden items-center gap-1 bg-gray-50 border border-gray-100 p-1 rounded-xl">
-                                                    <!-- Decrement / Complete Removal Trash Selector -->
-                                                    <button type="button" 
-                                                            class="qty-btn minus w-8 h-8 rounded-lg flex items-center justify-center bg-white border border-gray-100 text-gray-400 hover:text-black hover:border-black transition-all shadow-sm"
-                                                            onclick="adjustQty({{ $counter }}, false)">
-                                                        @if($isLowStock)
-                                                            <!-- Elegant trash bin icon when Buy-All is active -->
-                                                            <svg class="w-3.5 h-3.5 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                                            </svg>
-                                                        @else
-                                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4"/>
-                                                            </svg>
-                                                        @endif
-                                                    </button>
-                                                    
+                                                
+                                                <div class="flex-1 flex items-center justify-center">
                                                     <input type="number" 
                                                            name="quantity[{{ $counter }}]" 
-                                                           class="qty-input w-10 text-center text-xs font-bold border-transparent bg-transparent p-0 focus:ring-0 text-gray-900 tabular-nums {{ $isLowStock ? 'pointer-events-none bg-rose-50/50 rounded text-rose-600' : '' }}" 
+                                                           class="qty-input w-12 text-center text-xs font-black border-transparent bg-transparent p-0 focus:ring-0 text-gray-900 tabular-nums {{ $isLowStock ? 'pointer-events-none bg-rose-50/50 rounded text-rose-600' : '' }}" 
                                                            data-counter="{{ $counter }}"
                                                            value="{{ old('quantity.' . $counter, $cartItems[$product->id] ?? 0) }}" 
                                                            min="0" 
@@ -226,18 +230,18 @@
                                                            onchange="validateInput({{ $counter }})"
                                                            {{ $product->stock === 0 ? 'disabled' : '' }}
                                                            {{ $isLowStock ? 'readonly' : '' }}>
-                                                           
-                                                    <input type="hidden" name="product_id[{{ $counter }}]" value="{{ $product->id }}">
-
-                                                    <!-- Increment Button (Hidden entirely if Low-Stock is active and buying all is locked) -->
-                                                    <button type="button" 
-                                                            class="qty-btn plus w-8 h-8 rounded-lg flex items-center justify-center bg-white border border-gray-100 text-gray-400 hover:text-black hover:border-black transition-all shadow-sm {{ $isLowStock ? 'hidden' : '' }}"
-                                                            onclick="adjustQty({{ $counter }}, true)">
-                                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-                                                        </svg>
-                                                    </button>
                                                 </div>
+                                                       
+                                                <input type="hidden" name="product_id[{{ $counter }}]" value="{{ $product->id }}">
+
+                                                <!-- Increment Button (Hidden entirely if Low-Stock is active and buying all is locked) -->
+                                                <button type="button" 
+                                                        class="qty-btn plus w-8 h-8 rounded-lg flex items-center justify-center bg-white border border-gray-100 text-gray-400 hover:text-black hover:border-black transition-all shadow-sm {{ $isLowStock ? 'hidden' : '' }}"
+                                                        onclick="adjustQty({{ $counter }}, true)">
+                                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                                                    </svg>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
