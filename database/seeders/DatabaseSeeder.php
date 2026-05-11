@@ -26,21 +26,22 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // ── 2. Buyer account ────────────────────────────────────────────────
+        // ── 2. Reseller account ─────────────────────────────────────────────
         User::firstOrCreate(
-            ['email' => 'buyer@example.com'],
+            ['email' => 'reseller@reseller.com'],
             [
-                'name'     => 'John Buyer',
-                'password' => Hash::make('password'),
-                'role'     => 'buyer',
+                'name'            => 'Reseller Partner',
+                'password'        => Hash::make('password'),
+                'role'            => 'reseller',
+                'commission_rate' => 15.00,
+                'monthly_goal'    => 5000.00,
             ]
         );
 
         // ── 3. Product catalog ──────────────────────────────────────────────
         $this->call(ProductSeeder::class);
 
-        // ── 4. Resellers + realistic 6-month sales history ──────────────────
-        $this->call(SalesSeeder::class);
+
 
         // ── 5. Storefront Settings ─────────────────────────────────────────
         $this->call(StorefrontSettingsSeeder::class);

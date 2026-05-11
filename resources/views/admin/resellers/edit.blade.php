@@ -14,8 +14,8 @@
                 {{ strtoupper(substr($reseller->name, 0, 2)) }}
             </div>
             <div>
-                <h1 class="text-2xl font-bold text-gray-900 tracking-tight">{{ $reseller->name }}</h1>
-                <p class="text-sm text-gray-500 mt-1">Configure profile details and security credentials for this partner account.</p>
+                <h1 class="text-3xl font-black text-gray-900 tracking-tight">{{ $reseller->name }}</h1>
+                <p class="text-xs text-gray-400 mt-1">Configure profile details and security credentials for this partner account.</p>
             </div>
         </div>
 

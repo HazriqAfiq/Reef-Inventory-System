@@ -10,8 +10,8 @@
     <!-- Page Content Container -->
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-12">
         <div class="px-8 py-6 border-b border-gray-50 bg-gray-50/20">
-            <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Register New Reseller</h1>
-            <p class="text-sm text-gray-500 mt-1">Configure credentials and standard commission rate for the new network partner.</p>
+            <h1 class="text-3xl font-black text-gray-900 tracking-tight">Register New Reseller</h1>
+            <p class="text-xs text-gray-400 mt-1">Configure credentials and standard commission rate for the new network partner.</p>
         </div>
 
         <form action="{{ route('admin.resellers.store') }}" method="POST" class="p-8 space-y-12">

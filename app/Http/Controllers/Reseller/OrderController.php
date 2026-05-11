@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Reseller;
 
 use App\Http\Controllers\Controller;
+use App\Models\Address;
 use App\Models\Order;
+use App\Models\OrderAddress;
 use App\Models\Product;
 use App\Models\ResellerStock;
 use App\Services\NotificationService;
@@ -28,14 +30,26 @@ class OrderController extends Controller
         $cart = auth()->user()->cart;
         $cartItems = $cart && is_array($cart->content) ? $cart->content : [];
 
-        return view('reseller.orders.create', compact('products', 'totalMoq', 'productMoq', 'cartItems'));
+        // Fetch saved delivery addresses
+        $addresses = auth()->user()->addresses()->latest()->get();
+        $defaultAddress = $addresses->firstWhere('is_default', true) ?? $addresses->first();
+
+        return view('reseller.orders.create', compact('products', 'totalMoq', 'productMoq', 'cartItems', 'addresses', 'defaultAddress'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'product_id' => 'required|array',
-            'quantity' => 'required|array',
+            'product_id'     => 'required|array',
+            'quantity'       => 'required|array',
+            // Address: either a saved address_id OR inline fields
+            'address_id'     => 'nullable|exists:addresses,id',
+            'recipient_name' => 'required_without:address_id|string|max:255',
+            'phone'          => 'required_without:address_id|string|max:20',
+            'address_line_1' => 'required_without:address_id|string|max:255',
+            'city'           => 'required_without:address_id|string|max:100',
+            'state'          => 'required_without:address_id|string|max:100',
+            'postal_code'    => 'required_without:address_id|string|max:20',
         ]);
 
         $totalMoq = (int) \App\Models\Setting::getValue('reseller_total_moq', 15);
@@ -74,8 +88,8 @@ class OrderController extends Controller
 
                 $orderItems[] = [
                     'product_id' => $product->id,
-                    'quantity' => $qty,
-                    'price' => $product->wholesale_price,
+                    'quantity'   => $qty,
+                    'price'      => $product->wholesale_price,
                 ];
             }
         }
@@ -90,11 +104,42 @@ class OrderController extends Controller
 
         $order = auth()->user()->orders()->create([
             'total_price' => $totalPrice,
-            'status' => 'pending',
-            'billplz_id' => 'MOCK_' . uniqid(),
+            'status'      => 'pending',
+            'billplz_id'  => 'MOCK_' . uniqid(),
         ]);
 
         $order->items()->createMany($orderItems);
+
+        // Snapshot the delivery address into order_addresses
+        if ($request->filled('address_id')) {
+            $addr = Address::where('id', $request->address_id)
+                           ->where('user_id', auth()->id())
+                           ->firstOrFail();
+            OrderAddress::create([
+                'order_id'   => $order->id,
+                'first_name' => $addr->recipient_name,
+                'last_name'  => '',
+                'email'      => auth()->user()->email,
+                'phone'      => $addr->phone,
+                'address'    => $addr->address_line_1 . ($addr->address_line_2 ? ', ' . $addr->address_line_2 : ''),
+                'city'       => $addr->city,
+                'state'      => $addr->state,
+                'postcode'   => $addr->postal_code,
+            ]);
+        } else {
+            // Inline address entry
+            OrderAddress::create([
+                'order_id'   => $order->id,
+                'first_name' => $request->recipient_name,
+                'last_name'  => '',
+                'email'      => auth()->user()->email,
+                'phone'      => $request->phone,
+                'address'    => $request->address_line_1 . ($request->address_line_2 ? ', ' . $request->address_line_2 : ''),
+                'city'       => $request->city,
+                'state'      => $request->state,
+                'postcode'   => $request->postal_code,
+            ]);
+        }
 
         // Notify admins of the new wholesale order
         NotificationService::newOrder($order, auth()->user());

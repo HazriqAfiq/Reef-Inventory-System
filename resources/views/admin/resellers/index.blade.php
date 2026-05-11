@@ -1,54 +1,69 @@
 <x-app-layout title="Manage Resellers">
 
     <!-- Page Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
+    <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Manage Resellers</h1>
-            <p class="text-sm text-gray-500 mt-1">View and manage authorized reseller accounts within your network.</p>
+            <div class="flex items-center gap-2 mb-1.5">
+                <span class="flex h-2 w-2 relative">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">Reseller Network Live</span>
+            </div>
+            <h1 class="text-3xl font-black text-gray-900 tracking-tight">Manage Resellers</h1>
+            <p class="text-xs text-gray-400 mt-1">Authorized wholesale partners, procurement frequency, and network spend analytics.</p>
         </div>
-        <div class="flex items-center gap-2 shrink-0">
+        
+        <div class="flex items-center gap-3 shrink-0">
             <a href="{{ route('admin.resellers.create') }}"
-               class="inline-flex items-center gap-2 px-6 py-3 bg-black text-white text-xs font-bold uppercase tracking-widest rounded-xl hover:bg-gray-800 transition-all shadow-sm">
+               class="inline-flex items-center gap-2 px-6 py-3 bg-black text-white text-[11px] font-black uppercase tracking-widest rounded-xl hover:bg-gray-800 hover:-translate-y-0.5 transition-all shadow-md duration-300">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                Add Reseller
+                Add Reseller Account
             </a>
         </div>
     </div>
 
-
-
     <!-- KPI Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <!-- Accounts -->
-        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-5">
-            <div class="w-12 h-12 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400 shrink-0">
-                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group duration-300 flex flex-col justify-between h-full">
+            <div class="flex items-center justify-between mb-4">
+                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Registered Partners</span>
+                <div class="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center text-violet-600 group-hover:bg-violet-500 group-hover:text-white transition-colors duration-300">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857"/></svg>
+                </div>
             </div>
             <div>
-                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Accounts</p>
-                <p class="text-2xl font-bold text-gray-900 leading-none tabular-nums">{{ $totalResellers }}</p>
+                <h3 class="text-2xl font-black text-gray-900 tracking-tight tabular-nums">{{ $totalResellers }}</h3>
+                <p class="text-[9px] text-violet-600 font-bold uppercase tracking-wider mt-2 leading-none">Active reseller storefronts</p>
             </div>
         </div>
 
-        <!-- Transactions -->
-        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-5">
-            <div class="w-12 h-12 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400 shrink-0">
-                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        <!-- Wholesale Orders -->
+        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group duration-300 flex flex-col justify-between h-full">
+            <div class="flex items-center justify-between mb-4">
+                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Wholesale Orders</span>
+                <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white transition-colors duration-300">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                </div>
             </div>
             <div>
-                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Transactions</p>
-                <p class="text-2xl font-bold text-gray-900 leading-none tabular-nums">{{ number_format($totalSalesCount) }}</p>
+                <h3 class="text-2xl font-black text-gray-900 tracking-tight tabular-nums">{{ number_format($totalOrdersCount) }}</h3>
+                <p class="text-[9px] text-emerald-600 font-bold uppercase tracking-wider mt-2 leading-none">Total restock operations submitted</p>
             </div>
         </div>
 
         <!-- Revenue -->
-        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-5">
-            <div class="w-12 h-12 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400 shrink-0">
-                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group duration-300 flex flex-col justify-between h-full">
+            <div class="flex items-center justify-between mb-4">
+                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Network Wholesale Spend</span>
+                <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 group-hover:bg-indigo-500 group-hover:text-white transition-colors duration-300">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
             </div>
             <div>
-                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Network Revenue</p>
-                <p class="text-2xl font-bold text-gray-900 leading-none tabular-nums">RM{{ number_format($totalRevenue, 2) }}</p>
+                <h3 class="text-2xl font-black text-gray-900 tracking-tight tabular-nums">RM{{ number_format($totalRevenue, 2) }}</h3>
+                <p class="text-[9px] text-indigo-600 font-bold uppercase tracking-wider mt-2 leading-none">Aggregated wholesale pipeline value</p>
             </div>
         </div>
     </div>

@@ -10,7 +10,7 @@
                 <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">HQ Operations Live</span>
             </div>
             <h1 class="text-3xl font-black text-gray-900 tracking-tight">Command Center</h1>
-            <p class="text-xs text-gray-400 mt-1">Real-time sales tracking, stock levels, and reseller performance.</p>
+            <p class="text-xs text-gray-400 mt-1">Real-time order tracking, stock levels, and reseller performance.</p>
         </div>
         
         <div class="flex items-center gap-3 shrink-0">
@@ -41,7 +41,7 @@
         <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group duration-300 flex flex-col justify-between h-full">
             <div>
                 <div class="flex items-center justify-between mb-3">
-                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Monthly Sales Revenue</span>
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Monthly Wholesale Revenue</span>
                     <div class="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center text-rose-600 group-hover:bg-rose-500 group-hover:text-white transition-colors">
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     </div>
@@ -133,7 +133,7 @@
                 <div>
                     <h2 class="text-xs font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
                         <span class="w-2.5 h-2.5 rounded-full bg-black"></span>
-                        30-Day Sales & Order Trends
+                        30-Day Wholesale Revenue & Order Trends
                     </h2>
                     <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">Total wholesale revenue and order count history</p>
                 </div>

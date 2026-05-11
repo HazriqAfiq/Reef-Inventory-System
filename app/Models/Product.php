@@ -57,10 +57,6 @@ class Product extends Model
         return $this->hasOne(ProductImage::class)->where('is_primary', true);
     }
 
-    public function sales()
-    {
-        return $this->hasMany(Sale::class);
-    }
 
     public function orderItems()
     {

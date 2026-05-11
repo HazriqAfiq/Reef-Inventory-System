@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\Notification;
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\Sale;
 use App\Models\User;
 
 class NotificationService
@@ -51,33 +50,6 @@ class NotificationService
                 'action_url'   => route('admin.products.edit', $product),
                 'product_id'   => $product->id,
                 'product_name' => $product->name,
-            ]
-        );
-    }
-
-    // ──────────────────────────────────────────────────────────────────────────
-    //  Sales Events
-    // ──────────────────────────────────────────────────────────────────────────
-
-    /**
-     * Notify all admins that a reseller recorded a new B2C sale.
-     */
-    public static function newSale(Sale $sale, User $reseller): void
-    {
-        $admins = User::where('role', User::ROLE_ADMIN)->get();
-
-        $productName = optional($sale->product)->name ?? 'a product';
-        $amount      = number_format($sale->total_price, 2);
-
-        self::createForUsers(
-            $admins,
-            'new_sale',
-            'New Sale Recorded',
-            "{$reseller->name} sold {$sale->quantity}x {$productName} for RM {$amount}.",
-            [
-                'action_url'  => route('admin.sales.index'),
-                'sale_id'     => $sale->id,
-                'reseller_id' => $reseller->id,
             ]
         );
     }

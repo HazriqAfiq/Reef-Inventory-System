@@ -1,14 +1,27 @@
 <x-app-layout title="Wholesale Orders">
 
     <!-- Page Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
+    <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Wholesale Orders</h1>
-            <p class="text-sm text-gray-500 mt-1">B2B orders placed by the Reseller network.</p>
+            <div class="flex items-center gap-2 mb-1.5">
+                <span class="flex h-2 w-2 relative">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">B2B Order Stream Active</span>
+            </div>
+            <h1 class="text-3xl font-black text-gray-900 tracking-tight">Wholesale Orders</h1>
+            <p class="text-xs text-gray-400 mt-1">Review B2B purchase orders, transaction values, and partner fulfillment metrics.</p>
         </div>
-        <div class="flex items-center gap-3">
+        
+        <div class="flex items-center gap-3 shrink-0">
+            <div class="bg-white px-4 py-2 rounded-xl border border-gray-100 shadow-sm flex items-center gap-2 text-xs font-bold text-gray-600">
+                <svg class="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                <span>Partner Network</span>
+            </div>
+            
             <a href="{{ route('admin.orders.export') }}"
-               class="inline-flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 text-gray-400 hover:text-black text-xs font-bold uppercase tracking-widest rounded-xl transition-all">
+               class="inline-flex items-center gap-2 px-6 py-3.5 bg-black hover:bg-gray-800 text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-md shrink-0">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                 </svg>

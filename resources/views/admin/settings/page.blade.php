@@ -1,10 +1,17 @@
 <x-app-layout :title="$title ?? 'System Settings'">
 
     <!-- Page Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
+    <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900 tracking-tight">{{ $title ?? 'System Configuration' }}</h1>
-            <p class="text-sm text-gray-500 mt-1">Manage global identifiers and system presentation layers.</p>
+            <div class="flex items-center gap-2 mb-1.5">
+                <span class="flex h-2 w-2 relative">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">Global Ecosystem Configuration</span>
+            </div>
+            <h1 class="text-3xl font-black text-gray-900 tracking-tight">{{ $title ?? 'System Configuration' }}</h1>
+            <p class="text-xs text-gray-400 mt-1">Manage global identifiers, active aesthetic profiles, and presentation layers.</p>
         </div>
     </div>
 

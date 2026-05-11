@@ -1,285 +1,315 @@
-<x-app-layout title="Partner Workspace">
-    <!-- Page Header -->
-    <div class="mb-10">
-        <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Partner Workspace</h1>
-        <p class="text-sm text-gray-500 mt-1">Your personal sales performance, earnings, and inventory overview.</p>
-    </div>
-
-    <!-- KPI Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-        <!-- Lifetime Volume -->
-        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-            <div class="flex items-center gap-4 mb-4">
-                <div class="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-600">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-                </div>
-                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Lifetime Volume</span>
-            </div>
-            <div class="flex items-end justify-between">
-                <h3 class="text-2xl font-bold text-gray-900 tabular-nums">RM{{ number_format($myTotalRevenue, 0) }}</h3>
-                <span class="text-[10px] font-bold text-gray-500 bg-gray-50 px-2 py-1 rounded-lg">{{ number_format($myTotalSales) }} txns</span>
-            </div>
-        </div>
-
-        <!-- Current Month -->
-        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-            <div class="flex items-center gap-4 mb-4">
-                <div class="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-600">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                </div>
-                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Current Month</span>
-            </div>
-            <div class="flex items-end justify-between">
-                <h3 class="text-2xl font-bold text-gray-900 tabular-nums">RM{{ number_format($thisMonthRevenue, 0) }}</h3>
-                @if($revenueChange !== null)
-                    <span class="text-[10px] font-bold {{ $revenueChange >= 0 ? 'text-emerald-600 bg-emerald-50' : 'text-rose-600 bg-rose-50' }} px-2 py-1 rounded-lg">
-                        {{ $revenueChange >= 0 ? '+' : '' }}{{ $revenueChange }}%
-                    </span>
-                @endif
-            </div>
-        </div>
-
-        <!-- Earnings -->
-        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-            <div class="flex items-center gap-4 mb-4">
-                <div class="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-600">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                </div>
-                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">My Earnings</span>
-            </div>
-            <div class="flex items-end justify-between">
-                <h3 class="text-2xl font-bold text-gray-900 tabular-nums">RM{{ number_format($myCommission, 0) }}</h3>
-                <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg">Commission</span>
-            </div>
-        </div>
-
-        <!-- Personal Stock -->
-        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-            <div class="flex items-center gap-4 mb-4">
-                <div class="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-600">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/></svg>
-                </div>
-                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Personal Stock</span>
-            </div>
-            <div class="flex items-end justify-between">
-                <h3 class="text-2xl font-bold text-gray-900 tabular-nums">{{ number_format($myTotalUnits) }}</h3>
-                <span class="text-[10px] font-bold {{ $lowStockProducts->count() > 0 ? 'text-amber-600 bg-amber-50' : 'text-gray-500 bg-gray-50' }} px-2 py-1 rounded-lg">
-                    {{ $lowStockProducts->count() > 0 ? $lowStockProducts->count() . ' Low' : 'Stable' }}
-                </span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Sales Chart -->
-    <div class="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm mb-10">
-        <div class="flex items-center justify-between mb-8">
+<x-app-layout title="Reseller Dashboard">
+    <div class="relative">
+        
+        <!-- Page Header -->
+        <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-                <h2 class="text-sm font-bold text-gray-900 uppercase tracking-wider">Sales Trend</h2>
-                <p class="text-xs text-gray-400 mt-1">Daily revenue & volume analysis</p>
-            </div>
-            <div class="flex items-center gap-4">
-                <div class="flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
-                    <span class="text-[10px] font-bold text-gray-500 uppercase">Revenue</span>
+                <div class="flex items-center gap-2 mb-1.5">
+                    <span class="flex h-2 w-2 relative">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                    </span>
+                    <span class="text-[10px] font-bold text-indigo-600 uppercase tracking-widest">Reseller Ledger Live</span>
                 </div>
-                <div class="flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-indigo-200"></span>
-                    <span class="text-[10px] font-bold text-gray-500 uppercase">Units</span>
-                </div>
+                <h1 class="text-3xl font-black text-gray-900 tracking-tight">Reseller Dashboard</h1>
+                <p class="text-xs text-gray-400 mt-1">Verify physical shelf inventories, track active stock valuations, and coordinate restock requests.</p>
             </div>
-        </div>
-        <div class="h-[350px] w-full">
-            <canvas id="mainSalesChart"></canvas>
-        </div>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10 items-stretch">
-        <!-- Top Products -->
-        <div class="lg:col-span-2 bg-white p-8 rounded-2xl border border-gray-100 shadow-sm h-full">
-            <h2 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-6">Product Performance</h2>
-            <div class="h-[300px]">
-                <canvas id="topSellersChart"></canvas>
+            
+            <div class="flex items-center gap-3 shrink-0">
+                <div class="bg-white px-4 py-2 rounded-xl border border-gray-100 shadow-sm flex items-center gap-2 text-xs font-bold text-gray-600">
+                    <svg class="w-4 h-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    <span>Role: Partner Workspace</span>
+                </div>
+                
+                <a href="{{ route('reseller.audit.index') }}" class="inline-flex items-center gap-2 px-6 py-3.5 bg-black hover:bg-gray-800 text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-md">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                    </svg>
+                    Update Shelf Levels
+                </a>
             </div>
         </div>
 
-        <!-- Goal Progress -->
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden relative h-full" x-data="{ editing: false }">
-            <div class="px-6 py-4 border-b border-gray-50 bg-gray-50/30 flex items-center justify-between">
-                <h2 class="text-[10px] font-bold text-gray-900 uppercase tracking-wider">Monthly Goal</h2>
-                <button @click="editing = true" class="text-[10px] font-bold text-gray-400 hover:text-black uppercase tracking-wider transition-colors">Adjust</button>
+        <!-- Top Row (KPIs) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <!-- Stock Asset Value -->
+            <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group duration-300 flex flex-col justify-between h-full">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Stock Asset Value</span>
+                    <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white transition-colors duration-300">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-2.5xl font-black text-gray-900 tracking-tight tabular-nums truncate">RM{{ number_format($totalAssetValuation, 2) }}</h3>
+                    <p class="text-[9px] text-emerald-600 font-bold uppercase tracking-wider mt-2.5 leading-none">Total retail asset sitting on shelf</p>
+                </div>
             </div>
-            <div class="p-6">
-                @if($monthlyGoal > 0)
-                    <div class="flex flex-col items-center gap-4">
-                        <div class="relative w-28 h-28 flex items-center justify-center">
-                            <svg class="w-full h-full transform -rotate-90">
-                                <circle cx="56" cy="56" r="50" stroke="currentColor" stroke-width="6" fill="transparent" class="text-gray-100"/>
-                                <circle cx="56" cy="56" r="50" stroke="currentColor" stroke-width="6" fill="transparent" class="text-black" stroke-dasharray="{{ 2 * pi() * 50 }}" stroke-dashoffset="{{ (1 - ($goalProgress / 100)) * (2 * pi() * 50) }}" style="transition: stroke-dashoffset 1s ease-in-out;"/>
-                            </svg>
-                            <div class="absolute flex flex-col items-center">
-                                <span class="text-xl font-bold text-gray-900">{{ $goalProgress }}%</span>
+
+            <!-- Total Units on Hand -->
+            <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group duration-300 flex flex-col justify-between h-full">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Units on Hand</span>
+                    <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 group-hover:bg-indigo-500 group-hover:text-white transition-colors duration-300">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/></svg>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-2.5xl font-black text-gray-900 tracking-tight tabular-nums truncate">{{ number_format($totalUnitsHeld) }} Units</h3>
+                    <p class="text-[9px] text-indigo-600 font-bold uppercase tracking-wider mt-2.5 leading-none">Physical bottle count verified locally</p>
+                </div>
+            </div>
+
+            <!-- Audit Health -->
+            <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group duration-300 flex flex-col justify-between h-full">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Audit Health</span>
+                    <div class="w-10 h-10 rounded-xl {{ $auditHealthPercentage >= 80 ? 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white' : 'bg-amber-50 text-amber-600 group-hover:bg-amber-500 group-hover:text-white' }} flex items-center justify-center transition-colors duration-300">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-2.5xl font-black text-gray-900 tracking-tight tabular-nums truncate">{{ $auditHealthPercentage }}%</h3>
+                    <div class="mt-3.5 shrink-0">
+                        <div class="w-full h-1 bg-gray-100 rounded-full overflow-hidden">
+                            <div class="h-full {{ $auditHealthPercentage >= 80 ? 'bg-emerald-500' : 'bg-amber-500' }} rounded-full transition-all duration-500" style="width: {{ $auditHealthPercentage }}%"></div>
+                        </div>
+                        <span class="text-[8px] text-gray-400 font-bold uppercase tracking-widest mt-1 block leading-none">Percentage of products verified this week</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Area: Stock Status (Bar Chart) -->
+        <div class="mb-8">
+            
+            <!-- Stock Status (Bar Chart) -->
+            <div class="bg-white p-6 sm:p-8 rounded-2xl border border-gray-100 shadow-sm flex flex-col h-full">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 shrink-0">
+                    <div>
+                        <h2 class="text-xs font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-black"></span>
+                            Verified Stock Distribution
+                        </h2>
+                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">Physical counts of each perfume on hand</p>
+                    </div>
+                    
+                    <div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-[10px] font-black uppercase tracking-widest text-gray-400 shrink-0 select-none">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                            <span class="text-gray-900">Healthy (&ge;15)</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                            <span class="text-gray-900">Low (&lt;15)</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                            <span class="text-gray-900">Out of Stock</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex-1 min-h-[300px] h-[300px]">
+                    <canvas id="stockDistributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Row: Needs Attention (33%) & Recommendations (33%) & Shipments (33%) -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10 items-stretch">
+            
+            <!-- Needs Attention / Shelf Audit List -->
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col h-full">
+                <div class="px-6 py-4 border-b border-gray-50 bg-gray-50/20 flex items-center justify-between gap-3 shrink-0">
+                    <div>
+                        <h2 class="text-xs font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                            Needs Shelf Verification
+                        </h2>
+                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">Items needing manual verification or currently low count</p>
+                    </div>
+                </div>
+                
+                <div class="p-6 flex-1 overflow-y-auto max-h-[350px] divide-y divide-gray-50">
+                    @forelse($needsAttentionList as $stock)
+                        <div class="flex items-center justify-between py-3.5 first:pt-0 last:pb-0">
+                            <div class="min-w-0">
+                                <h4 class="text-xs font-bold text-gray-900 truncate">{{ $stock->product?->name }}</h4>
+                                <div class="flex items-center gap-1.5 mt-1 text-[9px] text-gray-400 font-bold uppercase tracking-wider">
+                                    <span>Shelf Level: {{ $stock->quantity }} units</span>
+                                    <span>&middot;</span>
+                                    <span>Last Verified: {{ $stock->updated_at ? $stock->updated_at->diffForHumans() : 'Never' }}</span>
+                                </div>
+                            </div>
+                            <div class="shrink-0 flex items-center gap-2">
+                                <span class="px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border {{ $stock->freshness_badge_color }}">
+                                    {{ $stock->days_since_audit > 7 ? 'Stale Audit' : 'Low Stock' }}
+                                </span>
+                                <a href="{{ route('reseller.audit.index') }}" class="text-[9px] font-black uppercase tracking-wider text-black border border-gray-150 px-2.5 py-1.5 rounded-lg hover:bg-gray-50">Count</a>
                             </div>
                         </div>
-                        <div class="text-center">
-                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Target</p>
-                            <h4 class="text-lg font-bold text-gray-900">RM{{ number_format($monthlyGoal, 0) }}</h4>
-                            <p class="text-[10px] font-bold text-gray-400 mt-1">RM{{ number_format($thisMonthRevenue, 2) }} earned</p>
+                    @empty
+                        <div class="flex flex-col items-center justify-center py-12 text-center">
+                            <div class="w-9 h-9 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center mb-3">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            </div>
+                            <p class="text-xs font-bold text-gray-500 uppercase tracking-widest">Inventory is flawless</p>
+                            <p class="text-[10px] text-gray-400 mt-0.5">All products verified and holding secure stock margins.</p>
                         </div>
-                    </div>
-                @else
-                    <div class="flex flex-col items-center justify-center py-6">
-                        <div class="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 mb-4">
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                        </div>
-                        <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">No Goal Set</p>
-                        <button @click="editing = true" class="px-6 py-2.5 bg-black text-white text-xs font-bold uppercase tracking-widest rounded-xl hover:bg-gray-800 transition-all shadow-sm">Set Target</button>
-                    </div>
-                @endif
+                    @endforelse
+                </div>
             </div>
 
-            <!-- Goal Edit Overlay -->
-            <div x-show="editing" x-cloak class="absolute inset-0 bg-white/95 backdrop-blur-sm z-20 p-6 flex flex-col justify-center rounded-2xl">
-                <form action="{{ route('reseller.dashboard.goal') }}" method="POST" class="space-y-5">
-                    @csrf
+            <!-- Restock Recommendations -->
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col h-full">
+                <div class="px-6 py-4 border-b border-gray-50 bg-gray-50/20 shrink-0">
+                    <h2 class="text-xs font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+                        Restock Intelligence Suggestions
+                    </h2>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">Recommended wholesale restock acquisitions</p>
+                </div>
+                
+                <div class="p-6 flex-1 overflow-y-auto max-h-[350px] space-y-4">
+                    <!-- Recommendations Table List -->
+                    <div class="space-y-2.5">
+                        @forelse($restockRecommendations as $rec)
+                            <div class="p-3 bg-gray-50/50 border border-gray-100 rounded-xl flex items-center justify-between gap-3">
+                                <div>
+                                    <h4 class="text-xs font-bold text-gray-900 truncate">{{ $rec['product']->name }}</h4>
+                                    <p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">Recommend buying: {{ $rec['recommended_qty'] }} units &middot; {{ $rec['reason'] }}</p>
+                                </div>
+                                <a href="{{ route('reseller.orders.create') }}" class="px-3 py-1.5 bg-black text-white text-[9px] font-black uppercase tracking-wider rounded-lg hover:bg-gray-800 shrink-0 shadow-sm">Buy Now</a>
+                            </div>
+                        @empty
+                            <div class="flex flex-col items-center justify-center py-6 text-center">
+                                <p class="text-xs font-bold text-gray-500 uppercase tracking-widest">No Procurement Recommends</p>
+                                <p class="text-[9px] text-gray-400 mt-0.5">All warehouse capacities are completely sufficient.</p>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Incoming Shipments -->
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col h-full">
+                <div class="px-6 py-4 border-b border-gray-50 bg-gray-50/20 flex items-center justify-between gap-3 shrink-0">
                     <div>
-                        <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-3 block text-center">Monthly Goal (RM)</label>
-                        <input type="number" name="monthly_goal" value="{{ $monthlyGoal }}" class="w-full bg-gray-50 border-gray-100 rounded-xl px-4 py-3 text-center text-xl font-bold focus:ring-2 focus:ring-black/10 focus:border-black transition-all">
+                        <h2 class="text-xs font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
+                            <span class="relative flex h-2 w-2">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                            </span>
+                            Active Incoming Shipments
+                        </h2>
+                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">Real-time procurement tracking & statuses</p>
                     </div>
-                    <div class="flex gap-3">
-                        <button type="submit" class="flex-1 bg-black text-white text-xs font-bold uppercase tracking-widest py-3 rounded-xl hover:bg-gray-800 transition-all shadow-sm">Save</button>
-                        <button type="button" @click="editing = false" class="px-5 bg-gray-100 text-gray-600 text-xs font-bold uppercase tracking-widest py-3 rounded-xl hover:bg-gray-200 transition-all">Cancel</button>
-                    </div>
-                </form>
+                </div>
+                
+                <div class="p-6 flex-1 overflow-y-auto max-h-[350px] divide-y divide-gray-50">
+                    @forelse($myRecentOrders->take(4) as $order)
+                        @php
+                            $status = strtolower($order->status);
+                            if ($status === 'paid' || $status === 'completed' || $status === 'success') {
+                                $statusBadge = 'bg-emerald-50 text-emerald-600 border-emerald-100/40';
+                            } elseif ($status === 'pending' || $status === 'unpaid') {
+                                $statusBadge = 'bg-amber-50 text-amber-600 border-amber-100/40';
+                            } else {
+                                $statusBadge = 'bg-gray-50 text-gray-500 border-gray-100';
+                            }
+                        @endphp
+                        <div class="flex items-center justify-between py-3.5 first:pt-0 last:pb-0">
+                            <div class="min-w-0">
+                                <span class="text-xs font-bold text-gray-900">Order #{{ substr($order->billplz_id ?? $order->id, 0, 8) }}</span>
+                                <div class="flex items-center gap-1.5 mt-1 text-[9px] text-gray-400 font-bold uppercase tracking-wider">
+                                    <span>Total: RM{{ number_format($order->total_price, 2) }}</span>
+                                    <span>&middot;</span>
+                                    <span>{{ $order->created_at ? $order->created_at->diffForHumans() : 'Recently' }}</span>
+                                </div>
+                            </div>
+                            <div class="shrink-0 flex items-center gap-2">
+                                <span class="px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border {{ $statusBadge }}">
+                                    {{ $order->status }}
+                                </span>
+                                <a href="{{ route('reseller.orders.show', $order) }}" class="text-[9px] font-black uppercase tracking-wider text-black border border-gray-150 px-2.5 py-1.5 rounded-lg hover:bg-gray-50">Track</a>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="flex flex-col items-center justify-center py-12 text-center h-full">
+                            <div class="w-9 h-9 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center mb-3 border border-blue-100/50 animate-pulse">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/></svg>
+                            </div>
+                            <p class="text-xs font-bold text-gray-500 uppercase tracking-widest">No Active Shipments</p>
+                            <p class="text-[10px] text-gray-400 mt-0.5">All procurement shipments are current and complete.</p>
+                        </div>
+                    @endforelse
+                </div>
             </div>
+
         </div>
+
+
+
     </div>
 
-    <!-- Operational Context -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
-        <!-- Low Stock Alerts -->
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-50 bg-gray-50/30 flex items-center justify-between">
-                <h2 class="text-[10px] font-bold text-gray-900 uppercase tracking-wider">Stock Alerts</h2>
-                <a href="{{ route('reseller.orders.create') }}" class="text-[10px] font-bold text-gray-400 hover:text-black uppercase tracking-wider transition-colors">Restock</a>
-            </div>
-            <div class="p-6 space-y-4">
-                @forelse($lowStockProducts->take(4) as $p)
-                    @php
-                        $statusColor = $p->quantity <= 5 ? 'bg-rose-500' : ($p->quantity < 15 ? 'bg-amber-500' : 'bg-emerald-500');
-                        $dotColor = $p->quantity <= 5 ? 'bg-rose-500' : ($p->quantity < 15 ? 'bg-amber-500' : 'bg-emerald-500');
-                    @endphp
-                    <div class="flex items-center gap-4">
-                        <div class="w-2 h-2 rounded-full {{ $dotColor }}"></div>
-                        <div class="flex-1">
-                            <p class="text-xs font-bold text-gray-900">{{ $p->product?->name }}</p>
-                            <p class="text-[10px] text-gray-400 uppercase tracking-widest mt-0.5">{{ $p->quantity }} units remaining</p>
-                        </div>
-                    </div>
-                @empty
-                    <div class="flex items-center gap-4">
-                        <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
-                        <p class="text-xs font-bold text-gray-700">All stock levels healthy</p>
-                    </div>
-                @endforelse
-            </div>
-        </div>
-
-        <!-- Recent Sales -->
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-50 bg-gray-50/30 flex items-center justify-between">
-                <h2 class="text-[10px] font-bold text-gray-900 uppercase tracking-wider">Recent Sales</h2>
-                <a href="{{ route('reseller.sales.index') }}" class="text-[10px] font-bold text-gray-400 hover:text-black uppercase tracking-wider transition-colors">View All</a>
-            </div>
-            <div class="divide-y divide-gray-50">
-                @forelse($myRecentSales->take(4) as $sale)
-                    <div class="px-6 py-4 flex items-center justify-between hover:bg-gray-50/50 transition-all">
-                        <div>
-                            <p class="text-xs font-bold text-gray-900 truncate w-32">{{ $sale->product->name }}</p>
-                            <p class="text-[9px] text-gray-400 uppercase tracking-widest mt-0.5">{{ $sale->created_at->diffForHumans() }}</p>
-                        </div>
-                        <span class="text-xs font-bold text-gray-900">RM{{ number_format($sale->total_price, 0) }}</span>
-                    </div>
-                @empty
-                    <div class="px-6 py-8 text-center">
-                        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">No sales yet</p>
-                    </div>
-                @endforelse
-            </div>
-        </div>
-    </div>
-
-    <!-- Scripts -->
+    <!-- Chart Configuration -->
     <script>
         Chart.defaults.font.family = "'Inter', sans-serif";
         Chart.defaults.color = '#94a3b8';
         Chart.defaults.font.size = 11;
 
-        var commonOptions = {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-                y: { grid: { color: '#f1f5f9' }, border: { display: false } },
-                x: { grid: { display: false }, border: { display: false } }
-            }
-        };
-
-        // Sales Trend
-        new Chart(document.getElementById('mainSalesChart'), {
-            type: 'line',
-            data: {
-                labels: @json($trendLabels),
-                datasets: [
-                    {
-                        data: @json($trendRevenue),
-                        borderColor: '#6366f1',
-                        borderWidth: 2,
-                        pointRadius: 0,
-                        tension: 0.3,
-                        yAxisID: 'y'
+        // Verified Stock Status (Horizontal Bar Chart)
+        const barCtx = document.getElementById('stockDistributionChart');
+        if (barCtx) {
+            new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: @json($stockLabels),
+                    datasets: [{
+                        label: 'Physical Count',
+                        data: @json($stockCounts),
+                        backgroundColor: @json($stockCounts).map(qty => {
+                            if (qty === 0) return '#ef4444'; // Out of Stock (Red)
+                            if (qty < 15) return '#f59e0b';  // Low Stock (Amber)
+                            return '#10b981';                // Healthy (Emerald)
+                        }),
+                        borderRadius: 8,
+                        borderWidth: 0,
+                        barThickness: 24,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            padding: 12,
+                            backgroundColor: 'rgba(0,0,0,0.85)',
+                            titleFont: { weight: 'black', size: 12 },
+                            bodyFont: { weight: 'bold', size: 11 },
+                            callbacks: {
+                                label: function(context) {
+                                    return ' Verified Count: ' + context.raw + ' units';
+                                }
+                            }
+                        }
                     },
-                    {
-                        data: @json($trendUnits),
-                        borderColor: '#c7d2fe',
-                        borderWidth: 2,
-                        pointRadius: 0,
-                        tension: 0.3,
-                        yAxisID: 'y1'
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            border: { display: false },
+                            ticks: { font: { weight: 'bold', size: 10 }, color: '#1e293b' }
+                        },
+                        y: {
+                            grid: { color: '#f1f5f9' },
+                            border: { display: false },
+                            ticks: { font: { weight: 'bold' } }
+                        }
                     }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { beginAtZero: true, grid: { color: '#f1f5f9' }, border: { display: false }, ticks: { callback: v => 'RM' + v.toLocaleString() } },
-                    y1: { beginAtZero: true, position: 'right', grid: { display: false }, border: { display: false }, ticks: { display: false } },
-                    x: { grid: { display: false }, border: { display: false }, ticks: { maxTicksLimit: 7 } }
                 }
-            }
-        });
-
-        // Product Performance
-        new Chart(document.getElementById('topSellersChart'), {
-            type: 'bar',
-            data: {
-                labels: @json($topProductLabels),
-                datasets: [{
-                    data: @json($topProductData),
-                    backgroundColor: '#6366f1',
-                    borderRadius: 4,
-                    barThickness: 16
-                }]
-            },
-            options: {
-                indexAxis: 'y',
-                ...commonOptions,
-                scales: {
-                    x: { grid: { display: false }, ticks: { display: false } },
-                    y: { grid: { display: false }, ticks: { font: { weight: 'bold' }, color: '#1f2937' } }
-                }
-            }
-        });
+            });
+        }
     </script>
 </x-app-layout>

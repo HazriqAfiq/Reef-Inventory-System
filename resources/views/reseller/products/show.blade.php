@@ -50,10 +50,19 @@
                            onchange="validateInput({{ $pCounter }})"
                            {{ $p->stock === 0 ? 'disabled' : '' }}
                            {{ $pIsLowStock ? 'readonly' : '' }}>
-                           
+                            
                     <input type="hidden" name="product_id[{{ $pCounter }}]" value="{{ $p->id }}">
                 </div>
             @endforeach
+
+            <!-- Back Navigation -->
+            <div class="mb-6">
+                <a href="{{ route('reseller.orders.create') }}"
+                   class="inline-flex items-center gap-2 text-xs font-bold text-gray-400 hover:text-black transition-colors uppercase tracking-widest">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                    Back to Restock HQ
+                </a>
+            </div>
 
             <!-- Workspace Layout (Desktop: Side-by-side spec-sheet and static cart, Mobile: stacked) -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -123,74 +132,118 @@
                                 <div class="space-y-8">
                                     
                                     <!-- Title Row -->
-                                    <div class="space-y-3">
-                                        <div class="flex flex-wrap items-center gap-3">
+                                    <div class="space-y-4">
+                                        <!-- Category / Type Tags -->
+                                        <div class="flex flex-wrap items-center gap-2">
                                             @if($product->volume_ml)
                                                 <span class="px-3 py-1 bg-black text-white text-[9px] font-black uppercase tracking-widest rounded-md">
-                                                    {{ $product->volume_ml }}ML Volume
+                                                    {{ $product->volume_ml }}ML
+                                                </span>
+                                            @endif
+                                            @if($product->category)
+                                                <span class="px-3 py-1 bg-gray-100 text-gray-600 text-[9px] font-black uppercase tracking-widest rounded-md border border-gray-200">
+                                                    {{ $product->category->name }}
+                                                </span>
+                                            @endif
+                                            @if($product->productType)
+                                                <span class="px-3 py-1 bg-indigo-50 text-indigo-600 text-[9px] font-black uppercase tracking-widest rounded-md border border-indigo-100">
+                                                    {{ $product->productType->name }}
+                                                </span>
+                                            @endif
+                                            @if(!$product->is_active)
+                                                <span class="px-3 py-1 bg-rose-50 text-rose-600 text-[9px] font-black uppercase tracking-widest rounded-md border border-rose-100">
+                                                    Unlisted
                                                 </span>
                                             @endif
                                         </div>
-                                        <h1 class="text-2xl lg:text-3xl font-black text-gray-900 tracking-tight leading-none pt-1">{{ $product->name }}</h1>
-                                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">SKU Code: <span class="text-gray-900 font-black">{{ $product->sku }}</span></p>
+
+                                        <div>
+                                            <h1 class="text-2xl lg:text-3xl font-black text-gray-900 tracking-tight leading-tight">{{ $product->name }}</h1>
+                                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-2">Product Code: <span class="text-gray-900 font-black font-mono">{{ $product->sku }}</span></p>
+                                        </div>
                                     </div>
 
-                                    <!-- Price spec table -->
-                                    <div class="bg-gradient-to-br from-gray-50 to-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-                                        <div class="grid grid-cols-3 gap-6 items-center">
+                                    <!-- Price Spec Table -->
+                                    <div class="bg-gradient-to-br from-gray-50 to-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
+                                        <div class="grid grid-cols-3 divide-x divide-gray-100">
                                             
                                             <!-- Wholesale Price -->
-                                            <div class="space-y-1">
-                                                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none">Wholesale Price</p>
-                                                <p class="text-xl font-black text-gray-900 tracking-tight">RM{{ number_format($product->wholesale_price, 2) }}</p>
-                                                <p class="text-[8px] font-medium text-gray-400">Unit Cost</p>
+                                            <div class="p-5 space-y-1">
+                                                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none">Wholesale</p>
+                                                <p class="text-xl font-black text-gray-900 tracking-tight tabular-nums">RM{{ number_format($product->wholesale_price, 2) }}</p>
+                                                <p class="text-[8px] font-bold text-gray-400 uppercase tracking-wider">Your Cost / Unit</p>
                                             </div>
 
                                             <!-- Retail Price -->
-                                            <div class="space-y-1 border-l border-gray-100 pl-6">
-                                                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none">Retail Price</p>
-                                                <p class="text-lg font-bold text-gray-900 tracking-tight">RM{{ number_format($product->retail_price, 2) }}</p>
-                                                <p class="text-[8px] font-medium text-gray-400">RSP</p>
+                                            <div class="p-5 space-y-1">
+                                                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none">Retail (RSP)</p>
+                                                <p class="text-xl font-black text-gray-900 tracking-tight tabular-nums">RM{{ number_format($product->retail_price, 2) }}</p>
+                                                <p class="text-[8px] font-bold text-gray-400 uppercase tracking-wider">Suggested Sell Price</p>
                                             </div>
 
-                                            <!-- Profit Margins -->
-                                            <div class="space-y-1 border-l border-gray-100 pl-4 bg-amber-50/50 p-3 rounded-xl border border-amber-100/50">
-                                                <p class="text-[9px] font-black text-amber-600 uppercase tracking-widest leading-none">Profit Margin</p>
-                                                <p class="text-lg font-black text-amber-700 tracking-tight">+RM{{ number_format($profit, 2) }}</p>
-                                                <p class="text-[9px] font-black text-amber-600 uppercase tracking-wider mt-0.5">{{ $margin }}% ROI</p>
+                                            <!-- Profit Margin -->
+                                            <div class="p-5 space-y-1 bg-emerald-50/60">
+                                                <p class="text-[9px] font-black text-emerald-600 uppercase tracking-widest leading-none">Profit / Unit</p>
+                                                <p class="text-xl font-black text-emerald-700 tracking-tight tabular-nums">+RM{{ number_format($profit, 2) }}</p>
+                                                <p class="text-[8px] font-black text-emerald-600 uppercase tracking-wider">{{ $margin }}% ROI Margin</p>
                                             </div>
 
                                         </div>
                                     </div>
 
-                                    <!-- Olfactory pyramid notes -->
-                                    <div class="space-y-4">
-                                        <h3 class="text-[10px] font-black text-gray-900 uppercase tracking-widest border-b border-gray-50 pb-2">Olfactory Profile Notes</h3>
+                                    <!-- Olfactory Pyramid Notes -->
+                                    <div class="space-y-3">
+                                        <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                                            <span class="flex-1 h-px bg-gray-100"></span>
+                                            Olfactory Profile
+                                            <span class="flex-1 h-px bg-gray-100"></span>
+                                        </h3>
                                         
                                         <div class="grid grid-cols-3 gap-3">
-                                            <div class="p-3 bg-gray-50/50 border border-gray-100 rounded-xl space-y-1">
-                                                <span class="text-[8px] font-black text-gray-400 uppercase tracking-widest">Top Note</span>
-                                                <p class="text-[11px] font-bold text-gray-800 leading-snug">{{ $product->top_note ?: 'Subtle citrus aura' }}</p>
+                                            <!-- Top Note -->
+                                            <div class="p-4 bg-white border border-gray-100 rounded-xl space-y-2 shadow-sm hover:shadow-md transition-shadow">
+                                                <div class="flex items-center gap-1.5">
+                                                    <span class="w-2 h-2 rounded-full bg-sky-400 shrink-0"></span>
+                                                    <span class="text-[8px] font-black text-gray-400 uppercase tracking-widest">Top Note</span>
+                                                </div>
+                                                <p class="text-xs font-bold text-gray-900 leading-snug">{{ $product->top_note ?: '—' }}</p>
+                                                <p class="text-[8px] text-gray-400">Opens first · 15–30 min</p>
                                             </div>
                                             
-                                            <div class="p-3 bg-gray-50/50 border border-gray-100 rounded-xl space-y-1">
-                                                <span class="text-[8px] font-black text-gray-400 uppercase tracking-widest">Heart Note</span>
-                                                <p class="text-[11px] font-bold text-gray-800 leading-snug">{{ $product->heart_note ?: 'Exotic florals' }}</p>
+                                            <!-- Heart Note -->
+                                            <div class="p-4 bg-white border border-gray-100 rounded-xl space-y-2 shadow-sm hover:shadow-md transition-shadow">
+                                                <div class="flex items-center gap-1.5">
+                                                    <span class="w-2 h-2 rounded-full bg-rose-400 shrink-0"></span>
+                                                    <span class="text-[8px] font-black text-gray-400 uppercase tracking-widest">Heart Note</span>
+                                                </div>
+                                                <p class="text-xs font-bold text-gray-900 leading-snug">{{ $product->heart_note ?: '—' }}</p>
+                                                <p class="text-[8px] text-gray-400">Character · 2–4 hrs</p>
                                             </div>
 
-                                            <div class="p-3 bg-gray-50/50 border border-gray-100 rounded-xl space-y-1">
-                                                <span class="text-[8px] font-black text-gray-400 uppercase tracking-widest">Base Note</span>
-                                                <p class="text-[11px] font-bold text-gray-800 leading-snug">{{ $product->base_note ?: 'Amber musk' }}</p>
+                                            <!-- Base Note -->
+                                            <div class="p-4 bg-white border border-gray-100 rounded-xl space-y-2 shadow-sm hover:shadow-md transition-shadow">
+                                                <div class="flex items-center gap-1.5">
+                                                    <span class="w-2 h-2 rounded-full bg-amber-500 shrink-0"></span>
+                                                    <span class="text-[8px] font-black text-gray-400 uppercase tracking-widest">Base Note</span>
+                                                </div>
+                                                <p class="text-xs font-bold text-gray-900 leading-snug">{{ $product->base_note ?: '—' }}</p>
+                                                <p class="text-[8px] text-gray-400">Foundation · 6+ hrs</p>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <!-- Product Description -->
-                                    <div class="space-y-3">
-                                        <h3 class="text-[10px] font-black text-gray-900 uppercase tracking-widest border-b border-gray-50 pb-2">Product Heritage</h3>
-                                        <p class="text-xs font-medium text-gray-500 leading-relaxed">
-                                            {{ $product->description ?: 'An exquisite formulation handcrafted to represent luxury. Handcrafted with organic base elements that diffuse beautifully across the skin, leaving a persistent trail of elegance.' }}
-                                        </p>
+                                    <!-- Stock Availability Strip -->
+                                    <div class="flex items-center gap-4 px-5 py-3.5 bg-gray-50 border border-gray-100 rounded-xl">
+                                        <div class="flex items-center gap-2 flex-1">
+                                            <div class="w-2 h-2 rounded-full {{ $product->stock === 0 ? 'bg-rose-500' : ($product->stock < $productMoq ? 'bg-amber-500' : 'bg-emerald-500') }}"></div>
+                                            <span class="text-[10px] font-black text-gray-900 uppercase tracking-wider">
+                                                @if($product->stock === 0) Out of Stock
+                                                @elseif($product->stock < $productMoq) Limited — {{ $product->stock }} units remaining
+                                                @else Available — {{ $product->stock }} units in warehouse
+                                                @endif
+                                            </span>
+                                        </div>
+                                        <span class="text-[9px] font-black text-gray-400 uppercase tracking-wider shrink-0">Min. Order: {{ $productMoq }} units</span>
                                     </div>
 
                                 </div>
@@ -202,14 +255,7 @@
                                     $loopIndex = $allProducts->search(fn($p) => $p->id === $product->id);
                                 @endphp
 
-                                <div class="pt-10 mt-10 border-t border-gray-50 flex flex-col sm:flex-row items-center justify-between gap-6">
-                                    <a href="{{ route('reseller.orders.create') }}" 
-                                       class="px-6 py-3.5 bg-gray-50 hover:bg-gray-100 border border-gray-100 text-gray-700 text-[10px] font-bold uppercase tracking-widest rounded-xl transition-all flex items-center gap-2">
-                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                                        </svg>
-                                        <span>Back to Restock HQ</span>
-                                    </a>
+                                <div class="pt-10 mt-10 border-t border-gray-50 flex flex-col sm:flex-row items-center justify-end gap-6">
 
                                     <div class="flex items-center gap-4">
                                         @if($product->stock === 0)
@@ -336,6 +382,22 @@
                     </div>
                 </div>
 
+            </div>
+
+            <!-- Product Heritage / Description - Full Width Container -->
+            <div class="mt-8 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div class="px-8 py-4 border-b border-gray-50 bg-gray-50/20">
+                    <h2 class="text-[10px] font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-gray-900"></span>
+                        Product Heritage
+                    </h2>
+                    <p class="text-[9px] text-gray-400 uppercase tracking-wider mt-0.5">Formulation narrative and olfactory character</p>
+                </div>
+                <div class="p-8">
+                    <p class="text-sm font-medium text-gray-500 leading-relaxed max-w-3xl">
+                        {{ $product->description ?: 'An exquisite formulation handcrafted to represent luxury. Handcrafted with organic base elements that diffuse beautifully across the skin, leaving a persistent trail of elegance.' }}
+                    </p>
+                </div>
             </div>
 
                 <!-- Backdrop Overlay for Slide-Out Drawer (Mobile/Tablet only) -->

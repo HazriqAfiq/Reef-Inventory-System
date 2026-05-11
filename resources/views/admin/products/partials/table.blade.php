@@ -6,7 +6,7 @@
                 <th class="text-center px-8 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Volume</th>
                 <th class="text-right px-8 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Pricing</th>
                 <th class="text-left px-8 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Inventory Breakdown</th>
-                <th class="text-center px-8 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Sales</th>
+                <th class="text-center px-8 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Wholesale Sold</th>
                 <th class="px-8 py-4"></th>
             </tr>
         </thead>
@@ -68,11 +68,11 @@
                             if($combinedStock == 0) $percent = 0;
                             
                             if ($combinedStock === 0) {
-                                $barColor = 'bg-rose-200';
+                                $barColor = 'bg-rose-500';
                             } elseif ($combinedStock < 50) {
-                                $barColor = 'bg-gradient-to-r from-amber-400 to-orange-500';
+                                $barColor = 'bg-amber-500';
                             } else {
-                                $barColor = 'bg-gradient-to-r from-indigo-500 to-emerald-500';
+                                $barColor = 'bg-emerald-500';
                             }
                         @endphp
                         <div class="mb-2 flex items-center justify-between gap-4">

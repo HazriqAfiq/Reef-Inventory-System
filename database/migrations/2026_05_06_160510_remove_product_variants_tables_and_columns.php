@@ -11,15 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::disableForeignKeyConstraints();
+
         Schema::table('order_items', function (Blueprint $table) {
-            $table->dropIndex('order_items_order_variant_idx');
             $table->dropForeign(['product_variant_id']);
+            $table->dropIndex('order_items_order_variant_idx');
             $table->dropColumn('product_variant_id');
         });
 
         Schema::table('sales', function (Blueprint $table) {
-            $table->dropIndex('sales_product_variant_created_idx');
             $table->dropForeign(['product_variant_id']);
+            $table->dropIndex('sales_product_variant_created_idx');
             $table->dropColumn('product_variant_id');
         });
 
@@ -29,6 +31,8 @@ return new class extends Migration
         });
 
         Schema::dropIfExists('product_variants');
+
+        Schema::enableForeignKeyConstraints();
     }
 
     /**

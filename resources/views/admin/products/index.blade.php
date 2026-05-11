@@ -1,19 +1,31 @@
 <x-app-layout title="Product Inventory">
 
-
-
     <!-- Page Header -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+    <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-            <span class="text-xs font-bold text-indigo-500 uppercase tracking-widest bg-indigo-50 px-3 py-1.5 rounded-lg">Product Assets & Stock</span>
-            <h1 class="text-3xl font-black text-gray-900 tracking-tight mt-3">Product Catalog</h1>
-            <p class="text-sm text-gray-500 mt-1.5">Manage full product catalog and ecosystem stock levels.</p>
+            <div class="flex items-center gap-2 mb-1.5">
+                <span class="flex h-2 w-2 relative">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">Ecosystem Stock Live</span>
+            </div>
+            <h1 class="text-3xl font-black text-gray-900 tracking-tight">Product Catalog</h1>
+            <p class="text-xs text-gray-400 mt-1">Manage full product catalog, retail pricing thresholds, and global partner inventory.</p>
         </div>
-        <a href="{{ route('admin.products.create') }}"
-           class="inline-flex items-center gap-2 px-6 py-3.5 bg-brand hover:bg-brand-hover text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-md shadow-brand/5 hover:shadow-lg hover:shadow-brand/10 hover:scale-[1.01] active:scale-[0.99] shrink-0">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-            Add Product
-        </a>
+        
+        <div class="flex items-center gap-3 shrink-0">
+            <div class="bg-white px-4 py-2 rounded-xl border border-gray-100 shadow-sm flex items-center gap-2 text-xs font-bold text-gray-600">
+                <svg class="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                <span>Ecosystem Inventory</span>
+            </div>
+            
+            <a href="{{ route('admin.products.create') }}"
+               class="inline-flex items-center gap-2 px-6 py-3.5 bg-black hover:bg-gray-800 text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-md shrink-0">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                Add Product
+            </a>
+        </div>
     </div>
 
     <!-- Inventory KPIs -->
@@ -23,7 +35,7 @@
             <div>
                 <div class="flex items-center justify-between mb-3">
                     <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Catalog Products</span>
-                    <div class="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-500 group-hover:bg-brand group-hover:text-white transition-colors">
+                    <div class="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-500 group-hover:bg-black group-hover:text-white transition-colors">
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
                     </div>
                 </div>
@@ -85,7 +97,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                 </svg>
                 <input type="text" id="search-input" name="search" value="{{ request('search') }}"
-                       placeholder="Search product name, SKU..." autocomplete="off"
+                       placeholder="Search product name, Product Code..." autocomplete="off"
                        class="w-full pl-11 pr-4 py-3 text-sm font-medium text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:bg-white focus:border-black focus:ring-0 transition-all placeholder:text-gray-400">
             </div>
 
@@ -111,7 +123,7 @@
                 <option value="stock" {{ request('sort') === 'stock' ? 'selected' : '' }}>Stock ↑</option>
             </select>
 
-            <button type="submit" class="px-8 py-3 bg-brand hover:bg-brand-hover text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-sm active:scale-95">Filter</button>
+            <button type="submit" class="px-8 py-3 bg-black hover:bg-gray-800 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-sm active:scale-95">Filter</button>
             
             @if(request()->hasAny(['search', 'stock', 'volume', 'sort']))
                 <a href="{{ route('admin.products.index') }}" class="px-6 py-3 text-[10px] font-black text-gray-400 hover:text-black bg-white border border-gray-100 rounded-xl text-center uppercase tracking-widest transition-all">Reset</a>

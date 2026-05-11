@@ -176,13 +176,6 @@
 
 
 
-                    <p class="px-3 pt-6 pb-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em]">Sales & Analytics</p>
-
-                    <a href="{{ route('admin.sales.index') }}"
-                       class="sidebar-link group {{ request()->routeIs('admin.sales.index') ? 'active' : '' }}" onclick="closeSidebar()">
-                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-                        Global Sales
-                    </a>
 
                     <p class="px-3 pt-6 pb-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em]">Partnerships</p>
 
@@ -210,47 +203,43 @@
 
 
                 @elseif(Auth::user()->isReseller())
-                    <p class="px-3 pt-2 pb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Main</p>
+                    <p class="px-3 pt-2 pb-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em]">Overview</p>
 
                     <a href="{{ route('reseller.dashboard') }}"
                        class="sidebar-link group {{ request()->routeIs('reseller.dashboard') ? 'active' : '' }}" onclick="closeSidebar()">
-                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                        <svg class="w-4 h-4 shrink-0 text-gray-500 group-hover:text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z"/></svg>
                         Dashboard
                     </a>
 
-                    <p class="px-3 pt-6 pb-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em]">Inventory</p>
+                    <p class="px-3 pt-6 pb-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em]">Auditing</p>
+
+                    <a href="{{ route('reseller.audit.index') }}"
+                       class="sidebar-link group {{ request()->routeIs('reseller.audit.index') ? 'active' : '' }}" onclick="closeSidebar()">
+                        <svg class="w-4 h-4 shrink-0 text-gray-500 group-hover:text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                        Inventory Audit
+                    </a>
 
                     <a href="{{ route('reseller.stock.index') }}"
                        class="sidebar-link group {{ request()->routeIs('reseller.stock.*') ? 'active' : '' }}" onclick="closeSidebar()">
-                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+                        <svg class="w-4 h-4 shrink-0 text-gray-500 group-hover:text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/></svg>
                         My Stock
                     </a>
 
+                    <p class="px-3 pt-6 pb-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em]">Purchases</p>
+
                     <a href="{{ route('reseller.orders.create') }}"
                        class="sidebar-link group {{ request()->routeIs('reseller.orders.create') ? 'active' : '' }}" onclick="closeSidebar()">
-                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        Restock HQ
+                        <svg class="w-4 h-4 shrink-0 text-gray-500 group-hover:text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                        Wholesale Store
                     </a>
 
                     <a href="{{ route('reseller.orders.index') }}"
                        class="sidebar-link group {{ request()->routeIs('reseller.orders.index') || request()->routeIs('reseller.orders.show') || request()->routeIs('reseller.orders.payment') || request()->routeIs('reseller.orders.invoice') ? 'active' : '' }}" onclick="closeSidebar()">
-                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                        Wholesale Orders
+                        <svg class="w-4 h-4 shrink-0 text-gray-500 group-hover:text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/></svg>
+                        My Shipments
                     </a>
 
-                    <p class="px-3 pt-6 pb-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em]">System</p>
 
-                    <a href="{{ route('reseller.sales.create') }}"
-                       class="sidebar-link group {{ request()->routeIs('reseller.sales.create') ? 'active' : '' }}" onclick="closeSidebar()">
-                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                        Record Sale
-                    </a>
-
-                    <a href="{{ route('reseller.sales.index') }}"
-                       class="sidebar-link group {{ request()->routeIs('reseller.sales.index') ? 'active' : '' }}" onclick="closeSidebar()">
-                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                        My Sales History
-                    </a>
                 @endif
             @endauth
         </nav>
@@ -456,26 +445,7 @@
                 </div>
                 @endauth
 
-                {{-- Global Reseller Wholesale Cart Icon & Dynamic Count Badge --}}
-                @auth
-                    @if(Auth::user()->isReseller())
-                        @php
-                            $globalCart = Auth::user()->cart;
-                            $globalCartCount = $globalCart && is_array($globalCart->content) ? array_sum($globalCart->content) : 0;
-                        @endphp
-                        <a href="{{ route('reseller.orders.create') }}" 
-                           id="global-header-cart-btn"
-                           class="relative w-9 h-9 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400 hover:text-black hover:bg-gray-100 hover:border-black transition-all duration-200 focus:outline-none"
-                           title="View Wholesale Cart">
-                            <svg class="w-4 h-4 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                            </svg>
-                            <span id="global-header-cart-badge" class="{{ $globalCartCount > 0 ? '' : 'hidden' }} absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-black text-white text-[9px] font-black flex items-center justify-center border-2 border-white shadow-sm">
-                                {{ $globalCartCount }}
-                            </span>
-                        </a>
-                    @endif
-                @endauth
+
 
                 <div class="h-5 w-px bg-gray-200 hidden sm:block"></div>
 
@@ -560,6 +530,12 @@
 document.addEventListener('click', async (e) => {
     const link = e.target.closest('a');
     if (!link) return;
+    
+    // Skip empty, hash, javascript, download, external targets, or explicit non-spa anchors
+    const href = link.getAttribute('href');
+    if (!href || href === '#' || href.startsWith('#') || href.startsWith('javascript:')) return;
+    if (link.hasAttribute('download') || link.getAttribute('target') === '_blank') return;
+    if (link.hasAttribute('data-no-spa')) return;
     
     // Only handle internal admin/reseller links, skip logout/profile/external
     const url = new URL(link.href, window.location.origin);
@@ -704,7 +680,7 @@ async function navigateTo(url, push = true, resetScroll = true) {
         
     } catch (error) {
         console.error('Navigation failed:', error);
-        if (push) window.location.href = url;
+        window.location.href = url; // Standard full page browser load fallback
     } finally {
         mainContent.style.opacity = '1';
         setTimeout(() => {

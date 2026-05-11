@@ -18,7 +18,7 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Product::withSum('sales', 'quantity')
+        $query = Product::withSum('orderItems as sales_sum_quantity', 'quantity')
             ->withSum('resellerStocks', 'quantity');
 
         // Search by name or SKU
@@ -112,7 +112,7 @@ class ProductController extends Controller
             \App\Models\ActivityLog::log(
                 'product_created',
                 $product,
-                "Created new product: {$product->name} (SKU: {$product->sku})",
+                "Created new product: {$product->name} (Code: {$product->sku})",
                 $request->all()
             );
 
@@ -204,7 +204,7 @@ class ProductController extends Controller
         \App\Models\ActivityLog::log(
             'product_deleted',
             null,
-            "Deleted product: {$product->name} (SKU: {$product->sku})",
+            "Deleted product: {$product->name} (Code: {$product->sku})",
             ['product_id' => $product->id, 'name' => $product->name, 'sku' => $product->sku]
         );
         $product->delete();

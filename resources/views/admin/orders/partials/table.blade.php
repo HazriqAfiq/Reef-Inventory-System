@@ -1,75 +1,93 @@
 <div class="overflow-x-auto">
-    <table class="w-full text-sm">
+    <table class="w-full text-left border-collapse">
         <thead>
             <tr class="bg-gray-50/50 border-b border-gray-100">
-                <th class="text-left px-8 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Order Ref</th>
-                <th class="text-left px-8 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Reseller</th>
-                <th class="text-left px-8 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Date & Time</th>
-                <th class="text-center px-8 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Items</th>
-                <th class="text-right px-8 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Value</th>
-                <th class="text-center px-8 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Status</th>
-                <th class="px-8 py-4"></th>
+                <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-left">Order ID</th>
+                <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-left">Reseller</th>
+                <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Items Qty</th>
+                <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Total Price</th>
+                <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Order Status</th>
+                <th class="px-6 py-4"></th>
             </tr>
         </thead>
-        <tbody class="divide-y divide-gray-50">
+        <tbody class="divide-y divide-gray-100 text-xs font-medium text-gray-700">
             @forelse($orders as $order)
                 <tr class="hover:bg-gray-50/50 transition-colors">
-                    {{-- Ref --}}
-                    <td class="px-8 py-5">
-                        <span class="text-xs font-bold text-gray-900">#{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}</span>
+                    {{-- Order ID --}}
+                    <td class="px-6 py-4">
+                        <a href="{{ route('admin.orders.show', $order) }}" class="font-black text-black hover:underline">
+                            #{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}
+                        </a>
+                        <p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">{{ $order->created_at->format('d M Y \a\t h:i A') }}</p>
                     </td>
 
                     {{-- Reseller --}}
-                    <td class="px-8 py-5">
+                    <td class="px-6 py-4">
                         <div class="flex items-center gap-3">
                             <div class="w-8 h-8 rounded-lg bg-gray-900 text-white flex items-center justify-center text-[10px] font-bold shrink-0">
                                 {{ strtoupper(substr($order->user->name, 0, 2)) }}
                             </div>
-                            <p class="text-sm font-bold text-gray-900">{{ $order->user->name }}</p>
+                            <div>
+                                <div class="font-bold text-gray-900 leading-none">{{ $order->user->name }}</div>
+                                <div class="text-[9px] text-gray-400 font-bold uppercase tracking-wider mt-1 truncate max-w-[150px]">{{ $order->user->email }}</div>
+                            </div>
                         </div>
                     </td>
 
-                    {{-- Date --}}
-                    <td class="px-8 py-5 whitespace-nowrap">
-                        <p class="text-sm font-bold text-gray-900">{{ $order->created_at->format('d M Y') }}</p>
-                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">{{ $order->created_at->format('h:i A') }}</p>
+                    {{-- Items Qty --}}
+                    <td class="px-6 py-4 text-center font-bold text-gray-900 tabular-nums">
+                        {{ $order->items->sum('quantity') }}
                     </td>
 
-                    {{-- Items --}}
-                    <td class="px-8 py-5 text-center">
-                        <span class="text-xs font-bold text-gray-900">{{ $order->items->sum('quantity') }}</span>
+                    {{-- Total Price --}}
+                    <td class="px-6 py-4 text-right font-black text-gray-900 tabular-nums">
+                        RM{{ number_format($order->total_price, 2) }}
                     </td>
 
-                    {{-- Total --}}
-                    <td class="px-8 py-5 text-right">
-                        <span class="text-sm font-bold text-gray-900">RM{{ number_format($order->total_price, 2) }}</span>
-                    </td>
-
-                    {{-- Status --}}
-                    <td class="px-8 py-5 text-center">
-                        @if($order->status === 'paid')
-                            <span class="inline-flex items-center gap-1.5 text-[9px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full uppercase tracking-widest border border-emerald-100">
-                                Paid
-                            </span>
-                        @else
-                            <span class="inline-flex items-center gap-1.5 text-[9px] font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full uppercase tracking-widest border border-amber-100">
-                                Pending
-                            </span>
-                        @endif
+                    {{-- Order Status --}}
+                    <td class="px-6 py-4 text-right">
+                        @php
+                            $statusColors = [
+                                'pending'    => 'bg-amber-50 text-amber-600 border-amber-100/40',
+                                'paid'       => 'bg-emerald-50 text-emerald-600 border-emerald-100/40',
+                                'processing' => 'bg-blue-50 text-blue-600 border-blue-100/40',
+                                'shipped'    => 'bg-indigo-50 text-indigo-600 border-indigo-100/40',
+                                'delivered'  => 'bg-teal-50 text-teal-600 border-teal-100/40',
+                                'cancelled'  => 'bg-gray-50 text-gray-500 border-gray-100/40',
+                            ];
+                            $badgeStyle = $statusColors[strtolower($order->status)] ?? 'bg-gray-50 text-gray-600 border-gray-100/40';
+                        @endphp
+                        <span class="inline-flex px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider border {{ $badgeStyle }}">
+                            {{ $order->status }}
+                        </span>
                     </td>
 
                     {{-- Actions --}}
-                    <td class="px-8 py-5 text-right">
-                        <a href="{{ route('admin.orders.show', $order) }}"
-                           class="text-[10px] font-bold text-gray-400 hover:text-black uppercase tracking-widest transition-colors">
-                            Details
-                        </a>
+                    <td class="px-6 py-4 text-right whitespace-nowrap">
+                        <div class="flex items-center justify-end gap-2">
+                            <a href="{{ route('admin.orders.show', $order) }}" 
+                               class="w-8 h-8 rounded-lg flex items-center justify-center bg-gray-50 border border-gray-100 text-gray-400 hover:bg-black hover:text-white hover:border-black transition-all hover:scale-105 active:scale-95" 
+                               title="View Details">
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </a>
+                        </div>
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" class="py-20 text-center">
-                        <p class="text-sm font-bold text-gray-400 uppercase tracking-[0.2em]">No B2B Orders Recorded</p>
+                    <td colspan="6" class="px-6 py-12 text-center">
+                        <div class="max-w-xs mx-auto">
+                            <div class="w-12 h-12 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400 mx-auto mb-3">
+                                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                                </svg>
+                            </div>
+                            <p class="text-xs font-black text-gray-400 uppercase tracking-widest">No B2B Orders Recorded</p>
+                            <p class="text-xs text-gray-400 mt-1">Check back later for wholesale orders placed by your reseller network.</p>
+                        </div>
                     </td>
                 </tr>
             @endforelse
@@ -78,7 +96,7 @@
 </div>
 
 @if($orders->hasPages())
-    <div class="px-8 py-5 border-t border-gray-50">
+    <div class="px-6 py-5 border-t border-gray-50">
         {{ $orders->links() }}
     </div>
 @endif

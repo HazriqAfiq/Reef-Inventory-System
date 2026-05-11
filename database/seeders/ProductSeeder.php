@@ -113,7 +113,6 @@ class ProductSeeder extends Seeder
                     'top_note'     => $item['top_note'],
                     'heart_note'   => $item['heart_note'],
                     'base_note'    => $item['base_note'],
-                    'fragrance_family' => $fragranceFamily,
                     'description'  => $item['top_note'] . ' | ' . $item['heart_note'] . ' | ' . $item['base_note'],
                     'wholesale_price' => rand(180, 250),
                     'retail_price'    => rand(320, 399),

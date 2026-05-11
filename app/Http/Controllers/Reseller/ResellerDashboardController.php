@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Reseller;
 
 use App\Http\Controllers\Controller;
+use App\Models\Order;
+use App\Models\ResellerStock;
 use App\Models\Product;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class ResellerDashboardController extends Controller
@@ -13,142 +16,191 @@ class ResellerDashboardController extends Controller
     {
         $user = auth()->user();
 
-        // ── All-time KPIs ─────────────────────────────────────────────────
-        $myTotalRevenue  = $user->sales()->sum('total_price');
-        $myTotalUnits    = $user->sales()->sum('quantity');
-        $myTotalSales    = $user->sales()->count();
-        $myCommission    = $user->calculateCommission($myTotalRevenue);
+        // ── 1. Load Personal Stocks & Products ────────────────────────────
+        $myStocks = $user->resellerStocks()->with(['product.primaryImage'])->get();
 
-        // ── This-month KPIs ───────────────────────────────────────────────
-        $thisMonthRevenue = $user->sales()
+        // If user has no stocks yet, seed them or retrieve available products to allow audit
+        if ($myStocks->isEmpty()) {
+            $products = Product::all();
+            foreach ($products as $p) {
+                ResellerStock::create([
+                    'user_id' => $user->id,
+                    'product_id' => $p->id,
+                    'quantity' => 0,
+                ]);
+            }
+            $myStocks = $user->resellerStocks()->with(['product.primaryImage'])->get();
+        }
+
+        // ── 2. Top-Row KPI Calculations ──────────────────────────────────
+        $totalAssetValuation = 0.0;
+        $totalUnitsHeld = 0;
+        $verifiedThisWeekCount = 0;
+
+        $myStocks->each(function($stock) use (&$totalAssetValuation, &$totalUnitsHeld, &$verifiedThisWeekCount) {
+            $stock->days_since_audit = $stock->updated_at ? $stock->updated_at->diffInDays(now()) : 99;
+            
+            // Asset Valuation (Current Count * Retail Price)
+            if ($stock->product) {
+                $totalAssetValuation += $stock->quantity * $stock->product->price;
+                $totalUnitsHeld += $stock->quantity;
+            }
+
+            // Freshness audit health (Verified within 7 days)
+            if ($stock->days_since_audit <= 7) {
+                $verifiedThisWeekCount++;
+            }
+
+            // Map Freshness metrics
+            if ($stock->days_since_audit <= 1) {
+                $stock->freshness_status = 'Fresh (Verified today)';
+                $stock->freshness_badge_color = 'bg-emerald-50 text-emerald-600 border-emerald-100';
+                $stock->freshness_dot_color = 'bg-emerald-500';
+                $stock->freshness_score = 100;
+            } elseif ($stock->days_since_audit <= 3) {
+                $stock->freshness_status = 'Recent (Verified within 3 days)';
+                $stock->freshness_badge_color = 'bg-indigo-50 text-indigo-600 border-indigo-100';
+                $stock->freshness_dot_color = 'bg-indigo-500';
+                $stock->freshness_score = 80;
+            } elseif ($stock->days_since_audit <= 7) {
+                $stock->freshness_status = 'Warning (Over 4 days old)';
+                $stock->freshness_badge_color = 'bg-amber-50 text-amber-600 border-amber-100';
+                $stock->freshness_dot_color = 'bg-amber-500';
+                $stock->freshness_score = 50;
+            } else {
+                $stock->freshness_status = 'Stale (Requires immediate audit)';
+                $stock->freshness_badge_color = 'bg-rose-50 text-rose-600 border-rose-100';
+                $stock->freshness_dot_color = 'bg-rose-500';
+                $stock->freshness_score = 10;
+            }
+        });
+
+        $totalStockItemsCount = max(1, $myStocks->count());
+        $auditHealthPercentage = round(($verifiedThisWeekCount / $totalStockItemsCount) * 100);
+
+        // ── 3. Stock Status & Distribution (Bar Chart) ───────────────────
+        $stockLabels = $myStocks->map(fn($s) => $s->product?->name)->values();
+        $stockCounts = $myStocks->pluck('quantity')->values();
+
+        // ── 4. Needs Attention List ──────────────────────────────────────
+        // Items where last verified > 7 days or quantity is dangerously low (<= 5)
+        $needsAttentionList = $myStocks->filter(function($stock) {
+            return $stock->days_since_audit > 7 || $stock->quantity <= 5;
+        })->sortByDesc('days_since_audit')->take(5)->values();
+
+        // ── 5. Restock Recommendations ───────────────────────────────────
+        // Proactively suggest buying replacement boxes if quantity is under 15
+        $restockRecommendations = [];
+        foreach ($myStocks as $stock) {
+            if ($stock->quantity <= 15 && $stock->product) {
+                $recommendedQty = 40 - $stock->quantity; // Restock target ceiling
+                $restockRecommendations[] = [
+                    'product' => $stock->product,
+                    'current_qty' => $stock->quantity,
+                    'recommended_qty' => $recommendedQty,
+                    'reason' => $stock->quantity == 0 ? 'Out of Stock' : 'Low Stock Threshold'
+                ];
+            }
+        }
+        $restockRecommendations = collect($restockRecommendations)->sortBy('current_qty')->take(3)->values();
+
+        // ── 6. Order Status Tracker (Incoming Shipments) ─────────────────
+        $myRecentOrders = $user->orders()
+            ->with('items.product')
+            ->latest()
+            ->take(4)
+            ->get();
+
+        // ── 7. Monthly Wholesale Goals (procurement targets) ─────────────
+        $thisMonthSpend = $user->orders()
+            ->where('status', '!=', Order::STATUS_CANCELLED)
             ->whereYear('created_at', now()->year)
             ->whereMonth('created_at', now()->month)
             ->sum('total_price');
 
-        $lastMonthRevenue = $user->sales()
-            ->whereYear('created_at', now()->subMonth()->year)
-            ->whereMonth('created_at', now()->subMonth()->month)
-            ->sum('total_price');
-
-        $revenueChange = $lastMonthRevenue > 0
-            ? round((($thisMonthRevenue - $lastMonthRevenue) / $lastMonthRevenue) * 100, 1)
-            : null;
-
-        $thisMonthCommission = $user->calculateCommission($thisMonthRevenue);
-        $lastMonthCommission = $user->calculateCommission($lastMonthRevenue);
-        $commissionChange = $lastMonthCommission > 0
-            ? round((($thisMonthCommission - $lastMonthCommission) / $lastMonthCommission) * 100, 1)
-            : null;
-
-        // ── Inventory snapshot (Personal Stock) ───────────────────────────
-        $availableProducts = $user->resellerStocks()->where('quantity', '>', 0)->count();
-        $lowStockProducts  = $user->resellerStocks()
-            ->where('quantity', '>', 0)
-            ->where('quantity', '<=', 10)
-            ->with('product')
-            ->orderBy('quantity')
-            ->get();
-
-        // ── Chart: Daily revenue (last 30 days) scoped to this reseller ───
-        $days = collect(range(29, 0))->map(fn($i) => now()->subDays($i)->startOfDay());
-
-        $dailyRevMap = $user->sales()
-            ->select(DB::raw("date(created_at) as day"), DB::raw("SUM(total_price) as revenue"))
-            ->where('created_at', '>=', now()->subDays(29)->startOfDay())
-            ->groupBy('day')
-            ->pluck('revenue', 'day');
-
-        $dailyUnitMap = $user->sales()
-            ->select(DB::raw("date(created_at) as day"), DB::raw("SUM(quantity) as units"))
-            ->where('created_at', '>=', now()->subDays(29)->startOfDay())
-            ->groupBy('day')
-            ->pluck('units', 'day');
-
-        $trendLabels  = $days->map(fn($d) => $d->format('d M'))->values();
-        $trendRevenue = $days->map(fn($d) => round((float)($dailyRevMap[$d->toDateString()] ?? 0), 2))->values();
-        $trendUnits   = $days->map(fn($d) => (int)($dailyUnitMap[$d->toDateString()] ?? 0))->values();
-
-        // ── Top 5 products this reseller has sold ────────────────────────
-        $myTopProducts = $user->sales()
-            ->select('product_id',
-                DB::raw('SUM(quantity) as total_qty'),
-                DB::raw('SUM(total_price) as total_rev')
-            )
-            ->with('product')
-            ->groupBy('product_id')
-            ->orderByDesc('total_qty')
-            ->take(5)
-            ->get();
-
-        $topProductLabels = $myTopProducts->map(fn($p) => $p->product->name)->values();
-        $topProductData   = $myTopProducts->pluck('total_qty')->values();
-        $topProductRev    = $myTopProducts->pluck('total_rev')->values();
-
-        // ── Performance Insights ──────────────────────────────────────────
-        $insights = [];
-        if ($revenueChange !== null) {
-            if ($revenueChange > 0) {
-                $insights[] = "Your sales increased by {$revenueChange}% this month! Keep up the great work.";
-            } elseif ($revenueChange < 0) {
-                $insights[] = "Your sales are down ".abs($revenueChange)."% compared to last month.";
-            }
-        }
-        $topSeller = $myTopProducts->first();
-        if ($topSeller) {
-            $insights[] = "{$topSeller->product->name} is currently your best-selling product.";
-        }
-        if ($lowStockProducts->count() > 0) {
-            $insights[] = "You have {$lowStockProducts->count()} product(s) running low on available stock.";
-        } else {
-            $insights[] = "Inventory levels are currently healthy.";
-        }
-
-        // ── Sparklines Data ───────────────────────────────────────────────
-        $sparkRevenue   = $trendRevenue->slice(-7)->values();
-        $sparkUnits     = $trendUnits->slice(-7)->values();
-
-        // ── Recent sales ──────────────────────────────────────────────────
-        $myRecentSales = $user->sales()
-            ->with('product')
-            ->latest()
-            ->take(8)
-            ->get();
-
-        // ── 5. New Strategic Aggregates ─────────────────────────────────────
-        // Weekly Velocity (Mon-Sun)
-        $weeklyVelocityData = collect(range(0, 6))->map(function($i) use ($user) {
-            return $user->sales()->where(DB::raw("DAYOFWEEK(created_at)"), $i + 1)->count();
-        })->values();
-
-        // Category Distribution
-        $categoryDistribution = DB::table('products')
-            ->join('categories', 'products.category_id', '=', 'categories.id')
-            ->join('sales', 'products.id', '=', 'sales.product_id')
-            ->where('sales.user_id', $user->id)
-            ->select('categories.name', DB::raw('SUM(sales.quantity) as total_qty'))
-            ->groupBy('categories.name')
-            ->pluck('total_qty', 'categories.name');
-
-        // Goal Progress
         $monthlyGoal = (float) $user->monthly_goal;
-        $goalProgress = $monthlyGoal > 0 ? min(100, round(($thisMonthRevenue / $monthlyGoal) * 100, 1)) : 0;
+        $goalProgress = $monthlyGoal > 0 ? min(100, round(($thisMonthSpend / $monthlyGoal) * 100, 1)) : 0;
 
         return view('reseller.dashboard', compact(
-            'myTotalRevenue', 'myTotalUnits', 'myTotalSales', 'myCommission',
-            'thisMonthRevenue', 'revenueChange', 'commissionChange',
-            'availableProducts', 'lowStockProducts',
-            'trendLabels', 'trendRevenue', 'trendUnits',
-            'myTopProducts', 'topProductLabels', 'topProductData', 'topProductRev',
-            'insights', 'sparkRevenue', 'sparkUnits',
-            'myRecentSales', 'monthlyGoal', 'goalProgress',
-            'weeklyVelocityData', 'categoryDistribution'
+            'myStocks', 'totalAssetValuation', 'totalUnitsHeld', 'auditHealthPercentage',
+            'stockLabels', 'stockCounts',
+            'needsAttentionList', 'restockRecommendations', 'myRecentOrders',
+            'thisMonthSpend', 'monthlyGoal', 'goalProgress'
         ));
     }
 
-    public function updateGoal(\Illuminate\Http\Request $request)
+    public function auditPage()
+    {
+        $user = auth()->user();
+        $myStocks = $user->resellerStocks()->with(['product.primaryImage'])->get();
+
+        // If user has no stocks yet, seed them
+        if ($myStocks->isEmpty()) {
+            $products = Product::all();
+            foreach ($products as $p) {
+                ResellerStock::create([
+                    'user_id' => $user->id,
+                    'product_id' => $p->id,
+                    'quantity' => 0,
+                ]);
+            }
+            $myStocks = $user->resellerStocks()->with(['product.primaryImage'])->get();
+        }
+
+        $verifiedThisWeekCount = 0;
+        $myStocks->each(function($stock) use (&$verifiedThisWeekCount) {
+            $stock->days_since_audit = $stock->updated_at ? $stock->updated_at->diffInDays(now()) : 99;
+            if ($stock->days_since_audit <= 7) {
+                $verifiedThisWeekCount++;
+            }
+
+            // Map Freshness metrics
+            if ($stock->days_since_audit <= 1) {
+                $stock->freshness_status = 'Fresh (Verified today)';
+                $stock->freshness_badge_color = 'bg-emerald-50 text-emerald-600 border-emerald-100';
+            } elseif ($stock->days_since_audit <= 3) {
+                $stock->freshness_status = 'Recent (Verified within 3 days)';
+                $stock->freshness_badge_color = 'bg-indigo-50 text-indigo-600 border-indigo-100';
+            } elseif ($stock->days_since_audit <= 7) {
+                $stock->freshness_status = 'Warning (Over 4 days old)';
+                $stock->freshness_badge_color = 'bg-amber-50 text-amber-600 border-amber-100';
+            } else {
+                $stock->freshness_status = 'Stale (Audit Required)';
+                $stock->freshness_badge_color = 'bg-rose-50 text-rose-600 border-rose-100';
+            }
+        });
+
+        $totalStockItemsCount = max(1, $myStocks->count());
+        $auditHealthPercentage = round(($verifiedThisWeekCount / $totalStockItemsCount) * 100);
+
+        return view('reseller.audit.index', compact('myStocks', 'auditHealthPercentage'));
+    }
+
+    public function auditStock(Request $request)
+    {
+        $request->validate([
+            'stocks' => 'required|array',
+            'stocks.*' => 'required|integer|min:0',
+        ]);
+
+        $user = auth()->user();
+
+        foreach ($request->stocks as $stockId => $qty) {
+            $user->resellerStocks()
+                ->where('id', $stockId)
+                ->update([
+                    'quantity' => $qty,
+                    'updated_at' => now(), // Force-update timestamp to today
+                ]);
+        }
+
+        return back()->with('success', 'Physical shelf counts successfully updated! Audit health is restored to green.');
+    }
+
+    public function updateGoal(Request $request)
     {
         $request->validate(['monthly_goal' => 'required|numeric|min:0']);
         auth()->user()->update(['monthly_goal' => $request->monthly_goal]);
-        return back()->with('success', 'Monthly goal updated successfully.');
+        return back()->with('success', 'Monthly restock target updated successfully.');
     }
 }

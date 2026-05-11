@@ -26,9 +26,7 @@
                         <x-nav-link :href="route('admin.resellers.index')" :active="request()->routeIs('admin.resellers.*')" class="text-[11px] font-black uppercase tracking-widest">
                             {{ __('Manage Resellers') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('admin.sales.index')" :active="request()->routeIs('admin.sales.*')" class="text-[11px] font-black uppercase tracking-widest">
-                            {{ __('B2C Global Sales') }}
-                        </x-nav-link>
+
                     @elseif(Auth::user()->isReseller())
                         <x-nav-link :href="route('reseller.stock.index')" :active="request()->routeIs('reseller.stock.index')" class="text-[11px] font-black uppercase tracking-widest">
                             {{ __('My Stock') }}
@@ -39,12 +37,7 @@
                         <x-nav-link :href="route('reseller.orders.index')" :active="request()->routeIs('reseller.orders.index') || request()->routeIs('reseller.orders.show') || request()->routeIs('reseller.orders.payment') || request()->routeIs('reseller.orders.invoice')" class="text-[11px] font-black uppercase tracking-widest">
                             {{ __('Wholesale Orders') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('reseller.sales.index')" :active="request()->routeIs('reseller.sales.index')" class="text-[11px] font-black uppercase tracking-widest">
-                            {{ __('My Sales History') }}
-                        </x-nav-link>
-                        <x-nav-link :href="route('reseller.sales.create')" :active="request()->routeIs('reseller.sales.create')" class="text-[11px] font-black uppercase tracking-widest">
-                            {{ __('Record New Sale') }}
-                        </x-nav-link>
+
                     @endif
                 </div>
             </div>

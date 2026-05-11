@@ -28,11 +28,6 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::resource('products', \App\Http\Controllers\ProductController::class);
     Route::resource('resellers', \App\Http\Controllers\Admin\ResellerController::class);
     
-    // Sales & Orders
-    Route::prefix('sales')->name('sales.')->group(function () {
-        Route::get('/', [\App\Http\Controllers\SaleController::class, 'index'])->name('index');
-        Route::get('/report', [\App\Http\Controllers\SaleController::class, 'report'])->name('report');
-    });
     
     Route::prefix('orders')->name('orders.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('index');
@@ -50,8 +45,9 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
 
 Route::middleware(['auth', 'verified', 'role:reseller'])->prefix('reseller')->name('reseller.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Reseller\ResellerDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/audit', [\App\Http\Controllers\Reseller\ResellerDashboardController::class, 'auditPage'])->name('audit.index');
     Route::post('/dashboard/goal', [\App\Http\Controllers\Reseller\ResellerDashboardController::class, 'updateGoal'])->name('dashboard.goal');
-    Route::resource('sales', \App\Http\Controllers\SaleController::class)->only(['index', 'create', 'store']);
+    Route::post('/dashboard/audit', [\App\Http\Controllers\Reseller\ResellerDashboardController::class, 'auditStock'])->name('dashboard.audit');
     Route::resource('orders', \App\Http\Controllers\Reseller\OrderController::class)->only(['index', 'show']);
     Route::get('restock', [\App\Http\Controllers\Reseller\OrderController::class, 'create'])->name('orders.create');
     Route::post('restock', [\App\Http\Controllers\Reseller\OrderController::class, 'store'])->name('orders.store');
@@ -62,6 +58,11 @@ Route::middleware(['auth', 'verified', 'role:reseller'])->prefix('reseller')->na
     Route::get('products/{product:slug}', [\App\Http\Controllers\Reseller\OrderController::class, 'showProduct'])->name('products.show');
     Route::post('/cart/update', [\App\Http\Controllers\Reseller\OrderController::class, 'updateCart'])->name('cart.update');
     Route::post('/cart/clear', [\App\Http\Controllers\Reseller\OrderController::class, 'clearCart'])->name('cart.clear');
+
+    // Address management
+    Route::post('/addresses', [\App\Http\Controllers\ProfileController::class, 'storeAddress'])->name('addresses.store');
+    Route::post('/addresses/{address}/default', [\App\Http\Controllers\ProfileController::class, 'setDefaultAddress'])->name('addresses.default');
+    Route::delete('/addresses/{address}', [\App\Http\Controllers\ProfileController::class, 'destroyAddress'])->name('addresses.destroy');
 });
 
 Route::middleware('auth')->group(function () {

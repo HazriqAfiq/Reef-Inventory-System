@@ -15,8 +15,8 @@ class ResellerController extends Controller
     public function index(Request $request)
     {
         $query = User::where('role', 'reseller')
-            ->withCount('sales')
-            ->withSum('sales', 'total_price');
+            ->withCount('orders')
+            ->withSum('orders as orders_sum_total_price', 'total_price');
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
@@ -32,10 +32,10 @@ class ResellerController extends Controller
         }
 
         $totalResellers = User::where('role', 'reseller')->count();
-        $totalSalesCount = \App\Models\Sale::count();
-        $totalRevenue = \App\Models\Sale::sum('total_price');
+        $totalOrdersCount = \App\Models\Order::count();
+        $totalRevenue = \App\Models\Order::sum('total_price');
 
-        return view('admin.resellers.index', compact('resellers', 'totalResellers', 'totalSalesCount', 'totalRevenue'));
+        return view('admin.resellers.index', compact('resellers', 'totalResellers', 'totalOrdersCount', 'totalRevenue'));
     }
 
     public function create()
