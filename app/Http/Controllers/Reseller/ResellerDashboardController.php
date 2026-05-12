@@ -148,7 +148,7 @@ class ResellerDashboardController extends Controller
         }
 
         $verifiedThisWeekCount = 0;
-        $myStocks->each(function($stock) use (&$verifiedThisWeekCount) {
+        $myStocks->each(function($stock) use (&$verifiedThisWeekCount, $user) {
             $stock->days_since_audit = $stock->updated_at ? $stock->updated_at->diffInDays(now()) : 99;
             if ($stock->days_since_audit <= 7) {
                 $verifiedThisWeekCount++;
@@ -168,6 +168,9 @@ class ResellerDashboardController extends Controller
                 $stock->freshness_status = 'Stale (Audit Required)';
                 $stock->freshness_badge_color = 'bg-rose-50 text-rose-600 border-rose-100';
             }
+
+            // The maximum they can audit is strictly their current database stock count
+            $stock->total_restocked = $stock->quantity;
         });
 
         $totalStockItemsCount = max(1, $myStocks->count());
@@ -186,12 +189,21 @@ class ResellerDashboardController extends Controller
         $user = auth()->user();
 
         foreach ($request->stocks as $stockId => $qty) {
-            $user->resellerStocks()
-                ->where('id', $stockId)
-                ->update([
-                    'quantity' => $qty,
-                    'updated_at' => now(), // Force-update timestamp to today
-                ]);
+            $stock = $user->resellerStocks()->find($stockId);
+            if (!$stock) {
+                continue;
+            }
+
+            $maxAllowed = $stock->quantity;
+
+            if ($qty > $maxAllowed) {
+                return back()->with('error', "Audit integrity violation! You cannot audit '{$stock->product->name}' with {$qty} units. The maximum allowed is {$maxAllowed} units (Current Stock on Hand).");
+            }
+
+            $stock->update([
+                'quantity' => $qty,
+                'updated_at' => now(), // Force-update timestamp to today
+            ]);
         }
 
         return back()->with('success', 'Physical shelf counts successfully updated! Audit health is restored to green.');

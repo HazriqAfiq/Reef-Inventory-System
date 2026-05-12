@@ -64,6 +64,24 @@
                 </a>
             </div>
 
+            @if($errors->any())
+                <div class="mb-6 p-5 bg-rose-50 border border-rose-100 rounded-2xl flex items-start gap-4 animate-fade-in-up">
+                    <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-rose-600 shadow-sm border border-rose-100 shrink-0">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-rose-900 uppercase tracking-widest text-[10px]">Restocking errors detected</h3>
+                        <ul class="mt-1 text-xs text-rose-600 font-medium space-y-1 pl-4 list-disc">
+                            @foreach($errors->all() as $err)
+                                <li class="uppercase tracking-wider text-[9px] font-bold">{{ $err }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+            @endif
+
             <!-- Workspace Layout (Desktop: Side-by-side spec-sheet and static cart, Mobile: stacked) -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 
@@ -345,7 +363,7 @@
                         </div>
 
                         <!-- Scrollable Selected Wholesale Items List -->
-                        <div class="cart-items-list space-y-4 max-h-[380px] overflow-y-auto pr-3 py-2 divide-y divide-gray-50">
+                        <div class="cart-items-list space-y-4 pr-3 py-2 divide-y divide-gray-50">
                             <!-- Populated in real-time via JS -->
                         </div>
 
@@ -940,7 +958,7 @@
                         btn.classList.remove('bg-gray-100', 'text-gray-400', 'cursor-not-allowed');
                         btn.classList.add('bg-black', 'text-white', 'hover:bg-gray-800', 'active:scale-95');
                         btn.disabled = false;
-                        btn.textContent = 'Proceed to Payment';
+                        btn.textContent = 'Proceed to Checkout';
                     });
                 } else {
                     const remaining = MIN_ORDER_QTY - items;
@@ -1015,7 +1033,7 @@
                         floatingCheckoutBtn.classList.remove('bg-gray-100', 'text-gray-400', 'cursor-not-allowed');
                         floatingCheckoutBtn.classList.add('bg-black', 'text-white', 'hover:bg-gray-800', 'active:scale-95');
                         floatingCheckoutBtn.disabled = false;
-                        floatingCheckoutBtn.textContent = 'Proceed Payment';
+                        floatingCheckoutBtn.textContent = 'Proceed to Checkout';
                     } else {
                         const remaining = MIN_ORDER_QTY - items;
                         floatingCheckoutBtn.classList.add('bg-gray-100', 'text-gray-400', 'cursor-not-allowed');

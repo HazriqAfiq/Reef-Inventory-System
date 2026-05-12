@@ -158,6 +158,12 @@
                         Dashboard
                     </a>
 
+                    <a href="{{ route('admin.reports.index') }}"
+                       class="sidebar-link group {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}" onclick="closeSidebar()">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        Reports & Logs
+                    </a>
+
 
 
                     <p class="px-3 pt-6 pb-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em]">Management</p>
@@ -235,8 +241,10 @@
 
                     <a href="{{ route('reseller.orders.index') }}"
                        class="sidebar-link group {{ request()->routeIs('reseller.orders.index') || request()->routeIs('reseller.orders.show') || request()->routeIs('reseller.orders.payment') || request()->routeIs('reseller.orders.invoice') ? 'active' : '' }}" onclick="closeSidebar()">
-                        <svg class="w-4 h-4 shrink-0 text-gray-500 group-hover:text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/></svg>
-                        My Shipments
+                        <svg class="w-4 h-4 shrink-0 text-gray-500 group-hover:text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                        </svg>
+                        My Orders
                     </a>
 
 
@@ -246,7 +254,7 @@
 
         <!-- User Profile Footer -->
         @auth
-        <div class="border-t border-gray-100 p-3 lg:p-4 bg-white/50 backdrop-blur-sm shrink-0 relative z-10 transition-colors hover:bg-white/80">
+        <div class="border-t border-gray-100 p-5 lg:p-6 bg-white/50 backdrop-blur-sm shrink-0 relative z-10 transition-colors hover:bg-white/80">
             <div class="flex items-center gap-3">
                 <div class="w-9 h-9 rounded-xl bg-black flex items-center justify-center text-white font-black text-[11px] shrink-0 shadow-lg shadow-black/10 transition-transform hover:scale-105">
                     {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
@@ -256,16 +264,17 @@
                     <p class="text-[9px] font-black text-gray-400 truncate uppercase tracking-[0.1em] mt-0.5">{{ Auth::user()->role }}</p>
                 </div>
             </div>
-            <div class="mt-3 flex gap-2">
+            <div class="mt-4 flex flex-col gap-2">
                 <a href="{{ route('profile.edit') }}"
-                   class="flex-1 py-2 bg-white flex justify-center items-center rounded-lg text-gray-400 hover:text-black hover:border-black transition-all border border-gray-100 shadow-sm hover:shadow-md group/btn"
-                   title="Profile Settings" onclick="closeSidebar()">
-                    <svg class="w-3.5 h-3.5 transition-transform group-hover/btn:rotate-45" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924-1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                   class="w-full py-2.5 bg-gray-50 hover:bg-black text-gray-700 hover:text-white text-[9px] font-black uppercase tracking-widest text-center rounded-lg border border-gray-100/80 transition-all hover:scale-[1.02] active:scale-98 shadow-xs"
+                   onclick="closeSidebar()">
+                    Profile
                 </a>
-                <form method="POST" action="{{ route('logout') }}" class="flex-1">
+                <form method="POST" action="{{ route('logout') }}" class="w-full">
                     @csrf
-                    <button type="submit" class="w-full h-full py-2 bg-white flex justify-center items-center rounded-lg text-red-400 hover:text-white hover:bg-black transition-all border border-gray-100 shadow-sm hover:shadow-md group/logout" title="Sign Out">
-                        <svg class="w-3.5 h-3.5 transition-transform group-hover/logout:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                    <button type="submit" 
+                            class="w-full py-2.5 bg-gray-50 hover:bg-rose-600 text-gray-700 hover:text-white text-[9px] font-black uppercase tracking-widest rounded-lg border border-gray-100/80 transition-all hover:scale-[1.02] active:scale-98 shadow-xs">
+                        Sign Out
                     </button>
                 </form>
             </div>

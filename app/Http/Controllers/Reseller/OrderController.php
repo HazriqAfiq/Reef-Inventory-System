@@ -42,14 +42,6 @@ class OrderController extends Controller
         $request->validate([
             'product_id'     => 'required|array',
             'quantity'       => 'required|array',
-            // Address: either a saved address_id OR inline fields
-            'address_id'     => 'nullable|exists:addresses,id',
-            'recipient_name' => 'required_without:address_id|string|max:255',
-            'phone'          => 'required_without:address_id|string|max:20',
-            'address_line_1' => 'required_without:address_id|string|max:255',
-            'city'           => 'required_without:address_id|string|max:100',
-            'state'          => 'required_without:address_id|string|max:100',
-            'postal_code'    => 'required_without:address_id|string|max:20',
         ]);
 
         $totalMoq = (int) \App\Models\Setting::getValue('reseller_total_moq', 15);
@@ -110,9 +102,35 @@ class OrderController extends Controller
 
         $order->items()->createMany($orderItems);
 
-        // Snapshot the delivery address into order_addresses
+        // Notify admins of the new wholesale order
+        NotificationService::newOrder($order, auth()->user());
+
+        return redirect()->route('reseller.orders.payment', $order);
+    }
+
+    public function payment(Order $order)
+    {
+        if ($order->user_id !== auth()->id()) abort(403);
+        if ($order->status === 'paid') {
+            return redirect()->route('reseller.orders.show', $order);
+        }
+
+        $addresses = auth()->user()->addresses;
+        $defaultAddress = auth()->user()->addresses()->where('is_default', true)->first() ?? auth()->user()->addresses()->first();
+
+        return view('reseller.orders.payment', compact('order', 'addresses', 'defaultAddress'));
+    }
+
+    public function callback(Request $request, Order $order)
+    {
+        if ($order->user_id !== auth()->id()) abort(403);
+        if ($order->status === 'paid') {
+            return redirect()->route('reseller.orders.show', $order);
+        }
+
+        // Handle shipping address snapshotting
         if ($request->filled('address_id')) {
-            $addr = Address::where('id', $request->address_id)
+            $addr = \App\Models\Address::where('id', $request->address_id)
                            ->where('user_id', auth()->id())
                            ->firstOrFail();
             OrderAddress::create([
@@ -127,7 +145,15 @@ class OrderController extends Controller
                 'postcode'   => $addr->postal_code,
             ]);
         } else {
-            // Inline address entry
+            $request->validate([
+                'recipient_name' => 'required|string|max:255',
+                'phone'          => 'required|string|max:20',
+                'address_line_1' => 'required|string|max:255',
+                'city'           => 'required|string|max:255',
+                'postal_code'    => 'required|string|max:10',
+                'state'          => 'required|string|max:255',
+            ]);
+
             OrderAddress::create([
                 'order_id'   => $order->id,
                 'first_name' => $request->recipient_name,
@@ -139,35 +165,21 @@ class OrderController extends Controller
                 'state'      => $request->state,
                 'postcode'   => $request->postal_code,
             ]);
-        }
 
-        // Notify admins of the new wholesale order
-        NotificationService::newOrder($order, auth()->user());
-
-        // Clear persistent database cart on successful order creation
-        $cart = \App\Models\Cart::where('user_id', auth()->id())->first();
-        if ($cart) {
-            $cart->content = [];
-            $cart->save();
-        }
-
-        return redirect()->route('reseller.orders.payment', $order);
-    }
-
-    public function payment(Order $order)
-    {
-        if ($order->user_id !== auth()->id()) abort(403);
-        if ($order->status === 'paid') {
-            return redirect()->route('reseller.orders.show', $order);
-        }
-        return view('reseller.orders.payment', compact('order'));
-    }
-
-    public function callback(Request $request, Order $order)
-    {
-        if ($order->user_id !== auth()->id()) abort(403);
-        if ($order->status === 'paid') {
-            return redirect()->route('reseller.orders.show', $order);
+            if ($request->boolean('save_address')) {
+                \App\Models\Address::create([
+                    'user_id'        => auth()->id(),
+                    'label'          => $request->address_label ?? 'Home',
+                    'recipient_name' => $request->recipient_name,
+                    'phone'          => $request->phone,
+                    'address_line_1' => $request->address_line_1,
+                    'address_line_2' => $request->address_line_2,
+                    'city'           => $request->city,
+                    'postal_code'    => $request->postal_code,
+                    'state'          => $request->state,
+                    'is_default'     => !auth()->user()->addresses()->exists(),
+                ]);
+            }
         }
 
         $order->update(['status' => 'paid']);
@@ -185,6 +197,13 @@ class OrderController extends Controller
 
         // Notify the reseller that their order was approved
         NotificationService::orderApproved($order);
+
+        // Clear persistent database cart only on successful payment / checkout completion
+        $cart = \App\Models\Cart::where('user_id', auth()->id())->first();
+        if ($cart) {
+            $cart->content = [];
+            $cart->save();
+        }
 
         return redirect()->route('reseller.orders.show', $order)->with('success', 'Payment successful. Order confirmed.');
     }

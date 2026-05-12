@@ -24,7 +24,11 @@
         }
     </style>
 
-    <div class="max-w-full pb-44" x-data="{ cartOpen: false, search: '', activeCategory: 'all' }">
+    <div class="max-w-full pb-44" x-data="{ 
+        cartOpen: false, 
+        search: '', 
+        activeCategory: 'all'
+    }">
         
         <!-- Page Header -->
         <div class="mb-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -38,14 +42,6 @@
                 </div>
                 <h1 class="text-3xl font-black text-gray-900 tracking-tight">Wholesale Restock HQ</h1>
                 <p class="text-xs text-gray-400 mt-1">Replenish your local stock directly from HQ. Orders require a Minimum Order Quantity (MOQ) of {{ $totalMoq }} items total.</p>
-            </div>
-            <div class="flex items-center gap-3 shrink-0">
-                <a href="{{ route('reseller.orders.index') }}" class="inline-flex items-center gap-2 px-6 py-3.5 bg-white border border-gray-100 text-gray-400 hover:text-black hover:border-black text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-sm">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                    </svg>
-                    Wholesale Orders History
-                </a>
             </div>
         </div>
 
@@ -267,305 +263,53 @@
                 </div>
 
                 <!-- Right Column: Static Wholesale Cart Sidebar (Desktop only) -->
-                <div class="hidden lg:block lg:col-span-4 xl:col-span-3 lg:sticky lg:top-6 lg:max-h-[calc(100vh-180px)] flex flex-col relative"
-                     x-data="{ 
-                         inlineAddr: {{ $addresses->isEmpty() ? 'true' : 'false' }}, 
-                         selectedAddr: '{{ session('selected_address_id') ?? ($defaultAddress?->id ?? '') }}',
-                         savingAddress: false,
-                         cartOpen: false,
-                         saveAddressAjax() {
-                             const form = document.getElementById('order-form');
-                             const csrfToken = document.querySelector('meta[name=&quot;csrf-token&quot;]').getAttribute('content');
-                             
-                             const label = form.querySelector('input[name=&quot;label&quot;]')?.value || 'Home';
-                             const recipient_name = form.querySelector('input[name=&quot;recipient_name&quot;]').value;
-                             const phone = form.querySelector('input[name=&quot;phone&quot;]').value;
-                             const address_line_1 = form.querySelector('input[name=&quot;address_line_1&quot;]').value;
-                             const address_line_2 = form.querySelector('input[name=&quot;address_line_2&quot;]').value;
-                             const city = form.querySelector('input[name=&quot;city&quot;]').value;
-                             const postal_code = form.querySelector('input[name=&quot;postal_code&quot;]').value;
-                             const state = form.querySelector('select[name=&quot;state&quot;]').value;
-
-                             if (!recipient_name || !phone || !address_line_1 || !city || !postal_code || !state) {
-                                 alert('Please fill in all required fields marked with *');
-                                 return;
-                             }
-
-                             this.savingAddress = true;
-
-                             fetch('{{ route('reseller.addresses.store') }}', {
-                                 method: 'POST',
-                                 headers: {
-                                     'Content-Type': 'application/json',
-                                     'X-CSRF-TOKEN': csrfToken,
-                                     'Accept': 'application/json'
-                                 },
-                                 body: JSON.stringify({
-                                     label,
-                                     recipient_name,
-                                     phone,
-                                     address_line_1,
-                                     address_line_2,
-                                     city,
-                                     state,
-                                     postal_code
-                                 })
-                             })
-                             .then(res => res.json())
-                             .then(data => {
-                                 this.savingAddress = false;
-                                 if (data.success) {
-                                     // Success! Auto-save the address, and reload the current page dynamically to update the address picker
-                                     navigateTo(window.location.href);
-                                 } else {
-                                     alert(data.message || 'Error saving address.');
-                                 }
-                             })
-                             .catch(err => {
-                                 this.savingAddress = false;
-                                 alert('An error occurred while saving the address.');
-                             });
-                         }
-                     }">
-                    
-                    <!-- Floating Cart List Popover -->
-                    <div x-show="cartOpen"
-                         x-cloak
-                         x-transition:enter="transition ease-out duration-300"
-                         x-transition:enter-start="opacity-0 -translate-x-6 scale-95"
-                         x-transition:enter-end="opacity-100 translate-x-0 scale-100"
-                         x-transition:leave="transition ease-in duration-200"
-                         x-transition:leave-start="opacity-100 translate-x-0 scale-100"
-                         x-transition:leave-end="opacity-0 -translate-x-6 scale-95"
-                         class="absolute right-full mr-6 top-0 w-96 bg-white border border-gray-100 rounded-3xl p-5 shadow-2xl z-50 flex flex-col max-h-full overflow-hidden"
-                         @click.outside="cartOpen = false">
-                         
-                         <!-- Popover Header -->
-                         <div class="flex items-center justify-between pb-3 border-b border-gray-100 flex-none">
-                             <div class="flex items-center gap-2.5">
-                                 <span class="w-7 h-7 rounded-lg bg-black text-white flex items-center justify-center shadow-md">
-                                     <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                         <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                                     </svg>
-                                 </span>
-                                 <div>
-                                     <h3 class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Cart Items</h3>
-                                     <p class="cart-items-count-text text-[8px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">0 Items Selected</p>
-                                 </div>
-                             </div>
-                             <button type="button" 
-                                     @click="cartOpen = false"
-                                     class="w-6 h-6 rounded-full bg-gray-50 hover:bg-gray-100 flex items-center justify-center text-gray-400 hover:text-black transition-all">
-                                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                                 </svg>
-                             </button>
-                         </div>
-                         
-                         <!-- Scrollable List of Cart Items -->
-                         <div class="cart-items-list space-y-4 max-h-[300px] overflow-y-auto pr-1 divide-y divide-gray-50 address-scroll-container mt-2">
-                             <!-- Populated in real-time via JS -->
-                         </div>
-                    </div>
-                     
-                    <!-- Floating Inline Address Input Popover (Shown only when inlineAddr is true) -->
-                    <div x-show="inlineAddr"
-                         x-cloak
-                         x-transition:enter="transition ease-out duration-300"
-                         x-transition:enter-start="opacity-0 -translate-x-6 scale-95"
-                         x-transition:enter-end="opacity-100 translate-x-0 scale-100"
-                         x-transition:leave="transition ease-in duration-200"
-                         x-transition:leave-start="opacity-100 translate-x-0 scale-100"
-                         x-transition:leave-end="opacity-0 -translate-x-6 scale-95"
-                         class="absolute right-full mr-6 top-0 w-96 bg-white border border-gray-100 rounded-3xl p-6 shadow-2xl z-50 flex flex-col gap-5">
-                         
-                        <!-- Floating Popover Header -->
-                        <div class="flex items-center justify-between pb-3 border-b border-gray-100 flex-none">
-                            <div class="flex items-center gap-2">
-                                <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
-                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                    </svg>
-                                </div>
-                                <div>
-                                    <h3 class="text-[11px] font-black text-gray-900 uppercase tracking-widest">Delivery Address</h3>
-                                    <p class="text-[8px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">Enter shipping details</p>
-                                </div>
-                            </div>
-                            @if($addresses->isNotEmpty())
-                                <button type="button" 
-                                        @click="inlineAddr = false; selectedAddr = '{{ $defaultAddress?->id ?? '' }}'"
-                                        class="w-7 h-7 rounded-full bg-gray-50 hover:bg-gray-100 flex items-center justify-center text-gray-400 hover:text-black transition-all">
-                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                                    </svg>
-                                </button>
-                            @endif
-                        </div>
-
-                        <!-- Floating Popover Body (Form Fields) -->
-                        <div class="space-y-3.5">
-                            <div class="grid grid-cols-2 gap-3.5">
-                                <div>
-                                    <label class="text-[8px] font-black text-gray-400 uppercase tracking-wider block mb-1">Address Label *</label>
-                                    <input type="text" name="label" placeholder="Home, Office..." value="Home" required
-                                           class="w-full px-3.5 py-2.5 text-xs font-bold text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:bg-white focus:border-black focus:ring-0 transition-all placeholder-gray-300">
-                                </div>
-                                <div>
-                                    <label class="text-[8px] font-black text-gray-400 uppercase tracking-wider block mb-1">Recipient Name *</label>
-                                    <input type="text" name="recipient_name" placeholder="John Doe" required
-                                           class="w-full px-3.5 py-2.5 text-xs font-bold text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:bg-white focus:border-black focus:ring-0 transition-all placeholder-gray-300">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="text-[8px] font-black text-gray-400 uppercase tracking-wider block mb-1">Phone Number *</label>
-                                <input type="text" name="phone" placeholder="+60123456789" required
-                                       class="w-full px-3.5 py-2.5 text-xs font-bold text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:bg-white focus:border-black focus:ring-0 transition-all placeholder-gray-300">
-                            </div>
-                            <div>
-                                <label class="text-[8px] font-black text-gray-400 uppercase tracking-wider block mb-1">Address Line 1 *</label>
-                                <input type="text" name="address_line_1" placeholder="Street Name, Unit No" required
-                                       class="w-full px-3.5 py-2.5 text-xs font-bold text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:bg-white focus:border-black focus:ring-0 transition-all placeholder-gray-300">
-                            </div>
-                            <div>
-                                <label class="text-[8px] font-black text-gray-400 uppercase tracking-wider block mb-1">Address Line 2 (Optional)</label>
-                                <input type="text" name="address_line_2" placeholder="Building, Floor, Landmark"
-                                       class="w-full px-3.5 py-2.5 text-xs font-bold text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:bg-white focus:border-black focus:ring-0 transition-all placeholder-gray-300">
-                            </div>
-                            <div class="grid grid-cols-2 gap-3.5">
-                                <div>
-                                    <label class="text-[8px] font-black text-gray-400 uppercase tracking-wider block mb-1">City *</label>
-                                    <input type="text" name="city" placeholder="Kuala Lumpur" required
-                                           class="w-full px-3.5 py-2.5 text-xs font-bold text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:bg-white focus:border-black focus:ring-0 transition-all placeholder-gray-300">
-                                </div>
-                                <div>
-                                    <label class="text-[8px] font-black text-gray-400 uppercase tracking-wider block mb-1">Postcode *</label>
-                                    <input type="text" name="postal_code" placeholder="50000" maxlength="10" required
-                                           class="w-full px-3.5 py-2.5 text-xs font-bold text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:bg-white focus:border-black focus:ring-0 transition-all placeholder-gray-300">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="text-[8px] font-black text-gray-400 uppercase tracking-wider block mb-1">State *</label>
-                                <select name="state" required class="w-full px-3.5 py-2.5 text-xs font-bold text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:bg-white focus:border-black focus:ring-0 transition-all cursor-pointer">
-                                    <option value="">Select State</option>
-                                    @foreach(['Johor','Kedah','Kelantan','Melaka','Negeri Sembilan','Pahang','Perak','Perlis','Pulau Pinang','Sabah','Sarawak','Selangor','Terengganu','W.P. Kuala Lumpur','W.P. Labuan','W.P. Putrajaya'] as $state)
-                                        <option value="{{ $state }}">{{ $state }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="pt-2">
-                                <button type="button" 
-                                        @click="saveAddressAjax()"
-                                        :disabled="savingAddress"
-                                        class="w-full py-3 bg-black text-white hover:bg-gray-900 disabled:opacity-50 font-bold text-xs uppercase tracking-widest rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-black/10">
-                                    <svg class="w-4 h-4 text-white animate-spin" x-show="savingAddress" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" x-cloak>
-                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                    </svg>
-                                    <span x-text="savingAddress ? 'Saving Address...' : 'Save & Select Address'">Save & Select Address</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Cart Sidebar Card (Inner) -->
-                    <div class="bg-white border border-gray-100 rounded-3xl p-5 shadow-sm flex flex-col max-h-full overflow-hidden">
-                        
-                        <!-- Sidebar Header (Docked) -->
-                        <div class="flex items-center justify-between pb-3.5 border-b border-gray-100 flex-none">
-                            <button type="button" 
-                                    @click="cartOpen = !cartOpen; if(cartOpen) inlineAddr = false;"
-                                    class="flex items-center gap-2.5 group/bag text-left cursor-pointer focus:outline-none select-none">
-                                <span class="relative w-8 h-8 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center group-hover/bag:bg-black group-hover/bag:text-white transition-all duration-300">
-                                    <svg class="w-4 h-4 text-gray-900 group-hover/bag:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <div class="hidden lg:block lg:col-span-4 xl:col-span-3 lg:sticky lg:top-6">
+                    <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm flex flex-col gap-6">
+                        <!-- Sidebar Header -->
+                        <div class="flex items-center justify-between pb-4 border-b border-gray-100">
+                            <div class="flex items-center gap-2.5">
+                                <span class="relative">
+                                    <svg class="w-5 h-5 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                                     </svg>
-                                    <span class="cart-badge-count absolute -top-1.5 -right-1.5 bg-black text-white text-[8px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-white group-hover/bag:scale-110 transition-transform">0</span>
+                                    <span class="cart-badge-count absolute -top-1.5 -right-1.5 bg-black text-white text-[8px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-white">0</span>
                                 </span>
-                                <div>
-                                    <h2 class="text-xs font-black text-gray-900 uppercase tracking-widest group-hover/bag:text-gray-600 transition-colors flex items-center gap-1.5">
-                                        Wholesale Cart
-                                        <svg class="w-3 h-3 text-gray-400 transition-transform duration-300" :class="cartOpen ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-                                        </svg>
-                                    </h2>
-                                    <p class="cart-items-count-text text-[8px] font-black text-gray-400 uppercase tracking-wider mt-0.5">0 Items</p>
-                                </div>
-                            </button>
-                            <span class="text-[8px] font-black bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded uppercase tracking-wider">Interactive</span>
+                                <h2 class="text-xs font-black text-gray-900 uppercase tracking-widest">Wholesale Cart</h2>
+                            </div>
+                            <span class="cart-items-count-text text-[9px] font-bold text-gray-400 uppercase tracking-wider">0 Items</span>
                         </div>
 
-                        <!-- Scrollable Mid Section -->
-                        <div class="cart-scroll-container flex-1 overflow-y-auto py-3.5 space-y-4 pr-2 -mr-2">
-
-                            <!-- Progress and MOQ Tracker Indicator -->
-                            <div class="border-t border-gray-100 pt-3.5 space-y-2">
-                                <div class="flex justify-between items-baseline">
-                                    <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">MOQ Progress ({{ $totalMoq }} Min)</p>
-                                    <p class="text-xs font-black text-gray-900 tabular-nums"><span class="cart-total-items text-xs font-black">0</span> / {{ $totalMoq }}</p>
-                                </div>
-                                <!-- Progress Line Bar -->
-                                <div class="w-full bg-gray-50 h-1.5 rounded-full overflow-hidden shadow-inner relative">
-                                    <div class="cart-moq-progress h-full bg-gradient-to-r from-amber-400 to-indigo-500 rounded-full transition-all duration-500 w-0"></div>
-                                </div>
-                                <div class="cart-moq-warning text-[9px] font-bold text-rose-500 uppercase tracking-wider flex items-center gap-1 leading-tight">
-                                    <svg class="w-3 h-3 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                                    </svg>
-                                    <span>Wholesale orders require a minimum of {{ $totalMoq }} items.</span>
-                                </div>
-                            </div>
-
-                            <!-- Delivery Address Section -->
-                            <div class="border-t border-gray-100 pt-3.5 space-y-2.5">
-                                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Delivery Address</p>
-
-                                @if($addresses->isNotEmpty())
-                                    <!-- Saved address selector -->
-                                    <div class="space-y-2 max-h-[120px] overflow-y-auto pr-1 address-scroll-container">
-                                        @foreach($addresses as $addr)
-                                            <label class="flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all"
-                                                   :class="selectedAddr === '{{ $addr->id }}' ? 'border-black bg-gray-50' : 'border-gray-100 hover:border-gray-300'">
-                                                <input type="radio" name="address_id" value="{{ $addr->id }}"
-                                                       x-model="selectedAddr"
-                                                       @change="inlineAddr = false"
-                                                       {{ $addr->id == ($defaultAddress?->id) ? 'checked' : '' }}
-                                                       class="mt-0.5 shrink-0 accent-black">
-                                                <div class="min-w-0">
-                                                    <span class="text-[10px] font-black text-gray-900 uppercase tracking-wider">{{ $addr->label }}</span>
-                                                    @if($addr->is_default) <span class="ml-1 text-[8px] bg-black text-white px-1.5 py-0.5 rounded font-black uppercase">Default</span> @endif
-                                                    <p class="text-[9px] text-gray-500 leading-relaxed mt-0.5">{{ $addr->recipient_name }} · {{ $addr->phone }}</p>
-                                                    <p class="text-[9px] text-gray-400 leading-snug">{{ $addr->address_line_1 }}, {{ $addr->city }}, {{ $addr->state }}</p>
-                                                </div>
-                                            </label>
-                                        @endforeach
-
-                                        <!-- Option: Enter new address inline -->
-                                        <label class="flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all"
-                                               :class="inlineAddr ? 'border-black bg-gray-50' : 'border-gray-100 hover:border-gray-300'">
-                                            <input type="radio" x-model="inlineAddr" :value="true" @change="selectedAddr = ''"
-                                                   class="shrink-0 accent-black">
-                                            <span class="text-[10px] font-black text-gray-900 uppercase tracking-wider">Use different address</span>
-                                        </label>
-                                    </div>
-                                @else
-                                    <div class="p-3 bg-indigo-50/50 border border-indigo-100 rounded-xl text-[9px] text-indigo-700 leading-relaxed font-semibold">
-                                        No saved addresses found. Please enter shipping information in the floating panel on the left.
-                                    </div>
-                                @endif
-                            </div>
-
+                        <!-- Scrollable Selected Wholesale Items List -->
+                        <div class="cart-items-list space-y-4 pr-3 py-2 divide-y divide-gray-50">
+                            <!-- Populated in real-time via JS -->
                         </div>
 
-                        <!-- Subtotal and Submit (Docked Footer) -->
-                        <div class="border-t border-gray-100 pt-3.5 space-y-3 flex-none">
+                        <!-- Progress and MOQ Tracker Indicator -->
+                        <div class="border-t border-gray-100 pt-5 space-y-3">
+                            <div class="flex justify-between items-baseline">
+                                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">MOQ Progress ({{ $totalMoq }} Min)</p>
+                                <p class="text-xs font-black text-gray-900 tabular-nums"><span class="cart-total-items text-sm font-black">0</span> / {{ $totalMoq }}</p>
+                            </div>
+                            <!-- Progress Line Bar -->
+                            <div class="w-full bg-gray-50 h-2 rounded-full overflow-hidden shadow-inner relative">
+                                <div class="cart-moq-progress h-full bg-gradient-to-r from-amber-400 to-indigo-500 rounded-full transition-all duration-500 w-0"></div>
+                            </div>
+                            <div class="cart-moq-warning text-[9px] font-bold text-rose-500 uppercase tracking-wider flex items-center gap-1.5 leading-tight">
+                                <svg class="w-3.5 h-3.5 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                </svg>
+                                <span>Wholesale orders require a minimum of {{ $totalMoq }} items.</span>
+                            </div>
+                        </div>
+
+                        <!-- Subtotal and Submit -->
+                        <div class="border-t border-gray-100 pt-5 space-y-4">
                             <div class="flex items-center justify-between">
                                 <span class="text-[9px] font-black uppercase tracking-widest text-gray-400">Total Price</span>
                                 <span class="cart-total-price text-xl font-black text-gray-900 tabular-nums">RM0.00</span>
                             </div>
                             <button type="submit" 
-                                    class="cart-checkout-btn w-full py-3.5 bg-gray-100 text-gray-400 font-bold text-xs uppercase tracking-widest rounded-xl transition-all duration-300 cursor-not-allowed text-center"
+                                    class="cart-checkout-btn w-full py-4 bg-gray-100 text-gray-400 font-bold text-xs uppercase tracking-widest rounded-xl transition-all duration-300 cursor-not-allowed text-center"
                                     disabled>
                                 Need {{ $totalMoq }} Items
                             </button>
@@ -1048,7 +792,7 @@
                         btn.classList.remove('bg-gray-100', 'text-gray-400', 'cursor-not-allowed');
                         btn.classList.add('bg-black', 'text-white', 'hover:bg-gray-800', 'active:scale-95');
                         btn.disabled = false;
-                        btn.textContent = 'Proceed to Payment';
+                        btn.textContent = 'Proceed to Checkout';
                     });
                 } else {
                     const remaining = MIN_ORDER_QTY - items;
@@ -1123,7 +867,7 @@
                         floatingCheckoutBtn.classList.remove('bg-gray-100', 'text-gray-400', 'cursor-not-allowed');
                         floatingCheckoutBtn.classList.add('bg-black', 'text-white', 'hover:bg-gray-800', 'active:scale-95');
                         floatingCheckoutBtn.disabled = false;
-                        floatingCheckoutBtn.textContent = 'Proceed Payment';
+                        floatingCheckoutBtn.textContent = 'Proceed to Checkout';
                     } else {
                         const remaining = MIN_ORDER_QTY - items;
                         floatingCheckoutBtn.classList.add('bg-gray-100', 'text-gray-400', 'cursor-not-allowed');

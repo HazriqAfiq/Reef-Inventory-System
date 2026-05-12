@@ -1,4 +1,4 @@
-<x-app-layout title="Wholesale Orders">
+<x-app-layout title="My Orders">
     <!-- Page Header -->
     <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
@@ -9,7 +9,7 @@
                 </span>
                 <span class="text-[10px] font-bold text-indigo-600 uppercase tracking-widest">Order Pipeline Syncing</span>
             </div>
-            <h1 class="text-3xl font-black text-gray-900 tracking-tight">Wholesale History</h1>
+            <h1 class="text-3xl font-black text-gray-900 tracking-tight">My Orders</h1>
             <p class="text-xs text-gray-400 mt-1">Review your past stock purchases from Headquarters.</p>
         </div>
         
@@ -35,6 +35,7 @@
                     <tr class="bg-gray-50/50 border-b border-gray-100">
                         <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-left">Order Ref</th>
                         <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-left">Date & Time</th>
+                        <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-left">Shipping Info</th>
                         <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Units</th>
                         <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Value</th>
                         <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Status</th>
@@ -54,6 +55,19 @@
                                 <p class="text-sm font-bold text-gray-900 leading-none">{{ $order->created_at->format('d M, Y') }}</p>
                                 <p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">{{ $order->created_at->format('h:i A') }}</p>
                             </td>
+                            <td class="px-6 py-4 text-left whitespace-nowrap">
+                                @if($order->shippingAddress)
+                                    @php $address = $order->shippingAddress; @endphp
+                                    <div>
+                                        <p class="text-sm font-bold text-gray-900 leading-none">{{ $address->full_name }}</p>
+                                        <p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1 truncate max-w-[200px]" title="{{ $address->address }}, {{ $address->postcode }} {{ $address->city }}, {{ $address->state }}">
+                                            {{ $address->city }}, {{ $address->state }}
+                                        </p>
+                                    </div>
+                                @else
+                                    <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">N/A</span>
+                                @endif
+                            </td>
                             <td class="px-6 py-4 text-center">
                                 <span class="inline-flex px-2 py-0.5 bg-gray-50 border border-gray-100 rounded text-[9px] font-black text-gray-500 tabular-nums">
                                     {{ $order->items->sum('quantity') }} items
@@ -63,26 +77,67 @@
                                 RM{{ number_format($order->total_price, 2) }}
                             </td>
                             <td class="px-6 py-4 text-center">
-                                @if($order->status === 'paid')
-                                    <span class="inline-flex items-center gap-1.5 text-[9px] font-black text-emerald-600 bg-emerald-50/50 px-2.5 py-1 rounded-xl uppercase tracking-widest border border-emerald-100/40">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                        Paid
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center gap-1.5 text-[9px] font-black text-amber-600 bg-amber-50/50 px-2.5 py-1 rounded-xl uppercase tracking-widest border border-amber-100/40">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
-                                        Pending
-                                    </span>
-                                @endif
+                                <div class="flex items-center justify-center gap-2 flex-wrap">
+                                    @if($order->status === 'paid')
+                                        <span class="inline-flex items-center gap-1.5 text-[9px] font-black text-emerald-600 bg-emerald-50/50 px-2.5 py-1 rounded-xl uppercase tracking-widest border border-emerald-100/40">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                            Paid
+                                        </span>
+                                    @elseif($order->status === 'processing')
+                                        <span class="inline-flex items-center gap-1.5 text-[9px] font-black text-blue-600 bg-blue-50/50 px-2.5 py-1 rounded-xl uppercase tracking-widest border border-blue-100/40">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+                                            Processing
+                                        </span>
+                                    @elseif($order->status === 'shipped')
+                                        <span class="inline-flex items-center gap-1.5 text-[9px] font-black text-indigo-600 bg-indigo-50/50 px-2.5 py-1 rounded-xl uppercase tracking-widest border border-indigo-100/40">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
+                                            Shipped
+                                        </span>
+                                    @elseif($order->status === 'delivered')
+                                        <span class="inline-flex items-center gap-1.5 text-[9px] font-black text-emerald-700 bg-emerald-100/30 px-2.5 py-1 rounded-xl uppercase tracking-widest border border-emerald-200/50">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                                            Delivered
+                                        </span>
+                                    @elseif($order->status === 'cancelled')
+                                        <span class="inline-flex items-center gap-1.5 text-[9px] font-black text-rose-600 bg-rose-50/50 px-2.5 py-1 rounded-xl uppercase tracking-widest border border-rose-100/40">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                                            Cancelled
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center gap-1.5 text-[9px] font-black text-amber-600 bg-amber-50/50 px-2.5 py-1 rounded-xl uppercase tracking-widest border border-amber-100/40">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                            Pending
+                                        </span>
+                                    @endif
+
+                                    {{-- Shortcuts: Make Payment & Tracking Status --}}
+                                    @if($order->status === 'pending')
+                                        <a href="{{ route('reseller.orders.payment', $order) }}" 
+                                           class="inline-flex items-center gap-1 px-3 py-1 bg-black hover:bg-gray-800 text-white text-[9px] font-black uppercase tracking-widest rounded-lg transition-all hover:scale-105 active:scale-95 shadow-sm shrink-0">
+                                            <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                                            </svg>
+                                            Make Payment
+                                        </a>
+                                    @elseif(in_array($order->status, ['shipped', 'delivered']) && $order->tracking_number)
+                                        <a href="{{ $order->tracking_url }}" target="_blank" 
+                                           class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-indigo-50/60 hover:bg-indigo-100 text-indigo-700 text-[9px] font-black uppercase tracking-widest rounded-lg transition-all hover:scale-105 active:scale-95 border border-indigo-100/50 shadow-xs shrink-0"
+                                           title="Courier: {{ $order->courier_name }}">
+                                            <svg class="w-3 h-3 text-indigo-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1"/>
+                                            </svg>
+                                            Track ({{ $order->tracking_number }})
+                                        </a>
+                                    @endif
+                                </div>
                             </td>
                             <td class="px-6 py-4 text-right whitespace-nowrap">
                                 <div class="flex items-center justify-end gap-2">
                                     <a href="{{ route('reseller.orders.show', $order) }}" 
-                                       class="w-8 h-8 rounded-lg flex items-center justify-center bg-gray-50 border border-gray-100 text-gray-400 hover:bg-black hover:text-white hover:border-black transition-all hover:scale-105 active:scale-95" 
-                                       title="View Details">
-                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                       class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-gray-50 hover:bg-black hover:text-white border border-gray-100 hover:border-black text-gray-700 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all hover:scale-105 active:scale-95 shadow-sm">
+                                        Order Details
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                                         </svg>
                                     </a>
                                 </div>
@@ -90,7 +145,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-12 text-center">
+                            <td colspan="7" class="px-6 py-12 text-center">
                                 <div class="max-w-xs mx-auto">
                                     <div class="w-12 h-12 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400 mx-auto mb-3">
                                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">

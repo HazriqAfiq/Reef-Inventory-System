@@ -35,4 +35,15 @@ return [
         ],
     ],
 
+    'easyparcel' => [
+        'key' => env('EASYPARCEL_API_KEY'),
+        'url' => env('EASYPARCEL_API_URL', 'https://demo.easyparcel.com/v1'),
+        'sender_postcode' => '40000',
+        'sender_state'    => 'Selangor',
+        'sender_city'     => 'Shah Alam',
+        'sender_name'     => 'Laman Store Warehouse',
+        'sender_phone'    => '0123456789',
+        'sender_address'  => 'No 1, Jalan Perindustrian 2, Kawasan Perindustrian',
+    ],
+
 ];

@@ -37,7 +37,8 @@
 
             {{-- Delivery Addresses (Reseller only) --}}
             @if(auth()->user()->isReseller())
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden"
+                 x-data="{ showDeleteModal: false, deleteUrl: '' }">
                 <div class="px-8 py-4 border-b border-gray-50 bg-gray-50/20 flex items-center justify-between">
                     <div>
                         <h2 class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Delivery Addresses</h2>
@@ -74,13 +75,11 @@
                                         </button>
                                     </form>
                                 @endif
-                                <form method="POST" action="{{ route('reseller.addresses.destroy', $addr) }}">
-                                    @csrf @method('DELETE')
-                                    <button type="submit" class="text-[9px] font-black uppercase tracking-wider text-rose-400 hover:text-rose-600 border border-rose-100 px-2.5 py-1.5 rounded-lg hover:bg-rose-50 transition-all"
-                                            onclick="return confirm('Remove this address?')">
-                                        Remove
-                                    </button>
-                                </form>
+                                <button type="button" 
+                                        @click="deleteUrl = '{{ route('reseller.addresses.destroy', $addr) }}'; showDeleteModal = true;"
+                                        class="text-[9px] font-black uppercase tracking-wider text-rose-400 hover:text-rose-600 border border-rose-100 px-2.5 py-1.5 rounded-lg hover:bg-rose-50 transition-all">
+                                    Remove
+                                </button>
                             </div>
                         </div>
                     @empty
@@ -170,6 +169,52 @@
                             </div>
                         </form>
                     </div>
+
+                    {{-- Beautiful Custom Deletion Modal Overlay --}}
+                    <div x-show="showDeleteModal" x-cloak style="display: none;"
+                         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-[2px] transition-opacity duration-300"
+                         x-transition:enter="ease-out duration-300"
+                         x-transition:enter-start="opacity-0"
+                         x-transition:enter-end="opacity-100"
+                         x-transition:leave="ease-in duration-200"
+                         x-transition:leave-start="opacity-100"
+                         x-transition:leave-end="opacity-0">
+                        
+                        <div @click.away="showDeleteModal = false"
+                             class="bg-white rounded-2xl border border-gray-100 shadow-2xl max-w-sm w-full p-6 text-center transform transition-all"
+                             x-transition:enter="ease-out duration-300"
+                             x-transition:enter-start="scale-95 translate-y-4"
+                             x-transition:enter-end="scale-100 translate-y-0"
+                             x-transition:leave="ease-in duration-200"
+                             x-transition:leave-start="scale-100 translate-y-0"
+                             x-transition:leave-end="scale-95 translate-y-4">
+                            
+                            <div class="w-14 h-14 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto mb-4 border border-rose-100">
+                                <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                            </div>
+                            
+                            <h3 class="text-base font-black text-gray-900 uppercase tracking-widest">Remove Address?</h3>
+                            <p class="text-xs text-gray-400 mt-2 leading-relaxed">
+                                Are you sure you want to remove this delivery address? This action cannot be undone.
+                            </p>
+                            
+                            <div class="flex items-center gap-3 mt-6">
+                                <button type="button" @click="showDeleteModal = false"
+                                        class="flex-1 px-5 py-3 bg-white border border-gray-150 hover:bg-gray-50 text-gray-400 hover:text-black rounded-xl text-xs font-black uppercase tracking-widest transition-all">
+                                    Cancel
+                                </button>
+                                <form method="POST" :action="deleteUrl" class="flex-1">
+                                    @csrf @method('DELETE')
+                                    <button type="submit"
+                                            class="w-full px-5 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-md">
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             @endif
@@ -224,37 +269,33 @@
                 </div>
             </div>
 
-            <!-- Notifications -->
+            <!-- Monthly Restock Target (Reseller Only) -->
+            @if(auth()->user()->isReseller())
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                 <div class="px-8 py-4 border-b border-gray-50 bg-gray-50/20">
-                    <h2 class="text-[10px] font-black text-gray-900 uppercase tracking-widest">System Preferences</h2>
-                    <p class="text-[9px] text-gray-400 uppercase tracking-wider mt-0.5">Control live notifications and browser-cached toggles</p>
+                    <h2 class="text-[10px] font-black text-gray-900 uppercase tracking-widest">Monthly Target</h2>
+                    <p class="text-[9px] text-gray-400 uppercase tracking-wider mt-0.5">Configure your monthly procurement objectives</p>
                 </div>
-                <div class="p-6 space-y-6">
-                    <div class="flex items-center justify-between gap-4">
-                        <div class="min-w-0">
-                            <p class="text-xs font-bold text-gray-900">Low Stock Alerts</p>
-                            <p class="text-[10px] text-gray-400 mt-0.5 leading-relaxed">Notify when levels are critical.</p>
+                <div class="p-6">
+                    <form method="POST" action="{{ route('reseller.dashboard.goal') }}" class="space-y-4">
+                        @csrf
+                        <div>
+                            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">Monthly Restock Goal (Units)</label>
+                            <input name="monthly_goal" type="number" min="0" required value="{{ auth()->user()->monthly_goal ?? 0 }}"
+                                   class="w-full px-4 py-3 text-sm font-bold text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:border-black focus:ring-0 transition-all">
+                            @error('monthly_goal') <p class="text-[9px] text-rose-500 mt-1 font-bold">{{ $message }}</p> @enderror
                         </div>
-                        <label class="relative inline-flex items-center cursor-pointer shrink-0">
-                            <input type="checkbox" checked class="sr-only peer">
-                            <div class="w-10 h-5 bg-gray-100 rounded-full peer peer-checked:after:translate-x-5 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-black"></div>
-                        </label>
-                    </div>
-                    <div class="h-px bg-gray-50"></div>
-                    <div class="flex items-center justify-between gap-4">
-                        <div class="min-w-0">
-                            <p class="text-xs font-bold text-gray-900">New Sales</p>
-                            <p class="text-[10px] text-gray-400 mt-0.5 leading-relaxed">Alerts for every transaction.</p>
+
+                        <div class="flex justify-end pt-2">
+                            <button type="submit"
+                                    class="inline-flex items-center gap-2 px-6 py-2.5 bg-black text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-gray-800 transition-all shadow-sm">
+                                Save Target
+                            </button>
                         </div>
-                        <label class="relative inline-flex items-center cursor-pointer shrink-0">
-                            <input type="checkbox" class="sr-only peer">
-                            <div class="w-10 h-5 bg-gray-100 rounded-full peer peer-checked:after:translate-x-5 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-black"></div>
-                        </label>
-                    </div>
-                    <p class="text-[9px] text-gray-400 italic">Preferences are saved to this browser.</p>
+                    </form>
                 </div>
             </div>
+            @endif
         </div>
     </div>
 </x-app-layout>

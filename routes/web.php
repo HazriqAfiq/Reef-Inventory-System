@@ -41,6 +41,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::post('/settings/{page}', [\App\Http\Controllers\Admin\SettingsController::class, 'updatePage'])->name('settings.page.update');
     
     Route::get('/activity-logs', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('activity-logs.index');
+    Route::get('/reports', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('reports.index');
 });
 
 Route::middleware(['auth', 'verified', 'role:reseller'])->prefix('reseller')->name('reseller.')->group(function () {
@@ -51,7 +52,7 @@ Route::middleware(['auth', 'verified', 'role:reseller'])->prefix('reseller')->na
     Route::resource('orders', \App\Http\Controllers\Reseller\OrderController::class)->only(['index', 'show']);
     Route::get('restock', [\App\Http\Controllers\Reseller\OrderController::class, 'create'])->name('orders.create');
     Route::post('restock', [\App\Http\Controllers\Reseller\OrderController::class, 'store'])->name('orders.store');
-    Route::get('orders/{order}/payment', [\App\Http\Controllers\Reseller\OrderController::class, 'payment'])->name('orders.payment');
+    Route::get('orders/{order}/checkout', [\App\Http\Controllers\Reseller\OrderController::class, 'payment'])->name('orders.payment');
     Route::post('orders/{order}/callback', [\App\Http\Controllers\Reseller\OrderController::class, 'callback'])->name('orders.callback');
     Route::get('orders/{order}/invoice', [\App\Http\Controllers\Reseller\OrderController::class, 'invoice'])->name('orders.invoice');
     Route::get('/stock', [\App\Http\Controllers\Reseller\StockController::class, 'index'])->name('stock.index');
@@ -78,5 +79,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/{notification}/read', [NotificationController::class, 'markRead'])->name('read');
     });
 });
+
+// ── EasyParcel Webhooks ──────────────────────────────────────────────
+Route::post('/webhooks/easyparcel', [\App\Http\Controllers\EasyParcelWebhookController::class, 'handleStatusUpdate'])->name('webhooks.easyparcel');
 
 require __DIR__.'/auth.php';
