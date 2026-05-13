@@ -150,7 +150,7 @@
                 </div>
             </div>
             
-            <div class="flex-1 min-h-[300px] h-[300px]">
+            <div class="flex-1 min-h-[200px] h-[200px] md:h-[260px] md:min-h-[260px] lg:h-[300px] lg:min-h-[300px]">
                 <canvas id="ordersTrendChart"></canvas>
             </div>
         </div>
@@ -298,7 +298,7 @@
 
             <div class="p-6 flex-1 flex flex-col justify-center items-center">
                 @if(isset($topSellingProducts) && $topSellingProducts->count() > 0)
-                    <div class="w-full h-[280px] relative">
+                    <div class="w-full h-[180px] md:h-[220px] lg:h-[280px] relative">
                         <canvas id="topWholesaleProductsChart"></canvas>
                     </div>
                 @else
@@ -321,7 +321,7 @@
 
             <div class="p-6 flex-1 flex flex-col justify-center items-center">
                 @if(isset($topResellers) && $topResellers->count() > 0)
-                    <div class="w-full h-[280px] relative">
+                    <div class="w-full h-[180px] md:h-[220px] lg:h-[280px] relative">
                         <canvas id="topResellersSpendChart"></canvas>
                     </div>
                 @else
@@ -344,7 +344,7 @@
 
             <div class="p-6 flex-1 flex flex-col justify-center items-center">
                 @if(isset($topResellers) && $topResellers->count() > 0)
-                    <div class="w-full h-[280px] relative flex items-center justify-center">
+                    <div class="w-full h-[180px] md:h-[220px] lg:h-[280px] relative flex items-center justify-center">
                         <canvas id="resellerSpendShareChart"></canvas>
                         <!-- Center Info Overlay -->
                         <div class="absolute flex flex-col items-center justify-center text-center pointer-events-none mb-8">
@@ -663,7 +663,7 @@
                         backgroundColor: '#1e293b',
                         hoverBackgroundColor: '#0f172a',
                         borderRadius: 6,
-                        barThickness: 16
+                        barThickness: window.innerWidth < 768 ? 6 : (window.innerWidth < 1024 ? 12 : undefined)
                     }]
                 },
                 options: {
@@ -719,7 +719,7 @@
                         backgroundColor: '#4f46e5',
                         hoverBackgroundColor: '#4338ca',
                         borderRadius: 6,
-                        barThickness: 16
+                        barThickness: window.innerWidth < 768 ? 6 : (window.innerWidth < 1024 ? 12 : undefined)
                     }]
                 },
                 options: {

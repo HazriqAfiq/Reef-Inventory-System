@@ -9,7 +9,7 @@
                 <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-left">IP Address</th>
             </tr>
         </thead>
-        <tbody class="divide-y divide-gray-100 text-xs font-medium text-gray-700">
+        <tbody id="admin-logs-tbody" class="divide-y divide-gray-100 text-xs font-medium text-gray-700">
             @forelse($logs as $log)
                 <tr class="hover:bg-gray-50/50 transition-colors">
                     <td class="px-6 py-4 whitespace-nowrap">
@@ -71,8 +71,15 @@
     </table>
 </div>
 
-@if($logs->hasPages())
-    <div class="px-6 py-5 border-t border-gray-50">
-        {{ $logs->links() }}
+@if($logs->nextPageUrl())
+    <div id="admin-logs-load-more-wrapper" class="px-6 py-5 border-t border-gray-50 flex justify-center">
+        <button id="btn-admin-logs-load-more" 
+                data-next-url="{{ $logs->nextPageUrl() }}" 
+                class="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-50 hover:bg-black hover:text-white border border-gray-100 hover:border-black text-gray-700 text-xs font-black uppercase tracking-widest rounded-xl transition-all hover:scale-105 active:scale-95 shadow-sm">
+            <span>Show More</span>
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 13l-7 7-7-7m14-6l-7 7-7-7"/>
+            </svg>
+        </button>
     </div>
 @endif

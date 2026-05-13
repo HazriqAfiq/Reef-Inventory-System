@@ -121,4 +121,17 @@ class OrderController extends Controller
         fclose($handle);
         exit;
     }
+
+    public function invoice(Order $order)
+    {
+        // Guard: only allow receipts to be generated for paid/fulfilled orders
+        if (!in_array($order->status, ['paid', 'processing', 'shipped', 'delivered'])) {
+            abort(403, 'Receipts can only be generated for paid orders.');
+        }
+
+        $order->load('items.product', 'user');
+        
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reseller.orders.invoice', compact('order'));
+        return $pdf->download("receipt_ORD_{$order->id}.pdf");
+    }
 }

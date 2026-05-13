@@ -17,7 +17,7 @@
     </style>
 
     <!-- Wrapper with local cartOpen state for Responsive Drawer -->
-    <div x-data="{ cartOpen: false }" class="relative">
+    <div x-data="{ cartOpen: false }" @open-cart.window="cartOpen = true" class="relative">
         
         <!-- Main Form wrapper submitting to checkout -->
         <form action="{{ route('reseller.orders.store') }}" method="POST" id="restock-form" class="relative">
@@ -343,79 +343,77 @@
                         </div>
 
                     </div>
-                </div>
 
-                <!-- Right Column: Static Wholesale Cart Sidebar (Desktop only) -->
-                <div class="hidden lg:block lg:col-span-4 xl:col-span-3 lg:sticky lg:top-6">
-                    <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm flex flex-col gap-6">
-                        <!-- Sidebar Header -->
-                        <div class="flex items-center justify-between pb-4 border-b border-gray-100">
-                            <div class="flex items-center gap-2.5">
-                                <span class="relative">
-                                    <svg class="w-5 h-5 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                                    </svg>
-                                    <span class="cart-badge-count absolute -top-1.5 -right-1.5 bg-black text-white text-[8px] font-black w-4 h-4 rounded-full flex items-center justify-center">0</span>
-                                </span>
-                                <h2 class="text-xs font-black text-gray-900 uppercase tracking-widest">Wholesale Cart</h2>
-                            </div>
-                            <span class="cart-items-count-text text-[9px] font-bold text-gray-400 uppercase tracking-wider">0 Items</span>
+                    <!-- Product Heritage / Description -->
+                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                        <div class="px-8 py-4 border-b border-gray-50 bg-gray-50/20">
+                            <h2 class="text-[10px] font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-gray-900"></span>
+                                Product Heritage
+                            </h2>
+                            <p class="text-[9px] text-gray-400 uppercase tracking-wider mt-0.5">Formulation narrative and olfactory character</p>
                         </div>
-
-                        <!-- Scrollable Selected Wholesale Items List -->
-                        <div class="cart-items-list space-y-4 pr-3 py-2 divide-y divide-gray-50">
-                            <!-- Populated in real-time via JS -->
-                        </div>
-
-                        <!-- Progress and MOQ Tracker Indicator -->
-                        <div class="border-t border-gray-100 pt-5 space-y-3">
-                            <div class="flex justify-between items-baseline">
-                                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">MOQ Progress ({{ $totalMoq }} Min)</p>
-                                <p class="text-xs font-black text-gray-900 tabular-nums"><span class="cart-total-items text-sm font-black">0</span> / {{ $totalMoq }}</p>
-                            </div>
-                            <!-- Progress Line Bar -->
-                            <div class="w-full bg-gray-50 h-2 rounded-full overflow-hidden shadow-inner relative">
-                                <div class="cart-moq-progress h-full bg-gradient-to-r from-amber-400 to-indigo-500 rounded-full transition-all duration-500 w-0"></div>
-                            </div>
-                            <div class="cart-moq-warning text-[9px] font-bold text-rose-500 uppercase tracking-wider flex items-center gap-1.5 leading-tight">
-                                <svg class="w-3.5 h-3.5 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                                </svg>
-                                <span>Wholesale orders require a minimum of {{ $totalMoq }} items.</span>
-                            </div>
-                        </div>
-
-                        <!-- Subtotal and Submit -->
-                        <div class="border-t border-gray-100 pt-5 space-y-4">
-                            <div class="flex items-center justify-between">
-                                <span class="text-[9px] font-black uppercase tracking-widest text-gray-400">Total Price</span>
-                                <span class="cart-total-price text-xl font-black text-gray-900 tabular-nums">RM0.00</span>
-                            </div>
-                            <button type="submit" 
-                                    class="cart-checkout-btn w-full py-4 bg-gray-100 text-gray-400 font-bold text-xs uppercase tracking-widest rounded-xl transition-all duration-300 cursor-not-allowed text-center"
-                                    disabled>
-                                Need {{ $totalMoq }} Items
-                            </button>
+                        <div class="p-8">
+                            <p class="text-sm font-medium text-gray-500 leading-relaxed max-w-3xl">
+                                {{ $product->description ?: 'An exquisite formulation handcrafted to represent luxury. Handcrafted with organic base elements that diffuse beautifully across the skin, leaving a persistent trail of elegance.' }}
+                            </p>
                         </div>
                     </div>
                 </div>
 
-            </div>
+                <!-- Right Column: Static Wholesale Cart Sidebar (Desktop only) -->
+                <div class="hidden lg:flex lg:fixed bg-white border border-gray-100 rounded-3xl p-6 shadow-sm flex-col gap-4 h-[calc(100vh-10rem)] w-[260px] xl:w-[320px] lg:right-8 xl:right-12 lg:top-28 overflow-hidden z-20">
+                    <!-- Sidebar Header -->
+                    <div class="flex items-center justify-between pb-4 border-b border-gray-100 shrink-0">
+                        <div class="flex items-center gap-2.5">
+                            <span class="relative">
+                                <svg class="w-5 h-5 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                                </svg>
+                                <span class="cart-badge-count absolute -top-1.5 -right-1.5 bg-black text-white text-[8px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-white">0</span>
+                            </span>
+                            <h2 class="text-xs font-black text-gray-900 uppercase tracking-widest">Wholesale Cart</h2>
+                        </div>
+                        <span class="cart-items-count-text text-[9px] font-bold text-gray-400 uppercase tracking-wider">0 Items</span>
+                    </div>
 
-            <!-- Product Heritage / Description - Full Width Container -->
-            <div class="mt-8 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                <div class="px-8 py-4 border-b border-gray-50 bg-gray-50/20">
-                    <h2 class="text-[10px] font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
-                        <span class="w-2.5 h-2.5 rounded-full bg-gray-900"></span>
-                        Product Heritage
-                    </h2>
-                    <p class="text-[9px] text-gray-400 uppercase tracking-wider mt-0.5">Formulation narrative and olfactory character</p>
+                    <!-- Scrollable Selected Wholesale Items List -->
+                    <div class="cart-items-list space-y-2 max-h-[calc(100vh-25rem)] overflow-y-auto pr-3 py-2 divide-y divide-gray-100 shrink">
+                        <!-- Populated in real-time via JS -->
+                    </div>
+
+                    <!-- Progress and MOQ Tracker Indicator -->
+                    <div class="border-t border-gray-100 pt-3 space-y-3 shrink-0 mt-auto">
+                        <div class="flex justify-between items-baseline">
+                            <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">MOQ Progress ({{ $totalMoq }} Min)</p>
+                            <p class="text-xs font-black text-gray-900 tabular-nums"><span class="cart-total-items text-sm font-black">0</span> / {{ $totalMoq }}</p>
+                        </div>
+                        <!-- Progress Line Bar -->
+                        <div class="w-full bg-gray-50 h-2 rounded-full overflow-hidden shadow-inner relative">
+                            <div class="cart-moq-progress h-full bg-gradient-to-r from-amber-400 to-indigo-500 rounded-full transition-all duration-500 w-0"></div>
+                        </div>
+                        <div class="cart-moq-warning text-[9px] font-bold text-rose-500 uppercase tracking-wider flex items-center gap-1.5 leading-tight">
+                            <svg class="w-3.5 h-3.5 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                            <span>Wholesale orders require a minimum of {{ $totalMoq }} items.</span>
+                        </div>
+                    </div>
+
+                    <!-- Subtotal and Submit -->
+                    <div class="border-t border-gray-100 pt-3 space-y-4 shrink-0">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[9px] font-black uppercase tracking-widest text-gray-400">Total Price</span>
+                            <span class="cart-total-price text-xl font-black text-gray-900 tabular-nums">RM0.00</span>
+                        </div>
+                        <button type="submit" 
+                                class="cart-checkout-btn w-full py-4 bg-gray-100 text-gray-400 font-bold text-xs uppercase tracking-widest rounded-xl transition-all duration-300 cursor-not-allowed text-center"
+                                disabled>
+                            Need {{ $totalMoq }} Items
+                        </button>
+                    </div>
                 </div>
-                <div class="p-8">
-                    <p class="text-sm font-medium text-gray-500 leading-relaxed max-w-3xl">
-                        {{ $product->description ?: 'An exquisite formulation handcrafted to represent luxury. Handcrafted with organic base elements that diffuse beautifully across the skin, leaving a persistent trail of elegance.' }}
-                    </p>
-                </div>
+
             </div>
 
                 <!-- Backdrop Overlay for Slide-Out Drawer (Mobile/Tablet only) -->
@@ -496,51 +494,17 @@
             </div>
         </form>
 
-        <!-- Static Floating Checkout Summary Panel (Right Bottom, Premium Minimalist Luxury - Hidden on desktop) -->
-        <div id="floating-cart-panel" 
-             class="fixed bottom-6 right-6 z-30 bg-white border border-gray-100 rounded-3xl p-5 shadow-2xl flex flex-col gap-4 w-80 max-w-[calc(100vw-3rem)] transition-all duration-300 hover:shadow-3xl lg:hidden">
-            <!-- Header with Subtotal -->
-            <div class="flex items-center justify-between">
-                <span class="text-[9px] font-black uppercase tracking-widest text-gray-400">Wholesale Subtotal</span>
-                <span id="floating-total-price" class="text-base font-black text-gray-900 tabular-nums">RM0.00</span>
-            </div>
-            
-            <!-- MOQ Progress Tracker -->
-            <div class="space-y-1.5">
-                <div class="flex justify-between items-baseline">
-                    <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">MOQ Progress ({{ $totalMoq }} Min)</span>
-                    <span class="text-[10px] font-black text-gray-900 tabular-nums"><span id="floating-total-items" class="text-xs font-black">0</span> / {{ $totalMoq }}</span>
-                </div>
-                <!-- Progress Line Bar -->
-                <div class="w-full bg-gray-50 h-1.5 rounded-full overflow-hidden shadow-inner relative">
-                    <div id="floating-moq-progress" class="h-full bg-gradient-to-r from-amber-400 to-indigo-500 rounded-full transition-all duration-500 w-0"></div>
-                </div>
-                <div id="floating-moq-warning" class="text-[8px] font-bold text-amber-500 uppercase tracking-wider flex items-center gap-1 leading-tight">
-                    <!-- Dynamic state injected via JS -->
-                </div>
-            </div>
-
-            <!-- View Cart & Proceed Payment Buttons -->
-            <div class="flex items-center gap-3 mt-1">
-                <!-- Circular Cart Icon Button for View Cart -->
-                <button type="button" 
-                        x-on:click="cartOpen = true"
-                        class="relative flex items-center justify-center w-12 h-12 bg-white border border-gray-200 text-gray-900 hover:text-indigo-600 hover:border-indigo-100 hover:bg-indigo-50/30 rounded-xl active:scale-95 transition-all shrink-0 shadow-sm"
-                        title="View Cart">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                    </svg>
-                    <span id="floating-cart-badge" class="absolute -top-1 -right-1 bg-rose-500 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center border-2 border-white shadow-sm">0</span>
-                </button>
-
-                <!-- Proceed Payment Button -->
-                <button type="button" 
-                        id="floating-checkout-btn" 
-                        disabled 
-                        class="flex-1 py-3.5 bg-gray-100 text-gray-400 font-bold text-xs uppercase tracking-widest rounded-xl transition-all duration-300 cursor-not-allowed text-center shadow-sm">
-                    Need {{ $totalMoq }} Items
-                </button>
-            </div>
+        <!-- Premium Floating Cart Bag Button (Mobile Only) -->
+        <div class="fixed bottom-6 right-6 z-30 lg:hidden">
+            <button type="button" 
+                    onclick="window.dispatchEvent(new CustomEvent('open-cart'))"
+                    class="relative flex items-center justify-center w-14 h-14 bg-black text-white hover:bg-gray-900 rounded-full active:scale-95 transition-all shadow-2xl focus:outline-none"
+                    title="View Cart">
+                <svg class="w-6 h-6 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                </svg>
+                <span id="floating-cart-badge" class="hidden absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-md pointer-events-none">0</span>
+            </button>
         </div>
 
     </div>
@@ -806,7 +770,7 @@
                     
                     // Locate specs
                     const parentContainers = document.querySelectorAll('.product-metadata-node');
-                    let pId = '', unitPrice = 0, pName = '', pSku = '', pImg = '', buyAll = false;
+                    let pId = '', unitPrice = 0, pName = '', pVolume = '', pSku = '', pImg = '', buyAll = false;
 
                     parentContainers.forEach(container => {
                         const inputNode = container.querySelector(`.qty-input[data-counter="${counterIndex}"]`);
@@ -814,6 +778,7 @@
                             const idNode = container.querySelector('.product-id');
                             const priceNode = container.querySelector('.product-price');
                             const nameNode = container.querySelector('.product-name');
+                            const volumeNode = container.querySelector('.product-volume');
                             const skuNode = container.querySelector('.product-sku');
                             const imgNode = container.querySelector('.product-image');
                             const buyAllNode = container.querySelector('.product-buy-all');
@@ -821,6 +786,7 @@
                             pId = idNode ? idNode.value : '';
                             unitPrice = priceNode ? (parseFloat(priceNode.value) || 0) : 0;
                             pName = nameNode ? nameNode.value : 'Fragrance';
+                            pVolume = volumeNode ? volumeNode.value : '';
                             pSku = skuNode ? skuNode.value : '';
                             pImg = imgNode ? imgNode.value : '';
                             buyAll = buyAllNode ? (buyAllNode.value === 'true') : false;
@@ -832,6 +798,7 @@
                         items += qty;
                         price += (qty * unitPrice);
 
+                        // Render elegant item card details inside checkout drawer/sidebar
                         let qtyControlsHtml = '';
                         if (buyAll) {
                             qtyControlsHtml = `
@@ -859,25 +826,31 @@
                         }
 
                         listHtml += `
-                            <div class="py-4 flex flex-col gap-3 group">
-                                <div class="flex items-center justify-between gap-3">
+                            <div class="py-2 flex flex-col gap-2 group">
+                                <div class="flex items-center justify-between gap-2">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 bg-gray-50 border border-gray-100 rounded-lg overflow-hidden shrink-0">
-                                            <img src="${pImg || 'https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=1974'}" class="w-full h-full object-cover">
+                                        <div class="w-10 h-10 bg-gray-50 border border-gray-100 rounded-xl flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
+                                            ${pImg ? `<img src="${pImg}" class="w-full h-full object-cover">` : `
+                                                <svg class="w-4 h-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                                                </svg>
+                                            `}
                                         </div>
-                                        <div class="text-left">
-                                            <p class="text-[11px] font-bold text-gray-900 leading-tight">${pName}</p>
-                                            <p class="text-[8px] font-semibold text-gray-400 uppercase tracking-widest">${pSku}</p>
-                                            <p class="text-[10px] font-black text-gray-900">RM${unitPrice.toFixed(2)}</p>
+                                        <div>
+                                            <p class="text-xs font-bold text-gray-900 line-clamp-1 leading-snug">${pName}${pVolume ? ` (${pVolume}ML)` : ''}</p>
+                                            <p class="text-[10px] font-black text-gray-900 mt-1">RM${unitPrice.toFixed(2)}/unit</p>
                                         </div>
                                     </div>
-                                    <button type="button" onclick="removeFromCart(${counterIndex})" class="w-8 h-8 rounded-lg flex items-center justify-center bg-gray-50 border border-gray-100 text-gray-400 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-100 transition-all">
+                                    
+                                    <button type="button" onclick="removeFromCart(${counterIndex})" class="w-8 h-8 rounded-lg flex items-center justify-center bg-gray-50 border border-gray-100 text-gray-400 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-100 transition-all" title="Remove Item">
                                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142M5 7h14l1 12H4L5 9z"/>
                                         </svg>
                                     </button>
                                 </div>
+
                                 <div class="flex items-center justify-between bg-gray-50/50 rounded-xl p-2 border border-gray-100">
+                                    <!-- Sidebar Quantity Controllers -->
                                     ${qtyControlsHtml}
                                     <p class="text-xs font-black text-gray-900 tabular-nums">RM${(qty * unitPrice).toFixed(2)}</p>
                                 </div>
@@ -945,7 +918,7 @@
                             <svg class="w-3.5 h-3.5 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
                             </svg>
-                            <span class="text-emerald-600 font-bold">Minimum order requirement met! Ready to purchase.</span>
+                            <span class="text-emerald-600 text-[9px] font-bold uppercase tracking-wider">Minimum order requirement met! Ready to purchase.</span>
                         `;
                     });
 
@@ -992,7 +965,14 @@
                 if (floatingTotalItemsEl) floatingTotalItemsEl.textContent = items;
 
                 const floatingCartBadgeEl = document.getElementById('floating-cart-badge');
-                if (floatingCartBadgeEl) floatingCartBadgeEl.textContent = items;
+                if (floatingCartBadgeEl) {
+                    floatingCartBadgeEl.textContent = items;
+                    if (items > 0) {
+                        floatingCartBadgeEl.classList.remove('hidden');
+                    } else {
+                        floatingCartBadgeEl.classList.add('hidden');
+                    }
+                }
 
                 const floatingMoqProgress = document.getElementById('floating-moq-progress');
                 if (floatingMoqProgress) {

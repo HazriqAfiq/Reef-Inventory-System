@@ -179,10 +179,14 @@
                 <div class="px-6 py-8 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-white">
                     <div>
                         <div class="flex items-center gap-3 mb-3">
-                            @if($order->status === 'paid')
+                            @if(in_array($order->status, ['paid', 'processing', 'shipped', 'delivered']))
                                 <span class="inline-flex items-center gap-1.5 text-[9px] font-black text-emerald-600 bg-emerald-50/50 px-2.5 py-1 rounded-xl uppercase tracking-widest border border-emerald-100/40">
                                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                                     Paid
+                                </span>
+                            @elseif($order->status === 'cancelled')
+                                <span class="inline-flex items-center gap-1.5 text-[9px] font-black text-gray-500 bg-gray-50 px-2.5 py-1 rounded-xl uppercase tracking-widest border border-gray-100/40">
+                                    Cancelled
                                 </span>
                             @else
                                 <span class="inline-flex items-center gap-1.5 text-[9px] font-black text-amber-600 bg-amber-50/50 px-2.5 py-1 rounded-xl uppercase tracking-widest border border-amber-100/40">
@@ -196,6 +200,20 @@
                             Order Items <span class="text-gray-300 font-medium">#</span>{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}
                         </h2>
                     </div>
+
+                    @if(in_array($order->status, ['paid', 'processing', 'shipped', 'delivered']))
+                        <div class="shrink-0">
+                            <a href="{{ route('admin.orders.invoice', $order) }}" 
+                               data-no-spa
+                               download
+                               class="inline-flex items-center gap-2 px-5 py-3 bg-black hover:bg-gray-800 text-white rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-md">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                <span>Generate Receipt</span>
+                            </a>
+                        </div>
+                    @endif
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">

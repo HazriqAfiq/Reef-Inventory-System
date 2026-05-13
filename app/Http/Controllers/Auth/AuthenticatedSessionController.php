@@ -31,15 +31,15 @@ class AuthenticatedSessionController extends Controller
         $user = Auth::user();
 
         if ($user->isAdmin()) {
-            return redirect()->intended(route('admin.dashboard'));
+            return redirect()->route('admin.dashboard');
         }
 
         if ($user->isReseller()) {
-            return redirect()->intended(route('reseller.dashboard'));
+            return redirect()->route('reseller.dashboard');
         }
 
         // Default: Redirect to Storefront (Homepage)
-        return redirect()->intended('/');
+        return redirect('/');
     }
 
     /**
@@ -53,6 +53,6 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect('/login');
     }
 }

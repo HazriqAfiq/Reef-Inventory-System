@@ -1,5 +1,5 @@
 @if(request()->ajax())
-    <title>{{ isset($title) ? $title . ' — ' : '' }}Laman Store · RPIMS</title>
+    <title>{{ isset($title) ? $title . ' — ' : '' }}Reef Store</title>
     <main id="main-content">
         @if(session('success'))
             <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)" 
@@ -69,7 +69,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ isset($title) ? $title . ' — ' : '' }}Laman Store · RPIMS</title>
+    <title>{{ isset($title) ? $title . ' — ' : '' }}Reef Store</title>
 
     <!-- Inter Font (full weight range) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -114,7 +114,7 @@
                class="flex items-center gap-3 transition-transform hover:scale-[1.02]">
                 @php
                     $logoPath = \App\Models\Setting::getValue('brand_logo');
-                    $brandName = \App\Models\Setting::getValue('brand_name', 'Laman Store');
+                    $brandName = \App\Models\Setting::getValue('brand_name', 'Reef Store');
                 @endphp
                 @if($logoPath && Storage::disk('public')->exists($logoPath))
                     <img src="{{ asset('storage/' . $logoPath) }}" 
@@ -130,7 +130,7 @@
                 <div class="min-w-0">
                     @php
                         $parts = explode(' ', $brandName, 2);
-                        $part1 = $parts[0] ?? 'LAMAN';
+                        $part1 = $parts[0] ?? 'REEF';
                         $part2 = $parts[1] ?? 'STORE';
                     @endphp
                     <p class="text-[14px] font-black text-gray-900 leading-none tracking-tight uppercase truncate">{{ $part1 }}</p>
@@ -215,6 +215,14 @@
                        class="sidebar-link group {{ request()->routeIs('reseller.dashboard') ? 'active' : '' }}" onclick="closeSidebar()">
                         <svg class="w-4 h-4 shrink-0 text-gray-500 group-hover:text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z"/></svg>
                         Dashboard
+                    </a>
+
+                    <a href="{{ route('reseller.reports.index') }}"
+                       class="sidebar-link group {{ request()->routeIs('reseller.reports.index') ? 'active' : '' }}" onclick="closeSidebar()">
+                        <svg class="w-4 h-4 shrink-0 text-gray-500 group-hover:text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        My Reports
                     </a>
 
                     <p class="px-3 pt-6 pb-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em]">Auditing</p>
@@ -308,7 +316,7 @@
                class="lg:hidden absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex items-center gap-2">
                 @php
                     $logoPath = \App\Models\Setting::getValue('brand_logo');
-                    $brandName = \App\Models\Setting::getValue('brand_name', 'Laman Store');
+                    $brandName = \App\Models\Setting::getValue('brand_name', 'Reef Store');
                 @endphp
                 @if($logoPath && Storage::disk('public')->exists($logoPath))
                     <img src="{{ asset('storage/' . $logoPath) }}"
@@ -536,6 +544,22 @@
 
 {{-- ===== AJAX NAVIGATION JS ===== --}}
 <script>
+// Instant auth verification on load (in case page was restored from disk cache)
+(function() {
+    const checkUrl = window.location.href;
+    if (checkUrl.includes('/admin') || checkUrl.includes('/reseller')) {
+        fetch(checkUrl, {
+            method: 'GET',
+            headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-SPA': 'true' },
+            cache: 'no-store'
+        }).then(response => {
+            if (response.redirected || response.url.includes('/login') || response.url.includes('/register')) {
+                window.location.href = '/login';
+            }
+        }).catch(() => {});
+    }
+})();
+
 document.addEventListener('click', async (e) => {
     const link = e.target.closest('a');
     if (!link) return;
@@ -563,13 +587,78 @@ window.addEventListener('popstate', () => {
     navigateTo(window.location.href, false);
 });
 
+// Verify auth session on pageshow and handle Back/Forward navigation visual security
+window.addEventListener('pageshow', (e) => {
+    const checkUrl = window.location.href;
+    if (!checkUrl.includes('/admin') && !checkUrl.includes('/reseller')) return;
+
+    let isBackForward = e.persisted;
+    
+    // Check performance navigation type if e.persisted is false/unsupported
+    if (!isBackForward && window.performance) {
+        if (window.performance.navigation && window.performance.navigation.type === 2) {
+            isBackForward = true;
+        } else if (window.performance.getEntriesByType) {
+            const navEntries = window.performance.getEntriesByType("navigation");
+            if (navEntries.length > 0 && navEntries[0].type === "back_forward") {
+                isBackForward = true;
+            }
+        }
+    }
+
+    if (isBackForward) {
+        // Instantly hide the page content to prevent any flash of unauthorized stale/private data
+        document.body.style.display = 'none';
+    }
+
+    fetch(checkUrl, {
+        method: 'GET',
+        headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-SPA': 'true' },
+        cache: 'no-store'
+    }).then(response => {
+        if (response.redirected || response.url.includes('/login') || response.url.includes('/register')) {
+            window.location.replace('/login');
+        } else if (isBackForward) {
+            // Restore visibility if the session is still active
+            document.body.style.display = '';
+        }
+    }).catch(() => {
+        if (isBackForward) document.body.style.display = '';
+    });
+});
+
 document.addEventListener('submit', async (e) => {
     const form = e.target;
+    
+    // Intercept logout specifically to apply nuclear client-side cleanup and history stack replacement
+    if (form.action.includes('/logout')) {
+        e.preventDefault();
+        
+        // 1. Clear any client-side cached data or storage
+        localStorage.clear();
+        sessionStorage.clear();
+        
+        // 2. Perform background logout request with FormData to destroy server session
+        try {
+            await fetch(form.action, {
+                method: 'POST',
+                body: new FormData(form),
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+        } catch (err) {
+            console.error('Logout request failed:', err);
+        }
+        
+        // 3. Nuclear option: replace current location to wipe dashboard from history trail
+        window.location.replace('/login');
+        return;
+    }
+
     // Handle both /admin and /reseller forms
     const isDashboardForm = form.action.includes('/admin') || form.action.includes('/reseller');
     if (!isDashboardForm || form.method.toLowerCase() !== 'post') return;
-    
-    if (form.action.includes('/logout')) return;
 
     e.preventDefault();
     
@@ -594,6 +683,12 @@ document.addEventListener('submit', async (e) => {
         });
 
         if (response.redirected) {
+            // If form redirected to guest page (like /login after session timeout)
+            if (response.url.includes('/login') || response.url.includes('/register') || (!response.url.includes('/admin') && !response.url.includes('/reseller'))) {
+                window.location.href = response.url;
+                return;
+            }
+
             const html = await response.text();
             
             if (html.includes('<main')) {
@@ -660,12 +755,19 @@ async function navigateTo(url, push = true, resetScroll = true) {
             headers: { 
                 'X-Requested-With': 'XMLHttpRequest',
                 'X-SPA': 'true'
-            }
+            },
+            cache: 'no-store'
         });
         
         progressBar.style.width = '70%';
         if (!response.ok) throw new Error('Network response was not ok');
         
+        // Handle redirect or unauthenticated state change (e.g., redirected to /login)
+        if (response.redirected || response.url.includes('/login') || response.url.includes('/register') || (!response.url.includes('/admin') && !response.url.includes('/reseller'))) {
+            window.location.href = response.url;
+            return;
+        }
+
         const html = await response.text();
         
         if (html.includes('<main')) {

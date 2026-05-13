@@ -9,7 +9,7 @@
                 <div class="mb-16 text-center md:text-left">
                     <a href="/" class="inline-block group">
                         <h2 class="text-2xl font-luxury font-black tracking-[0.3em] uppercase text-black group-hover:opacity-60 transition-opacity">
-                            {{ \App\Models\Setting::getValue('brand_name', 'Laman Store') }}
+                            {{ \App\Models\Setting::getValue('brand_name', 'Reef Store') }}
                         </h2>
                     </a>
                 </div>
@@ -53,12 +53,12 @@
 
             <!-- Absolute Copy -->
             <div class="absolute bottom-8 left-12 hidden lg:block">
-                <p class="text-[9px] font-black text-gray-300 uppercase tracking-[0.2em]">&copy; {{ date('Y') }} {{ \App\Models\Setting::getValue('brand_name', 'Laman Store') }}. All rights reserved.</p>
+                <p class="text-[9px] font-black text-gray-300 uppercase tracking-[0.2em]">&copy; {{ date('Y') }} {{ \App\Models\Setting::getValue('brand_name', 'Reef Store') }}. All rights reserved.</p>
             </div>
         </div>
 
         <!-- Right Side: Imagery -->
-        <div class="hidden md:block w-full md:w-[55%] bg-black relative overflow-hidden">
+        <div class="hidden md:block w-full md:w-[55%] bg-[#0c0c0c] relative overflow-hidden">
             <!-- Cinematic Background -->
             <div class="absolute inset-0 z-0">
                 <img src="https://images.unsplash.com/photo-1541643600914-78b084683601?q=80&w=1000&auto=format&fit=crop" 
@@ -66,8 +66,8 @@
                      alt="Luxury Fragrance">
             </div>
             
-            <div class="absolute inset-0 bg-gradient-to-r from-white via-transparent to-transparent z-10 w-32"></div>
-            <div class="absolute inset-0 bg-black/10 z-10"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-transparent z-10 w-32"></div>
+            <div class="absolute inset-0 bg-black/30 z-10"></div>
             
             <div class="absolute inset-0 flex items-center justify-center z-20">
                 <div class="text-center animate-fade-in-up delay-300">

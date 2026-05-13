@@ -67,9 +67,9 @@ class EasyParcelService
             'bulk'   => [
                 [
                     // Sender details (Your wholesale warehouse)
-                    'send_name'     => config('services.easyparcel.sender_name', 'Laman Store Warehouse'),
+                    'send_name'     => config('services.easyparcel.sender_name', 'Reef Store Warehouse'),
                     'send_phone'    => config('services.easyparcel.sender_phone', '0123456789'),
-                    'send_email'    => 'warehouse@lamanstore.com',
+                    'send_email'    => 'warehouse@reefstore.com',
                     'send_addr1'    => config('services.easyparcel.sender_address', 'No 1, Jalan Perindustrian 2'),
                     'send_city'     => config('services.easyparcel.sender_city', 'Shah Alam'),
                     'send_state'    => config('services.easyparcel.sender_state', 'Selangor'),

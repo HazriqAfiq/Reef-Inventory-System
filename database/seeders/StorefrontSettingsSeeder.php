@@ -13,19 +13,18 @@ class StorefrontSettingsSeeder extends Seeder
     public function run(): void
     {
         $settings = [
-            // Global Settings
-            ['key' => 'brand_name', 'value' => 'Laman Store', 'type' => 'text', 'group' => 'global'],
+            ['key' => 'brand_name', 'value' => 'Reef Store', 'type' => 'text', 'group' => 'global'],
             ['key' => 'announcement_bar_enabled', 'value' => '1', 'type' => 'boolean', 'group' => 'announcement'],
             ['key' => 'announcement_bar_text', 'value' => 'Complimentary Shipping on all orders over RM150', 'type' => 'text', 'group' => 'announcement'],
             ['key' => 'footer_instagram', 'value' => 'https://instagram.com', 'type' => 'text', 'group' => 'social'],
             ['key' => 'footer_facebook', 'value' => 'https://facebook.com', 'type' => 'text', 'group' => 'social'],
             ['key' => 'contact_whatsapp', 'value' => '+60123456789', 'type' => 'text', 'group' => 'contact'],
-            ['key' => 'contact_email', 'value' => 'concierge@lamanstore.com', 'type' => 'text', 'group' => 'contact'],
-            ['key' => 'copyright_text', 'value' => '© 2026 Laman Store Malaysia. All rights reserved.', 'type' => 'text', 'group' => 'global'],
+            ['key' => 'contact_email', 'value' => 'concierge@reefstore.com', 'type' => 'text', 'group' => 'contact'],
+            ['key' => 'copyright_text', 'value' => '© 2026 Reef Store Malaysia. All rights reserved.', 'type' => 'text', 'group' => 'global'],
 
             // Homepage Settings
             ['key' => 'homepage_title', 'value' => 'The Art of Pure Essence', 'type' => 'text', 'group' => 'homepage'],
-            ['key' => 'homepage_subtitle', 'value' => 'The Laman Signature', 'type' => 'text', 'group' => 'homepage'],
+            ['key' => 'homepage_subtitle', 'value' => 'The Reef Signature', 'type' => 'text', 'group' => 'homepage'],
             ['key' => 'homepage_hero_image', 'value' => 'hero/hero_cinematic.png', 'type' => 'image', 'group' => 'homepage'],
             ['key' => 'new_arrivals_hero_image', 'value' => 'hero/shop_banner_cinematic.png', 'type' => 'image', 'group' => 'new_arrivals'],
             ['key' => 'best_sellers_hero_image', 'value' => 'hero/shop_banner_cinematic.png', 'type' => 'image', 'group' => 'best_sellers'],

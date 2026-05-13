@@ -9,7 +9,7 @@
                 <div class="mb-10 text-center lg:text-left">
                     <a href="/" class="inline-block group mb-8">
                         <h2 class="text-xl font-luxury font-black tracking-[0.3em] uppercase text-black">
-                            {{ \App\Models\Setting::getValue('brand_name', 'Laman Store') }}
+                            {{ \App\Models\Setting::getValue('brand_name', 'Reef Store') }}
                         </h2>
                     </a>
                     
@@ -75,16 +75,16 @@
             </div>
         </div>
 
-        <div class="hidden lg:block w-[55%] bg-black relative overflow-hidden">
+        <div class="hidden lg:block w-[55%] bg-[#0c0c0c] relative overflow-hidden">
             @php $signUpImage = \App\Models\Setting::getValue('sign_up_image', 'https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=1974&auto=format&fit=crop'); @endphp
             <img src="{{ str_contains($signUpImage, 'http') ? $signUpImage : asset('storage/' . $signUpImage) }}" 
                  class="w-full h-full object-cover opacity-60 animate-zoom-slow" 
                  alt="Luxury Fragrance">
-            <div class="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent z-10"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-black/50 via-black/20 to-transparent z-10"></div>
             
             <div class="absolute inset-0 flex items-center justify-center z-20">
                 <div class="text-center animate-fade-in-up delay-300">
-                    <p class="text-white/40 text-[10px] font-black uppercase tracking-[0.6em] mb-6">Laman Signature</p>
+                    <p class="text-white/40 text-[10px] font-black uppercase tracking-[0.6em] mb-6">Reef Signature</p>
                     <h3 class="font-serif text-6xl text-white italic drop-shadow-2xl opacity-90">
                         Create
                     </h3>

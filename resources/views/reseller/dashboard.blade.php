@@ -14,20 +14,6 @@
                 <h1 class="text-3xl font-black text-gray-900 tracking-tight">Reseller Dashboard</h1>
                 <p class="text-xs text-gray-400 mt-1">Verify physical shelf inventories, track active stock valuations, and coordinate restock requests.</p>
             </div>
-            
-            <div class="flex items-center gap-3 shrink-0">
-                <div class="bg-white px-4 py-2 rounded-xl border border-gray-100 shadow-sm flex items-center gap-2 text-xs font-bold text-gray-600">
-                    <svg class="w-4 h-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                    <span>Role: Partner Workspace</span>
-                </div>
-                
-                <a href="{{ route('reseller.audit.index') }}" class="inline-flex items-center gap-2 px-6 py-3.5 bg-black hover:bg-gray-800 text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-md">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
-                    </svg>
-                    Update Shelf Levels
-                </a>
-            </div>
         </div>
 
         <!-- Top Row (KPIs) -->
@@ -110,7 +96,7 @@
                     </div>
                 </div>
                 
-                <div class="flex-1 min-h-[300px] h-[300px]">
+                <div class="flex-1 min-h-[200px] h-[200px] md:h-[260px] md:min-h-[260px]">
                     <canvas id="stockDistributionChart"></canvas>
                 </div>
             </div>
@@ -276,7 +262,7 @@
                         }),
                         borderRadius: 8,
                         borderWidth: 0,
-                        barThickness: 24,
+                        barThickness: window.innerWidth < 768 ? 8 : (window.innerWidth < 1024 ? 16 : undefined),
                     }]
                 },
                 options: {

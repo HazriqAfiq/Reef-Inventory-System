@@ -22,7 +22,13 @@ class OrderController extends Controller
 
     public function create()
     {
-        $products = Product::active()->with('primaryImage')->get();
+        $products = Product::active()
+            ->with('primaryImage')
+            ->withSum('orderItems as total_sales', 'quantity')
+            ->orderByRaw('stock > 0 DESC')
+            ->orderByRaw('COALESCE(total_sales, 0) DESC')
+            ->orderBy('name', 'asc')
+            ->get();
         $totalMoq = (int) \App\Models\Setting::getValue('reseller_total_moq', 15);
         $productMoq = (int) \App\Models\Setting::getValue('reseller_product_moq', 5);
         

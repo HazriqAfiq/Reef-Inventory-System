@@ -33,6 +33,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
         Route::get('/', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('index');
         Route::get('/export', [\App\Http\Controllers\Admin\OrderController::class, 'export'])->name('export');
         Route::get('/{order}', [\App\Http\Controllers\Admin\OrderController::class, 'show'])->name('show');
+        Route::get('/{order}/invoice', [\App\Http\Controllers\Admin\OrderController::class, 'invoice'])->name('invoice');
         Route::patch('/{order}', [\App\Http\Controllers\Admin\OrderController::class, 'update'])->name('update');
     });
 
@@ -42,11 +43,14 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     
     Route::get('/activity-logs', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('activity-logs.index');
     Route::get('/reports', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/pdf', [\App\Http\Controllers\Admin\ReportController::class, 'exportPdf'])->name('reports.pdf');
 });
 
 Route::middleware(['auth', 'verified', 'role:reseller'])->prefix('reseller')->name('reseller.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Reseller\ResellerDashboardController::class, 'index'])->name('dashboard');
     Route::get('/audit', [\App\Http\Controllers\Reseller\ResellerDashboardController::class, 'auditPage'])->name('audit.index');
+    Route::get('/reports', [\App\Http\Controllers\Reseller\ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/pdf', [\App\Http\Controllers\Reseller\ReportController::class, 'exportPdf'])->name('reports.pdf');
     Route::post('/dashboard/goal', [\App\Http\Controllers\Reseller\ResellerDashboardController::class, 'updateGoal'])->name('dashboard.goal');
     Route::post('/dashboard/audit', [\App\Http\Controllers\Reseller\ResellerDashboardController::class, 'auditStock'])->name('dashboard.audit');
     Route::resource('orders', \App\Http\Controllers\Reseller\OrderController::class)->only(['index', 'show']);

@@ -15,11 +15,6 @@
         </div>
         
         <div class="flex items-center gap-3 shrink-0">
-            <div class="bg-white px-4 py-2 rounded-xl border border-gray-100 shadow-sm flex items-center gap-2 text-xs font-bold text-gray-600">
-                <svg class="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                <span>Partner Network</span>
-            </div>
-            
             <a href="{{ route('admin.orders.export') }}"
                class="inline-flex items-center gap-2 px-6 py-3.5 bg-black hover:bg-gray-800 text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-md shrink-0">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -31,24 +26,7 @@
     </div>
 
     <!-- Orders Table Container -->
-    <div x-data="{ 
-            loading: false,
-            async fetchOrders(url) {
-                this.loading = true;
-                try {
-                    const response = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-                    document.getElementById('table-container').innerHTML = await response.text();
-                    window.history.pushState({}, '', url);
-                } catch (error) { console.error(error); } finally { this.loading = false; }
-            }
-         }"
-         @click="if($event.target.closest('.pagination a')) { $event.preventDefault(); fetchOrders($event.target.closest('.pagination a').href); }"
-         class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden relative mb-12">
-        
-        <div x-show="loading" class="absolute inset-0 bg-white/60 backdrop-blur-[1px] z-50 flex items-center justify-center rounded-2xl">
-            <div class="w-8 h-8 border-2 border-gray-100 border-t-black rounded-full animate-spin"></div>
-        </div>
-
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden relative mb-12">
         <div class="px-8 py-4 border-b border-gray-50 bg-gray-50/20">
             <h2 class="text-[10px] font-bold text-gray-900 uppercase tracking-widest">Order Ledger</h2>
         </div>
@@ -58,4 +36,83 @@
         </div>
     </div>
 
+    <script>
+        function initOrdersLedger() {
+            const tableContainer = document.getElementById('table-container');
+
+            if (tableContainer) {
+                tableContainer.addEventListener('click', function(e) {
+                    const btnLoadMore = e.target.closest('#btn-admin-load-more');
+                    if (!btnLoadMore) return;
+
+                    const nextUrl = btnLoadMore.getAttribute('data-next-url');
+                    if (!nextUrl) return;
+
+                    btnLoadMore.disabled = true;
+                    btnLoadMore.classList.add('opacity-75');
+                    btnLoadMore.innerHTML = `
+                        <svg class="animate-spin h-3.5 w-3.5 text-current" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span>Syncing Ledger...</span>
+                    `;
+
+                    fetch(nextUrl, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        
+                        const tbody = document.getElementById('admin-orders-tbody');
+                        const newRows = doc.querySelectorAll('#admin-orders-tbody tr');
+                        newRows.forEach(row => {
+                            row.style.opacity = '0';
+                            row.style.transform = 'translateY(8px)';
+                            row.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
+                            tbody.appendChild(row);
+                            
+                            setTimeout(() => {
+                                row.style.opacity = '1';
+                                row.style.transform = 'translateY(0)';
+                            }, 50);
+                        });
+
+                        const wrapper = document.getElementById('admin-load-more-wrapper');
+                        const newBtn = doc.getElementById('btn-admin-load-more');
+                        if (newBtn) {
+                            const newUrl = newBtn.getAttribute('data-next-url');
+                            btnLoadMore.setAttribute('data-next-url', newUrl);
+                            btnLoadMore.disabled = false;
+                            btnLoadMore.classList.remove('opacity-75');
+                            btnLoadMore.innerHTML = `
+                                <span>Show More</span>
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 13l-7 7-7-7m14-6l-7 7-7-7"/>
+                                </svg>
+                            `;
+                        } else {
+                            if (wrapper) wrapper.remove();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading more orders:', error);
+                        btnLoadMore.disabled = false;
+                        btnLoadMore.classList.remove('opacity-75');
+                        btnLoadMore.innerHTML = `<span>Error - Retry</span>`;
+                    });
+                });
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initOrdersLedger);
+        } else {
+            initOrdersLedger();
+        }
+    </script>
 </x-app-layout>

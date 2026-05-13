@@ -101,8 +101,7 @@
         </div>
 
         <!-- Partners Table -->
-        <div @click="if($event.target.closest('.pagination a')) { $event.preventDefault(); fetchResellers($event.target.closest('.pagination a').href); }"
-             class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-12 relative">
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-12 relative">
             
             <div x-show="loading" class="absolute inset-0 bg-white/60 backdrop-blur-[1px] z-50 flex items-center justify-center rounded-2xl">
                 <div class="w-8 h-8 border-2 border-gray-100 border-t-black rounded-full animate-spin"></div>
@@ -117,6 +116,86 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function initResellersCatalog() {
+            const tableContainer = document.getElementById('table-container');
+
+            if (tableContainer) {
+                tableContainer.addEventListener('click', function(e) {
+                    const btnLoadMore = e.target.closest('#btn-admin-resellers-load-more');
+                    if (!btnLoadMore) return;
+
+                    const nextUrl = btnLoadMore.getAttribute('data-next-url');
+                    if (!nextUrl) return;
+
+                    btnLoadMore.disabled = true;
+                    btnLoadMore.classList.add('opacity-75');
+                    btnLoadMore.innerHTML = `
+                        <svg class="animate-spin h-3.5 w-3.5 text-current" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span>Syncing Partners...</span>
+                    `;
+
+                    fetch(nextUrl, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        
+                        const tbody = document.getElementById('admin-resellers-tbody');
+                        const newRows = doc.querySelectorAll('#admin-resellers-tbody tr');
+                        newRows.forEach(row => {
+                            row.style.opacity = '0';
+                            row.style.transform = 'translateY(8px)';
+                            row.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
+                            tbody.appendChild(row);
+                            
+                            setTimeout(() => {
+                                row.style.opacity = '1';
+                                row.style.transform = 'translateY(0)';
+                            }, 50);
+                        });
+
+                        const wrapper = document.getElementById('admin-resellers-load-more-wrapper');
+                        const newBtn = doc.getElementById('btn-admin-resellers-load-more');
+                        if (newBtn) {
+                            const newUrl = newBtn.getAttribute('data-next-url');
+                            btnLoadMore.setAttribute('data-next-url', newUrl);
+                            btnLoadMore.disabled = false;
+                            btnLoadMore.classList.remove('opacity-75');
+                            btnLoadMore.innerHTML = `
+                                <span>Show More</span>
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 13l-7 7-7-7m14-6l-7 7-7-7"/>
+                                </svg>
+                            `;
+                        } else {
+                            if (wrapper) wrapper.remove();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading more resellers:', error);
+                        btnLoadMore.disabled = false;
+                        btnLoadMore.classList.remove('opacity-75');
+                        btnLoadMore.innerHTML = `<span>Error - Retry</span>`;
+                    });
+                });
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initResellersCatalog);
+        } else {
+            initResellersCatalog();
+        }
+    </script>
 
     <!-- Delete Modal -->
     <div id="delete-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/40 backdrop-blur-[2px]">

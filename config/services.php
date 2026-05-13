@@ -41,7 +41,7 @@ return [
         'sender_postcode' => '40000',
         'sender_state'    => 'Selangor',
         'sender_city'     => 'Shah Alam',
-        'sender_name'     => 'Laman Store Warehouse',
+        'sender_name'     => 'Reef Store Warehouse',
         'sender_phone'    => '0123456789',
         'sender_address'  => 'No 1, Jalan Perindustrian 2, Kawasan Perindustrian',
     ],

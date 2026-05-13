@@ -8,20 +8,22 @@
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                         <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                     </span>
-                    <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">HQ Reports Live</span>
+                    <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">Reports Live</span>
                 </div>
                 <h1 class="text-3xl font-black text-gray-900 tracking-tight">Reports & Analytics</h1>
                 <p class="text-xs text-gray-400 mt-1">Deep-dive performance logs, product traction, and reseller engagement matrices.</p>
             </div>
             
             <div class="flex items-center gap-3 shrink-0">
-                <button onclick="window.print()" 
-                        class="inline-flex items-center gap-2 px-4 py-2.5 bg-black hover:bg-gray-800 text-white rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-md">
+                <a href="{{ route('admin.reports.pdf') }}" 
+                   data-no-spa
+                   download
+                   class="inline-flex items-center gap-2 px-5 py-3 bg-black hover:bg-gray-800 text-white rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-md">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                     </svg>
-                    <span>Export Report (PDF)</span>
-                </button>
+                    <span>Generate PDF Report</span>
+                </a>
             </div>
         </div>
 
@@ -29,7 +31,7 @@
         <div class="hidden print:block mb-8 border-b-2 border-black pb-6">
             <div class="flex justify-between items-start">
                 <div>
-                    <h1 class="text-2xl font-black uppercase tracking-tight text-gray-900">LAMAN STORE HQ</h1>
+                    <h1 class="text-2xl font-black uppercase tracking-tight text-gray-900">REEF STORE</h1>
                     <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Wholesale Inventory & Sales Report</p>
                     <p class="text-[10px] text-gray-400 mt-0.5">Generated: {{ now()->format('d M Y - H:i:s') }}</p>
                 </div>
@@ -182,7 +184,7 @@
                             <thead>
                                 <tr class="bg-gray-50/50 border-b border-gray-100">
                                     <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Perfume SKU / Name</th>
-                                    <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">HQ Stock Available</th>
+                                    <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Stock Available</th>
                                     <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Units Sold</th>
                                     <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Revenue Generated</th>
                                     <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Market Share</th>
@@ -358,7 +360,7 @@
                                             <span class="font-mono text-rose-500 font-black mr-2">{{ $item->sku }}</span> <span class="font-bold">{{ $item->name }}</span>
                                         </td>
                                         <td class="px-6 py-4 text-right">
-                                            <a href="{{ route('admin.products.index') }}" class="text-[10px] font-black uppercase tracking-wider text-black hover:opacity-75 transition-opacity px-2.5 py-1.5 bg-white border border-gray-150 rounded-lg shadow-sm">Replenish HQ Stock</a>
+                                            <a href="{{ route('admin.products.index') }}" class="text-[10px] font-black uppercase tracking-wider text-black hover:opacity-75 transition-opacity px-2.5 py-1.5 bg-white border border-gray-150 rounded-lg shadow-sm">Replenish Stock</a>
                                         </td>
                                     </tr>
                                 @empty
@@ -388,7 +390,7 @@
                             <thead>
                                 <tr class="bg-amber-50/50 border-b border-amber-100">
                                     <th class="px-6 py-4 text-[10px] font-black text-amber-500 uppercase tracking-widest">SKU / Product Profile</th>
-                                    <th class="px-6 py-4 text-[10px] font-black text-amber-500 uppercase tracking-widest text-center">Current HQ Stock</th>
+                                    <th class="px-6 py-4 text-[10px] font-black text-amber-500 uppercase tracking-widest text-center">Current Stock</th>
                                     <th class="px-6 py-4 text-[10px] font-black text-amber-500 uppercase tracking-widest text-right">Replenishment Status</th>
                                 </tr>
                             </thead>
